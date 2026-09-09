@@ -167,11 +167,27 @@ Full-dataset run (`Arnav_Optimizer_Clean_Dataset`: 30,000 tasks, 33,600 blocks,
 | Solver wall time | 868 s |
 
 The optimizer spends its capacity where it matters: 96% of the scheduled work is
-critical-risk (Neev score ≥ 80). Throughput is currently limited by
-`OptimizerConfig.max_daily_candidate_pool` (700) — 27,034 of the 28,402
-deferrals are `batch_limit_excluded_on_deadline`, meaning the task hit its
-deadline while outside the daily CP-SAT batch, not that the network lacked
-track or crew. Only 1,367 deferrals are genuine resource exhaustion.
+critical-risk (Neev score ≥ 80). Only 1,367 deferrals are genuine resource
+exhaustion (`team_capacity_exhausted`, `no_qualifying_team_shift`,
+`block_capacity_exhausted`); the other 27,034 are
+`batch_limit_excluded_on_deadline` — the task reached its deadline while
+outside the daily CP-SAT batch of `OptimizerConfig.max_daily_candidate_pool`
+(700).
+
+That knob is **not** free throughput, and raising it is counter-productive.
+Measured over an identical 3-day window (6,429 eligible tasks, 15 s solver
+limit per day):
+
+| `max_daily_candidate_pool` | Tasks scheduled | Wall time |
+| :--- | :--- | :--- |
+| 700 | 424 | 51 s |
+| 2,000 | 452 | 60 s |
+| 5,000 | **136** | 95 s |
+
+Past roughly 2,000 the per-day model grows faster than the solver can search
+it, so CP-SAT hits its time limit on a poor incumbent and *fewer* tasks get
+scheduled. Real headroom would come from a longer per-day solver budget or
+decomposing the day batch by corridor — not from widening the pool.
 
 > **Note on artifacts.** `optimization_metrics.json` must come from
 > `optimizer.main`. A targeted replan re-solves a single task and cannot report
