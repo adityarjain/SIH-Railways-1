@@ -111,17 +111,22 @@ class ClosedLoopController:
         replan_req_path = self.ritvik_config.replan_request_path
         validate_replan_request_file(replan_req_path)
 
-        # Step 5: Arnav re-optimizes maintenance plan using CP-SAT
+        # Step 5: Arnav re-optimizes maintenance plan using CP-SAT.
+        # Reads the baseline plan but writes the revised artifacts to a separate
+        # directory: the baseline is a fixture for the tests and demo events, and
+        # overwriting it in place silently invalidates every downstream scenario.
+        replan_out_dir = self.ritvik_config.replan_output_dir
         opt_res = replan_from_request(
             replan_request_path=replan_req_path,
             bundle=self.bundle,
             prep=self.prep,
             config=self.arnav_config,
             plan_json_path=self.ritvik_config.plan_json_path,
-            output_dir=self.ritvik_config.plan_json_path.parent,
+            output_dir=replan_out_dir,
         )
 
-        # Step 6: Ritvik re-loads and re-validates the updated maintenance plan
+        # Step 6: Ritvik re-loads and re-validates against the revised plan
+        self.ritvik_engine.config.plan_json_path = replan_out_dir / self.arnav_config.output_json
         self.ritvik_engine.initialize()
         replanned_maint = self.ritvik_engine.maintenance_plan[task_id]
 

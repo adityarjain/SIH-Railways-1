@@ -1208,22 +1208,22 @@
       "department": "Electrical / TRD",
       "corridor_id": "COR-001",
       "section_id": "SEC-0004",
-      "date": "2026-09-08",
-      "start_minute": 1080,
-      "end_minute": 1280,
+      "date": "2026-09-07",
+      "start_minute": 0,
+      "end_minute": 200,
       "duration_minutes": 200,
       "block_ids": [
-        "BLK-012046",
-        "BLK-012047"
+        "BLK-009637",
+        "BLK-009638"
       ],
       "assigned_teams": [
-        "TEAM-018"
+        "TEAM-013"
       ],
       "is_bundled": false,
       "bundled_with": [],
       "is_night": true,
       "risk_score": 81.0,
-      "priority_score": 1772.25
+      "priority_score": 1762.25
     }
   ]
 }

@@ -16,6 +16,10 @@ class RitvikConfig:
     output_decision_path: Path = Path("ritvik_operational_decision.json")
     replan_request_path: Path = Path("replan_request.json")
 
+    # Replanned artifacts are written here rather than over plan_json_path, so a
+    # closed-loop run never destroys the baseline plan its own fixtures depend on.
+    replan_output_dir: Path = Path("replan_output")
+
     # Operational capacity model
     default_section_capacity: int = 8
     section_capacities: Dict[str, int] = field(

@@ -126,7 +126,7 @@ def run_closed_loop_demo():
     print(f"  • New Blocks:       {', '.join(replanned.block_ids)}")
     print(f"  • Assigned Team:    {', '.join(replanned.assigned_teams)}")
     print(f"  • Night Window:     {'Yes' if replanned.is_night else 'No'}")
-    print(f"Artifact Updated:     optimized_block_plan.json (Synchronized to disk)")
+    print(f"Artifact Written:     {ritvik_cfg.replan_output_dir}/optimized_block_plan.json (baseline plan left intact)")
 
     # ==========================================================================
     # STEP 6: RITVIK RE-VALIDATION & FINAL APPROVAL FOR ADITYA

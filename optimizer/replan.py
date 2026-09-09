@@ -5,6 +5,7 @@ and re-optimizing affected maintenance tasks via Google OR-Tools CP-SAT.
 """
 
 import json
+import time
 from pathlib import Path
 from typing import Dict, List, Set, Tuple, Optional, Any
 from ortools.sat.python import cp_model
@@ -33,6 +34,8 @@ def replan_from_request(
     and uses CP-SAT to select the next optimal feasible placement for the task.
     Updates optimized_block_plan.json, optimized_block_plan.csv, and metrics.
     """
+    start_time = time.time()
+
     if config is None:
         config = OptimizerConfig()
 
@@ -177,7 +180,9 @@ def replan_from_request(
                 priority_score=compute_task_priority(t, config),
                 required_duration_minutes=t.required_duration_minutes,
                 required_team_size=t.required_team_size,
-                deferral_reason="no_candidate_window_within_horizon",
+                # A replan only re-solves the disrupted task; it has no visibility
+                # into why the base solve deferred the rest, so it must not invent one.
+                deferral_reason="deferred_in_base_plan",
             )
 
     conc_bundles = sum(1 for r in updated_scheduled.values() if r.sharing_type == "concurrent") // 2
@@ -186,7 +191,7 @@ def replan_from_request(
         scheduled_tasks=updated_scheduled,
         deferred_tasks=deferred_all,
         solver_status="FEASIBLE",
-        wall_time_seconds=0.5,
+        wall_time_seconds=time.time() - start_time,
         objective_value=solver.ObjectiveValue(),
         total_tasks_considered=len(bundle.tasks),
         total_scheduled=len(updated_scheduled),

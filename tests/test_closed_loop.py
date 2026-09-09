@@ -75,6 +75,7 @@ def test_closed_loop_full_cycle(tmp_path):
         plan_json_path=test_plan_path,
         output_decision_path=tmp_path / "ritvik_operational_decision.json",
         replan_request_path=tmp_path / "replan_request.json",
+        replan_output_dir=tmp_path / "replan_output",
     )
     # Saturate bypass corridors so rerouting is impossible
     ritvik_cfg.section_capacities["SEC-0005"] = 0
@@ -105,10 +106,20 @@ def test_closed_loop_full_cycle(tmp_path):
     assert result.final_decision.status == "PLAN_APPROVED"
     assert result.final_decision.maintenance_plan_valid is True
 
-    # Check updated plan on disk
-    with open(test_plan_path, "r", encoding="utf-8") as f:
+    # The revised plan is written as a new artifact and avoids the blocked track
+    replanned_path = ritvik_cfg.replan_output_dir / arnav_cfg.output_json
+    with open(replanned_path, "r", encoding="utf-8") as f:
         updated_data = json.load(f)
 
     updated_task = next(t for t in updated_data["scheduled_tasks"] if t["task_id"] == "TASK-000005")
     assert "BLK-009637" not in updated_task["block_ids"]
     assert "BLK-009638" not in updated_task["block_ids"]
+
+    # The baseline plan must survive the cycle untouched: it is the fixture the
+    # demo events and every other scenario test are pinned to.
+    with open(test_plan_path, "r", encoding="utf-8") as f:
+        baseline_task = next(
+            t for t in json.load(f)["scheduled_tasks"] if t["task_id"] == "TASK-000005"
+        )
+    assert baseline_task["block_ids"] == ["BLK-009637", "BLK-009638"]
+    assert baseline_task["date"] == "2026-09-07"
