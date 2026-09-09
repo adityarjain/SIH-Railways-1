@@ -151,7 +151,36 @@ PYTHONPATH=. .venv/bin/python -m optimizer.main --data-dir Arnav_Optimizer_Clean
 
 ---
 
-## 5. Downstream Integration Boundary
+## 5. Measured Performance
+
+Full-dataset run (`Arnav_Optimizer_Clean_Dataset`: 30,000 tasks, 33,600 blocks,
+14-day horizon), reproduced with the command in §4:
+
+| Metric | Value |
+| :--- | :--- |
+| Tasks scheduled | **1,598 / 30,000 (5.3%)** |
+| Critical-risk tasks scheduled | **1,542** (29.6% of all critical-risk demand) |
+| Independent post-solve validation | **PASS — 22/22 checks** |
+| Block possessions utilised | 2,248 |
+| Maintenance teams utilised | 39 / 39 |
+| Concurrent bundles | 42 pairs |
+| Solver wall time | 868 s |
+
+The optimizer spends its capacity where it matters: 96% of the scheduled work is
+critical-risk (Neev score ≥ 80). Throughput is currently limited by
+`OptimizerConfig.max_daily_candidate_pool` (700) — 27,034 of the 28,402
+deferrals are `batch_limit_excluded_on_deadline`, meaning the task hit its
+deadline while outside the daily CP-SAT batch, not that the network lacked
+track or crew. Only 1,367 deferrals are genuine resource exhaustion.
+
+> **Note on artifacts.** `optimization_metrics.json` must come from
+> `optimizer.main`. A targeted replan re-solves a single task and cannot report
+> base-solve deferral reasons, so its metrics are not a substitute. Replanning
+> writes to `replan_output/` and never overwrites the baseline plan.
+
+---
+
+## 6. Downstream Integration Boundary
 
 - **Ritvik (Dynamic Operations & Replanning Engine):**
   - Consumes `optimized_block_plan.json` from Arnav.
@@ -161,7 +190,7 @@ PYTHONPATH=. .venv/bin/python -m optimizer.main --data-dir Arnav_Optimizer_Clean
   - Generates `ritvik_operational_decision.json` for Aditya (`PLAN_APPROVED` or `OPERATIONAL_UPDATE`).
   - Generates `replan_request.json` back to Arnav when disruptions cannot be resolved operationally.
 
-- **Aditya (Backend & REST API):**
+- **Aditya (Backend & REST API) — not yet implemented:**
   Can expose endpoints:
   - `POST /optimize`: calls Arnav's optimizer and returns `optimized_block_plan.json`
   - `POST /ritvik/evaluate`: calls Ritvik's operations engine and returns `ritvik_operational_decision.json`
