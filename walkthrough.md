@@ -37,9 +37,11 @@ The frontend for the **AI-Powered Automatic Block Planning to Maximize Asset Ava
 - **Styling**: Tailwind CSS with enterprise railway control room design tokens
 - **Data Visualizations**: Recharts
 - **Iconography**: Lucide React (`lucide-react`)
-- **Location**: `/Users/arnav/Desktop/SIH/frontend`
-- **Build Status**: Production bundle compiled in **265ms** (`npm run build` $\rightarrow$ 0 errors)
-- **Local Dev Server**: Active on `http://localhost:5173/`
+- **Location**: `frontend/` (repository root)
+- **Build Status**: `npm run build` $\rightarrow$ 0 errors; `npm run lint` $\rightarrow$ 0 errors
+- **Local Dev Server**: `npm run dev` on `http://localhost:5173/`
+- **Navigation**: role-scoped tab state in `src/App.jsx`; tab ids come from
+  `NAV_ITEMS_BY_ROLE` in `src/components/layout/Sidebar.jsx` (no router)
 
 ---
 
@@ -56,7 +58,7 @@ The frontend for the **AI-Powered Automatic Block Planning to Maximize Asset Ava
 
 ### 2. Operations Control Center (Role 1)
 - **Overview**:
-  - 6 Key Performance Indicators (Critical Maintenance: 14 scheduled, Pending Demand: 29,947, Planned Blocks: 78, Active Conflicts: 0, Teams: 27/39, Network Availability: 94.2%).
+  - 6 Key Performance Indicators, read from `optimization_metrics.json` (Critical Maintenance: 1,542 scheduled, Pending Demand: 28,402, Planned Blocks: 2,248, Active Conflicts: 0, Teams: 39/39, Network Availability: 94.2%).
   - Interactive Railway Network Corridor Map with section status badges, track electrification, speed limits, and active possession pins.
   - Upcoming Maintenance Windows chronological list.
 - **Maintenance Demand**:

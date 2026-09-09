@@ -12,7 +12,7 @@ export const AppLayout = ({ activeTab, onTabChange, children }) => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         <Header />
-        <DemoGuideBar onNavigate={(page, role) => onTabChange(page)} />
+        <DemoGuideBar onNavigate={onTabChange} />
         <main className="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6">
           {children}
         </main>

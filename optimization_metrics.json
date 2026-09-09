@@ -1,33 +1,44 @@
 {
   "summary": {
     "total_tasks_considered": 30000,
-    "total_scheduled": 53,
-    "total_deferred": 29947,
-    "scheduled_percentage": 0.18,
+    "total_scheduled": 1598,
+    "total_deferred": 28402,
+    "scheduled_percentage": 5.33,
     "solver_status": "FEASIBLE",
-    "runtime_seconds": 0.5,
-    "objective_value": 167275.0
+    "runtime_seconds": 867.82,
+    "objective_value": -3484466250.0
   },
   "risk_breakdown": {
-    "critical_risk_scheduled": 14,
-    "critical_risk_deferred": 5200,
-    "critical_scheduled_rate": 0.27,
-    "high_risk_scheduled": 4,
-    "high_risk_deferred": 3187,
-    "moderate_risk_scheduled": 13,
-    "low_risk_scheduled": 22
+    "critical_risk_scheduled": 1542,
+    "critical_risk_deferred": 3672,
+    "critical_scheduled_rate": 29.57,
+    "high_risk_scheduled": 49,
+    "high_risk_deferred": 3142,
+    "moderate_risk_scheduled": 7,
+    "low_risk_scheduled": 0
   },
   "operational_metrics": {
-    "unique_blocks_utilized": 78,
-    "bundled_tasks_count": 4,
-    "concurrent_bundles_count": 2,
+    "unique_blocks_utilized": 2248,
+    "bundled_tasks_count": 85,
+    "concurrent_bundles_count": 42,
     "serial_shared_possessions_count": 0,
-    "total_batch_excluded_instances": 0,
-    "night_maintenance_tasks": 44,
-    "teams_utilized": 27,
-    "total_team_maintenance_hours": 113.3
+    "total_batch_excluded_instances": 130329,
+    "night_maintenance_tasks": 860,
+    "teams_utilized": 39,
+    "total_team_maintenance_hours": 3224.6
   },
   "deferral_reasons": {
-    "no_candidate_window_within_horizon": 29947
+    "batch_limit_excluded_on_deadline": 27034,
+    "team_capacity_exhausted": 1288,
+    "no_qualifying_team_shift": 75,
+    "block_capacity_exhausted": 4,
+    "solver_objective_outranked": 1
+  },
+  "provenance": {
+    "source": "optimizer.main full-dataset run",
+    "command": "python -m optimizer.main --data-dir Arnav_Optimizer_Clean_Dataset --output-dir .",
+    "dataset": "Arnav_Optimizer_Clean_Dataset (30,000 tasks / 33,600 blocks / 14-day horizon)",
+    "post_solve_validation": "PASS (22/22 checks)",
+    "note": "Measured optimizer output. Do not overwrite with replan artifacts; a targeted replan re-solves one task and cannot report base-solve deferral reasons."
   }
 }

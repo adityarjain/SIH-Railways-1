@@ -1,155 +1,98 @@
-import React, { useState, useEffect } from 'react';
-import { StoryNav } from './components/presentation/StoryNav';
-import { ScreenPortal } from './components/presentation/ScreenPortal';
-import { ScreenOperationsHome } from './components/presentation/ScreenOperationsHome';
-import { ScreenTasksList } from './components/presentation/ScreenTasksList';
-import { ScreenTaskDetails } from './components/presentation/ScreenTaskDetails';
-import { ScreenArnavPlan } from './components/presentation/ScreenArnavPlan';
-import { ScreenLiveOps } from './components/presentation/ScreenLiveOps';
-import { ScreenReplanningRequests } from './components/presentation/ScreenReplanningRequests';
-import { ScreenReplanning } from './components/presentation/ScreenReplanning';
-import { ScreenMaintenancePortal } from './components/presentation/ScreenMaintenancePortal';
-import { ScreenVerification } from './components/presentation/ScreenVerification';
+import React, { useState } from 'react';
 
-export default function App() {
-  // Screen state machine
-  const [currentScreen, setCurrentScreen] = useState('portal');
-  const [selectedTaskId, setSelectedTaskId] = useState('TASK-000005');
-  const [selectedEventId, setSelectedEventId] = useState('EVENT-001');
+import { AuthProvider, useAuth, ROLES } from './context/AuthContext';
+import { PlanContext_Provider } from './context/PlanContext';
+import { DemoGuideProvider } from './context/DemoGuideContext';
 
-  // Shared Maintenance Requirements state (defined by Maintenance, passed to Arnav)
-  const [maintenanceReqs, setMaintenanceReqs] = useState({
-    duration: 200,
-    personnel: 5,
-    canCollaborate: true,
-    compatibleDept: 'Track / Civil',
-    canBundle: true,
-  });
+import { AppLayout } from './components/layout/AppLayout';
+import { NAV_ITEMS_BY_ROLE } from './components/layout/Sidebar';
+import { Login } from './pages/Login';
 
-  // Global Theme state (default dark per Vision Pro / Apple macOS black monochrome glass direction)
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('sih_theme') || 'dark';
-  });
+import { Overview } from './pages/occ/Overview';
+import { Demand } from './pages/occ/Demand';
+import { BlockPlanning } from './pages/occ/BlockPlanning';
+import { LiveOps } from './pages/occ/LiveOps';
+import { Replanning } from './pages/occ/Replanning';
+import { Network } from './pages/occ/Network';
+import { Analytics } from './pages/occ/Analytics';
+import { Simulator } from './pages/occ/Simulator';
 
-  useEffect(() => {
-    localStorage.setItem('sih_theme', theme);
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+import { MaintDashboard } from './pages/maintenance/MaintDashboard';
+import { MyTasks } from './pages/maintenance/MyTasks';
+import { AssetHealth } from './pages/maintenance/AssetHealth';
+import { TeamAvailability } from './pages/maintenance/TeamAvailability';
+import { CompletedWork } from './pages/maintenance/CompletedWork';
+
+import { GeneralPortal } from './pages/general/GeneralPortal';
+
+// Tab ids are the ones the Sidebar emits; keep them in sync with Sidebar.jsx.
+const PAGES = {
+  overview: Overview,
+  demand: Demand,
+  'block-planning': BlockPlanning,
+  'live-ops': LiveOps,
+  replanning: Replanning,
+  network: Network,
+  analytics: Analytics,
+  simulator: Simulator,
+
+  'maint-dashboard': MaintDashboard,
+  'my-tasks': MyTasks,
+  'asset-health': AssetHealth,
+  teams: TeamAvailability,
+  completed: CompletedWork,
+
+  'general-verify': GeneralPortal,
+};
+
+// A role's first nav item is its landing page.
+const landingTab = (role) => (NAV_ITEMS_BY_ROLE[role] || NAV_ITEMS_BY_ROLE[ROLES.OCC])[0].id;
+
+const roleCanReach = (role, tab) =>
+  (NAV_ITEMS_BY_ROLE[role] || []).some((item) => item.id === tab);
+
+function AppShell() {
+  const { currentUser, login } = useAuth();
+  const [activeTab, setActiveTab] = useState(landingTab(ROLES.OCC));
+
+  if (!currentUser) {
+    return <Login onLoginSuccess={(role) => setActiveTab(landingTab(role))} />;
+  }
+
+  // The demo guide walks across roles (step 14 hands off to the maintenance
+  // crew), so a navigation request carries the role its page belongs to.
+  const handleNavigate = (page, role) => {
+    if (role && role !== currentUser.role) {
+      login(role);
     }
-  }, [theme]);
-
-  const handleToggleTheme = () => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+    if (page) {
+      setActiveTab(page);
+    }
   };
 
-  const handleSelectPortal = (portalType) => {
-    if (portalType === 'maintenance') setCurrentScreen('tasks_list');
-    else if (portalType === 'operations') setCurrentScreen('operations_home');
-    else if (portalType === 'verification') setCurrentScreen('verification');
-  };
-
-  const handleSelectTask = (taskId) => {
-    setSelectedTaskId(taskId);
-    setCurrentScreen('task_details');
-  };
-
-  const handleSelectEvent = (eventId) => {
-    setSelectedEventId(eventId);
-    setCurrentScreen('replanning_detail');
-  };
-
-  const handleSaveRequirements = (newReqs) => {
-    setMaintenanceReqs(newReqs);
-  };
-
-  const handleReset = () => {
-    setCurrentScreen('portal');
-    setSelectedTaskId('TASK-000005');
-    setSelectedEventId('EVENT-001');
-  };
+  // The header's role switcher calls login() directly, so the tab can be left
+  // pointing at a page the new role has no nav entry for. Resolve against the
+  // role rather than trusting activeTab, which covers every switch path.
+  const tab = roleCanReach(currentUser.role, activeTab)
+    ? activeTab
+    : landingTab(currentUser.role);
+  const Page = PAGES[tab] || Overview;
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] dark:bg-[#08080a] text-neutral-900 dark:text-neutral-100 flex flex-col font-sans antialiased transition-colors selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-black">
-      {/* Apple-style Monochrome Glass Header */}
-      <StoryNav
-        currentScreen={currentScreen}
-        onNavigate={setCurrentScreen}
-        onReset={handleReset}
-        theme={theme}
-        onToggleTheme={handleToggleTheme}
-      />
+    <AppLayout activeTab={tab} onTabChange={handleNavigate}>
+      <Page onNavigate={handleNavigate} />
+    </AppLayout>
+  );
+}
 
-      {/* Main Screen Container */}
-      <main className="flex-1 pb-16">
-        {currentScreen === 'portal' && (
-          <ScreenPortal onSelectPortal={handleSelectPortal} />
-        )}
-
-        {currentScreen === 'tasks_list' && (
-          <ScreenTasksList
-            onNavigate={setCurrentScreen}
-            onSelectTask={handleSelectTask}
-          />
-        )}
-
-        {currentScreen === 'task_details' && (
-          <ScreenTaskDetails
-            taskId={selectedTaskId}
-            onNavigate={setCurrentScreen}
-            onSaveRequirements={handleSaveRequirements}
-          />
-        )}
-
-        {currentScreen === 'arnav_plan' && (
-          <ScreenArnavPlan
-            taskId={selectedTaskId}
-            maintenanceReqs={maintenanceReqs}
-            onNavigate={setCurrentScreen}
-          />
-        )}
-
-        {currentScreen === 'operations_home' && (
-          <ScreenOperationsHome onNavigate={setCurrentScreen} />
-        )}
-
-        {currentScreen === 'live_ops' && (
-          <ScreenLiveOps onNavigate={setCurrentScreen} />
-        )}
-
-        {currentScreen === 'replanning_requests' && (
-          <ScreenReplanningRequests
-            onNavigate={setCurrentScreen}
-            onSelectEvent={handleSelectEvent}
-          />
-        )}
-
-        {currentScreen === 'replanning_detail' && (
-          <ScreenReplanning onNavigate={setCurrentScreen} />
-        )}
-
-        {currentScreen === 'maintenance_portal' && (
-          <ScreenMaintenancePortal
-            onNavigate={setCurrentScreen}
-            onSelectTask={handleSelectTask}
-          />
-        )}
-
-        {currentScreen === 'verification' && (
-          <ScreenVerification onNavigate={setCurrentScreen} />
-        )}
-      </main>
-
-      {/* Calm Monochrome Footer */}
-      <footer className="border-t border-black/[0.06] dark:border-white/[0.08] bg-[#f8f9fa]/80 dark:bg-[#08080a]/80 py-4 text-center text-xs text-neutral-500 dark:text-neutral-500 transition-colors">
-        <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>Indian Railways • Maintenance Optimization Prototype</span>
-          <span className="font-mono text-[11px] text-neutral-400">
-            Maintenance Requirements → Block Optimization → Live Operations → Replanning → Verification
-          </span>
-        </div>
-      </footer>
-    </div>
+export default function App() {
+  return (
+    <AuthProvider>
+      <PlanContext_Provider>
+        <DemoGuideProvider>
+          <AppShell />
+        </DemoGuideProvider>
+      </PlanContext_Provider>
+    </AuthProvider>
   );
 }

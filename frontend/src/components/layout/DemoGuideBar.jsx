@@ -1,25 +1,26 @@
 import React from 'react';
-import { useDemoGuide } from '../../context/DemoGuideContext';
+import { useDemoGuide, DEMO_STEPS } from '../../context/DemoGuideContext';
 import { ChevronLeft, ChevronRight, X, Info } from 'lucide-react';
 
 export const DemoGuideBar = ({ onNavigate }) => {
-  const { isGuideActive, toggleGuide, currentStepIndex, currentStep, nextStep, prevStep, totalSteps } = useDemoGuide();
+  const { isGuideActive, toggleGuide, currentStepIndex, currentStep, setStep, totalSteps } = useDemoGuide();
 
   if (!isGuideActive) return null;
 
-  const handleNext = () => {
-    nextStep();
-    if (onNavigate && currentStep) {
-      onNavigate(currentStep.page, currentStep.role);
+  // Navigate to the step being moved TO. Reading `currentStep` after calling
+  // nextStep() sees the pre-update value, which left every step showing the
+  // previous step's page and skipped the role handoff on step 14.
+  const goToStep = (index) => {
+    const target = DEMO_STEPS[index];
+    if (!target) return;
+    setStep(index);
+    if (onNavigate) {
+      onNavigate(target.page, target.role);
     }
   };
 
-  const handlePrev = () => {
-    prevStep();
-    if (onNavigate && currentStep) {
-      onNavigate(currentStep.page, currentStep.role);
-    }
-  };
+  const handleNext = () => goToStep(currentStepIndex + 1);
+  const handlePrev = () => goToStep(currentStepIndex - 1);
 
   return (
     <div className="bg-slate-900 text-white px-6 py-2.5 flex items-center justify-between border-b border-slate-800 shadow-md sticky top-14 z-25">

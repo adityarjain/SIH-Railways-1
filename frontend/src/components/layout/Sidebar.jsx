@@ -18,11 +18,11 @@ import {
   Layers,
 } from 'lucide-react';
 
-export const Sidebar = ({ activeTab, onTabChange }) => {
-  const { currentUser, selectedDept, setSelectedDept, DEPARTMENTS, logout } = useAuth();
-  const role = currentUser?.role || ROLES.OCC;
-
-  const occNavItems = [
+// Single source of truth for which tabs each role can reach. App.jsx uses this
+// to keep the mounted page and the sidebar from drifting apart when the role
+// changes (header switcher, demo guide, or login all land here).
+export const NAV_ITEMS_BY_ROLE = {
+  [ROLES.OCC]: [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
     { id: 'demand', label: 'Maintenance Demand', icon: ClipboardList },
     { id: 'block-planning', label: 'Automatic Block Planning', icon: CalendarDays, highlight: true },
@@ -31,26 +31,24 @@ export const Sidebar = ({ activeTab, onTabChange }) => {
     { id: 'network', label: 'Network', icon: GitFork },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
     { id: 'simulator', label: 'Event Simulator', icon: PlayCircle },
-  ];
-
-  const maintNavItems = [
+  ],
+  [ROLES.MAINTENANCE]: [
     { id: 'maint-dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'my-tasks', label: 'My Tasks', icon: Wrench, highlight: true },
     { id: 'asset-health', label: 'Asset Health (Neev)', icon: HeartPulse },
     { id: 'teams', label: 'Team Availability', icon: Users },
     { id: 'completed', label: 'Completed Work', icon: CheckCircle2 },
-  ];
-
-  const generalNavItems = [
+  ],
+  [ROLES.GENERAL]: [
     { id: 'general-verify', label: 'Completed Work', icon: CheckCircle2, highlight: true },
-  ];
+  ],
+};
 
-  const navItems =
-    role === ROLES.OCC
-      ? occNavItems
-      : role === ROLES.MAINTENANCE
-      ? maintNavItems
-      : generalNavItems;
+export const Sidebar = ({ activeTab, onTabChange }) => {
+  const { currentUser, selectedDept, setSelectedDept, DEPARTMENTS, logout } = useAuth();
+  const role = currentUser?.role || ROLES.OCC;
+
+  const navItems = NAV_ITEMS_BY_ROLE[role] || NAV_ITEMS_BY_ROLE[ROLES.OCC];
 
   return (
     <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col h-screen sticky top-0 shrink-0 select-none border-r border-slate-800">
