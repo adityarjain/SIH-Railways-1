@@ -1,44 +1,47 @@
 {
   "summary": {
-    "total_tasks_considered": 30000,
-    "total_scheduled": 1598,
-    "total_deferred": 28402,
-    "scheduled_percentage": 5.33,
+    "total_tasks_considered": 62,
+    "total_scheduled": 53,
+    "total_deferred": 9,
+    "scheduled_percentage": 85.48,
     "solver_status": "FEASIBLE",
-    "runtime_seconds": 867.82,
-    "objective_value": -3484466250.0
+    "runtime_seconds": 2.18,
+    "objective_value": 4286887.0
   },
   "risk_breakdown": {
-    "critical_risk_scheduled": 1542,
-    "critical_risk_deferred": 3672,
-    "critical_scheduled_rate": 29.57,
-    "high_risk_scheduled": 49,
-    "high_risk_deferred": 3142,
-    "moderate_risk_scheduled": 7,
-    "low_risk_scheduled": 0
+    "critical_risk_scheduled": 14,
+    "critical_risk_deferred": 1,
+    "critical_scheduled_rate": 93.33,
+    "high_risk_scheduled": 4,
+    "high_risk_deferred": 0,
+    "moderate_risk_scheduled": 13,
+    "low_risk_scheduled": 22
   },
   "operational_metrics": {
-    "unique_blocks_utilized": 2248,
-    "bundled_tasks_count": 85,
-    "concurrent_bundles_count": 42,
+    "unique_blocks_utilized": 78,
+    "bundled_tasks_count": 4,
+    "concurrent_bundles_count": 2,
     "serial_shared_possessions_count": 0,
-    "total_batch_excluded_instances": 130329,
-    "night_maintenance_tasks": 860,
-    "teams_utilized": 39,
-    "total_team_maintenance_hours": 3224.6
+    "total_batch_excluded_instances": 0,
+    "night_maintenance_tasks": 44,
+    "teams_utilized": 27,
+    "total_team_maintenance_hours": 113.3
   },
   "deferral_reasons": {
-    "batch_limit_excluded_on_deadline": 27034,
-    "team_capacity_exhausted": 1288,
-    "no_qualifying_team_shift": 75,
-    "block_capacity_exhausted": 4,
-    "solver_objective_outranked": 1
+    "not_in_demo_subset": 29938,
+    "no_qualifying_team_shift": 5,
+    "solver_objective_outranked": 4
   },
   "provenance": {
-    "source": "optimizer.main full-dataset run",
-    "command": "python -m optimizer.main --data-dir Arnav_Optimizer_Clean_Dataset --output-dir .",
-    "dataset": "Arnav_Optimizer_Clean_Dataset (30,000 tasks / 33,600 blocks / 14-day horizon)",
-    "post_solve_validation": "PASS (22/22 checks)",
-    "note": "Measured optimizer output. Do not overwrite with replan artifacts; a targeted replan re-solves one task and cannot report base-solve deferral reasons."
+    "scope": "DEMO_SCENARIO_SUBSET",
+    "description": "Scenario subset solved by demo.py: the 2026-09-03 day batch plus all SEC-0073 tasks on that date (to exercise cross-department bundling), plus TASK-000005 on 2026-09-07. This is the plan the guided demo, the Ritvik scenarios and the frontend render.",
+    "command": "PYTHONPATH=. python demo.py",
+    "dataset": "Arnav_Optimizer_Clean_Dataset",
+    "subset_tasks_considered": 62,
+    "full_dataset_tasks": 30000,
+    "not_evaluated_here": "Tasks outside the subset appear in deferred_tasks.csv as 'not_in_demo_subset' so the inventory check stays complete; they are not solver deferrals.",
+    "full_run_baseline": "benchmarks/full_run_metrics.json",
+    "post_solve_validation": "PASS",
+    "runtime_note": "Wall time is machine-dependent."
   }
 }

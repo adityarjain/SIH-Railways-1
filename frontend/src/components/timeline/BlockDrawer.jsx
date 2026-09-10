@@ -31,7 +31,7 @@ export const BlockDrawer = ({ task, isOpen, onClose, onOpenWhyArnav }) => {
               OR-Tools CP-SAT Decision Trace
             </span>
           </div>
-          <Badge variant="LOW" size="sm">Mathematically Proven</Badge>
+          <Badge variant="LOW" size="sm">Constraint-checked</Badge>
         </div>
         <p className="text-xs text-slate-300 mt-1">
           Explore the 5-step constraint pruning and optimization trace that selected this specific block window.
@@ -100,7 +100,7 @@ export const BlockDrawer = ({ task, isOpen, onClose, onOpenWhyArnav }) => {
             variant={task.risk_score >= 80 ? 'CRITICAL' : task.risk_score >= 60 ? 'HIGH' : 'MODERATE'}
             size="md"
           >
-            Neev Risk: {task.risk_score ? task.risk_score.toFixed(1) : '81.0'}%
+            Neev Risk: {task.risk_score != null ? `${task.risk_score.toFixed(1)}%` : '\u2014'}
           </Badge>
         </div>
 
@@ -112,7 +112,7 @@ export const BlockDrawer = ({ task, isOpen, onClose, onOpenWhyArnav }) => {
           <div>
             <span className="text-slate-500 block text-[11px]">Optimizer Priority Score</span>
             <span className="font-mono font-bold text-slate-800">
-              {task.priority_score ? task.priority_score.toFixed(1) : '1,762.2'}
+              {task.priority_score != null ? task.priority_score.toFixed(1) : '\u2014'}
             </span>
           </div>
           <div>
@@ -123,7 +123,7 @@ export const BlockDrawer = ({ task, isOpen, onClose, onOpenWhyArnav }) => {
           </div>
           <div>
             <span className="text-slate-500 block text-[11px]">Operational Status</span>
-            <Badge variant="Scheduled" size="sm">Scheduled & Feasible</Badge>
+            <Badge variant="Scheduled" size="sm">Scheduled</Badge>
           </div>
         </div>
       </div>
@@ -142,7 +142,7 @@ export const BlockDrawer = ({ task, isOpen, onClose, onOpenWhyArnav }) => {
             </span>
             <p className="text-[11px] text-slate-500 mt-0.5">{task.department} Specialist Team</p>
           </div>
-          <Badge variant="success" size="sm">Crew Shift Covers Window</Badge>
+          <Badge variant="success" size="sm">Assigned crew</Badge>
         </div>
       </div>
 

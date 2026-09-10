@@ -1,8 +1,24 @@
 import React, { createContext, useContext, useState, useMemo } from 'react';
 import initialPlanJson from '../data/optimized_block_plan.json';
+// Two distinct optimizer runs, deliberately kept separate. `metrics` describes
+// the scenario subset this UI actually renders; `baselineMetrics` describes the
+// full 30,000-task run. Mixing them is what previously produced contradictory
+// KPI figures, so each screen must state which one it is showing.
 import metricsJson from '../data/optimization_metrics.json';
+import fullRunMetricsJson from '../data/full_run_metrics.json';
 import initialTasks from '../data/tasks_inventory.json';
-import { INITIAL_PLAN_TASK_5, REPLANNED_PLAN_TASK_5, SIMULATION_EVENTS } from '../data/simulationData';
+import completedWorkJson from '../data/completed_work.json';
+// Ritvik's actual outputs. These are produced by demo_closed_loop.py and were
+// previously shipped but never read, so the operational screens retyped their
+// contents as prose. Every conflict, route rejection and delay figure the UI
+// shows must come from here.
+import operationalDecisionJson from '../data/ritvik_operational_decision.json';
+import replanRequestJson from '../data/replan_request.json';
+import demoEventsJson from '../data/ritvik_demo_events.json';
+// Both operational scenarios, each produced by an actual Ritvik engine run
+// (scripts/generate_ritvik_scenarios.py).
+import ritvikScenariosJson from '../data/ritvik_scenarios.json';
+import { SIMULATION_EVENTS } from '../data/simulationData';
 
 const PlanContext = createContext();
 
@@ -24,15 +40,19 @@ export const PlanContext_Provider = ({ children }) => {
   // Replan request state
   const [replanRequestActive, setReplanRequestActive] = useState(false);
 
+  // Controller decisions on optimizer recommendations, keyed by task id.
+  const [planDecisions, setPlanDecisions] = useState({});
+
   // Derive scheduled tasks based on isReplanned state
+  // The replanned record is the optimizer's actual output, captured by
+  // scripts/generate_ritvik_scenarios.py -- not a hand-written stand-in.
+  const replannedRecord = ritvikScenariosJson.replanned_record;
+
   const scheduledTasks = useMemo(() => {
-    return initialPlanJson.scheduled_tasks.map((task) => {
-      if (task.task_id === 'TASK-000005') {
-        return isReplanned ? REPLANNED_PLAN_TASK_5 : INITIAL_PLAN_TASK_5;
-      }
-      return task;
-    });
-  }, [isReplanned]);
+    return initialPlanJson.scheduled_tasks.map((task) =>
+      task.task_id === replannedRecord.task_id && isReplanned ? replannedRecord : task
+    );
+  }, [isReplanned, replannedRecord]);
 
   // Derive all tasks inventory with live status overrides
   const tasksInventory = useMemo(() => {
@@ -41,16 +61,28 @@ export const PlanContext_Provider = ({ children }) => {
       if (taskStatusOverrides[t.task_id]) {
         currentStatus = taskStatusOverrides[t.task_id].status;
       }
-      if (t.task_id === 'TASK-000005' && isReplanned) {
+      const isReplannedTask = t.task_id === replannedRecord.task_id && isReplanned;
+      if (isReplannedTask) {
         currentStatus = 'Replanned';
       }
       return {
         ...t,
+        // Replanning moves the window, blocks and crew; the maintenance portal
+        // must show the new ones rather than the original with a new label.
+        ...(isReplannedTask
+          ? {
+              scheduled_date: replannedRecord.date,
+              start_minute: replannedRecord.start_minute,
+              end_minute: replannedRecord.end_minute,
+              block_ids: replannedRecord.block_ids,
+              assigned_teams: replannedRecord.assigned_teams,
+            }
+          : {}),
         status: currentStatus,
         statusMeta: taskStatusOverrides[t.task_id] || null,
       };
     });
-  }, [isReplanned, taskStatusOverrides]);
+  }, [isReplanned, taskStatusOverrides, replannedRecord]);
 
   // Actions
   const toggleReplan = (state) => {
@@ -93,6 +125,42 @@ export const PlanContext_Provider = ({ children }) => {
     }));
   };
 
+  // --- OCC recommendation workflow -------------------------------------------
+  // The controller accepts, amends or rejects the optimizer's recommendation.
+  // Session state only, like the verification flow: nothing is written to an
+  // external system, and the UI says so.
+  const recordDecision = (taskId, decision, note = '') => {
+    setPlanDecisions((prev) => ({
+      ...prev,
+      [taskId]: {
+        decision,
+        note,
+        decidedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      },
+    }));
+  };
+
+  const approveRecommendation = (taskId, note = '') => recordDecision(taskId, 'APPROVED', note);
+  const rejectRecommendation = (taskId, note = '') => {
+    recordDecision(taskId, 'REJECTED', note);
+    // A rejected possession is no longer an accepted plan; surface it as needing
+    // re-optimization rather than silently leaving it approved.
+    setReplanRequestActive(true);
+  };
+  const modifyRecommendation = (taskId, note = '') => recordDecision(taskId, 'MODIFIED', note);
+
+  /**
+   * Re-optimize. This does not run CP-SAT in the browser -- the solver is Python.
+   * It applies the replan that `demo_closed_loop.py` actually produced, which is
+   * committed as ritvik_operational_decision.json / replan_request.json, so the
+   * resulting schedule is the optimizer's real output rather than a mock.
+   */
+  const reoptimize = (taskId = 'TASK-000005') => {
+    setIsReplanned(true);
+    setReplanRequestActive(false);
+    recordDecision(taskId, 'RE_OPTIMIZED', 'Applied replan produced by optimizer.replan (replan_output/)');
+  };
+
   const submitVerification = (taskId, action, comments = '') => {
     setVerifications((prev) => ({
       ...prev,
@@ -117,9 +185,26 @@ export const PlanContext_Provider = ({ children }) => {
         scheduledTasks,
         tasksInventory,
         metrics: metricsJson,
+        baselineMetrics: fullRunMetricsJson,
+        completedWork: completedWorkJson,
+        // Ritvik pipeline outputs, read rather than retyped
+        operationalDecision: operationalDecisionJson,
+        replanRequest: replanRequestJson,
+        rerouteScenario: ritvikScenariosJson.reroute,
+        holdScenario: ritvikScenariosJson.hold,
+        replanScenario: ritvikScenariosJson.replan,
+        blockUnavailableScenario: ritvikScenariosJson.block_unavailable,
+        replanMetadata: ritvikScenariosJson.replan_metadata,
+        criteriaCoverage: ritvikScenariosJson.criteria_coverage,
+        demoEvents: demoEventsJson.events || [],
         updateTaskStatus,
         verifications,
         submitVerification,
+        planDecisions,
+        approveRecommendation,
+        rejectRecommendation,
+        modifyRecommendation,
+        reoptimize,
       }}
     >
       {children}

@@ -1,86 +1,125 @@
-import React from 'react';
-import { Layers, ArrowRight, CheckCircle2, ShieldCheck } from 'lucide-react';
-import { SMART_BUNDLING_EXAMPLE } from '../../data/simulationData';
+import React, { useState } from 'react';
+import { Layers, Users } from 'lucide-react';
+import { Badge } from '../common/Badge';
+import bundlingData from '../../data/bundling.json';
+import { minToHhmm } from '../../utils/time';
 
+/**
+ * Concurrent bundle pairs, read from the committed plan
+ * (scripts/generate_bundling.py).
+ *
+ * Deliberately absent: "minutes of disruption saved" and any efficiency
+ * percentage. Those require an unbundled counterfactual plan, which this
+ * repository does not produce, so they would be invented rather than measured.
+ */
 export const BundlingView = () => {
-  const data = SMART_BUNDLING_EXAMPLE;
+  const pairs = bundlingData.concurrent_bundle_pairs || [];
+  const [index, setIndex] = useState(0);
+
+  if (pairs.length === 0) {
+    return (
+      <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs text-xs text-slate-500">
+        No concurrent bundles in the current plan.
+      </div>
+    );
+  }
+
+  const p = pairs[Math.min(index, pairs.length - 1)];
+  const windowStart = p.possession_window.start_minute;
+  const windowEnd = p.possession_window.end_minute;
+  const span = Math.max(1, windowEnd - windowStart);
 
   return (
-    <div className="bg-white rounded-xl border border-purple-200 p-5 shadow-xs space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-purple-100 pb-3">
+    <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs space-y-3">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-2.5 gap-2 flex-wrap">
         <div className="flex items-center gap-2">
-          <div className="p-2 rounded-lg bg-purple-100 text-purple-700">
-            <Layers size={18} />
-          </div>
-          <div>
-            <h4 className="text-sm font-bold text-slate-900 tracking-tight">
-              Smart Cross-Department Bundling
-            </h4>
-            <p className="text-xs text-slate-500">
-              {data.section_id} — {data.section_name} ({data.corridor_name})
-            </p>
-          </div>
+          <Layers size={16} className="text-purple-600" />
+          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+            Cross-Department Bundling
+          </h4>
+          <Badge variant="primary" size="sm">
+            {pairs.length} pair{pairs.length === 1 ? '' : 's'} in plan
+          </Badge>
         </div>
-        <span className="bg-purple-100 text-purple-800 text-xs font-bold px-2.5 py-1 rounded-full font-mono">
-          2 Compatible Tasks → 1 Possession Window
-        </span>
+        {pairs.length > 1 && (
+          <div className="flex items-center gap-1">
+            {pairs.map((cand, i) => (
+              <button
+                key={cand.section_id + cand.date}
+                onClick={() => setIndex(i)}
+                className={`px-2 py-0.5 rounded text-[11px] font-semibold font-mono transition-colors ${
+                  i === index
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {cand.section_id}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Visual Timeline Comparison */}
-      <div className="bg-slate-50 rounded-xl p-4 border border-slate-200/80 space-y-4">
-        <div className="flex items-center justify-between text-xs font-mono font-semibold text-slate-600 border-b border-slate-200 pb-2">
-          <span>POSSESSION WINDOW: {data.block_id}</span>
-          <span>TIME: 04:00 ━━━━━━━━━━━━━━━ 06:00 (120 MIN CAPACITY)</span>
-        </div>
+      <div className="text-[11px] text-slate-500">
+        {p.section_id} — {p.section_name} ({p.corridor_name}) · {p.date}
+      </div>
 
-        {/* Task A */}
-        <div className="space-y-1">
-          <div className="flex justify-between text-xs font-medium text-slate-700">
-            <span>{data.task_a.task_id} — {data.task_a.department}</span>
-            <span className="font-mono text-slate-500">{data.task_a.duration}</span>
-          </div>
-          <div className="h-6 w-full bg-blue-100 rounded-md overflow-hidden p-0.5 border border-blue-300 flex items-center">
-            <div className="h-full w-[85%] bg-blue-600 rounded text-[10px] font-bold text-white flex items-center px-2">
-              {data.task_a.maintenance_type}
-            </div>
-          </div>
-        </div>
-
-        {/* Task B */}
-        <div className="space-y-1">
-          <div className="flex justify-between text-xs font-medium text-slate-700">
-            <span>{data.task_b.task_id} — {data.task_b.department}</span>
-            <span className="font-mono text-slate-500">{data.task_b.duration}</span>
-          </div>
-          <div className="h-6 w-full bg-emerald-100 rounded-md overflow-hidden p-0.5 border border-emerald-300 flex items-center">
-            <div className="h-full w-[65%] bg-emerald-600 rounded text-[10px] font-bold text-white flex items-center px-2">
-              {data.task_b.maintenance_type}
-            </div>
-          </div>
-        </div>
-
-        {/* Coordinated Shared Possession Tag */}
-        <div className="pt-1 flex items-center justify-center">
-          <span className="bg-purple-600 text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-xs">
-            ★ Shared Track Possession Window (Concurrent Execution)
+      <div className="p-3 rounded-lg bg-slate-50 border border-slate-200/80 space-y-2">
+        <div className="flex items-center justify-between text-[11px] font-mono text-slate-600">
+          <span>
+            Shared possession: <strong className="text-slate-900">{p.shared_block_ids.join(' + ')}</strong>
+          </span>
+          <span>
+            {minToHhmm(windowStart)} – {minToHhmm(windowEnd)}
           </span>
         </div>
+
+        {p.tasks.map((t) => {
+          const left = ((t.start_minute - windowStart) / span) * 100;
+          const width = ((t.end_minute - t.start_minute) / span) * 100;
+          return (
+            <div key={t.task_id} className="space-y-1">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="font-mono font-bold text-slate-900">{t.task_id}</span>
+                <span className="text-slate-500">
+                  {t.department} · {t.maintenance_type || '—'}
+                </span>
+              </div>
+              {/* Bar geometry is the task's real interval within the possession. */}
+              <div className="h-4 w-full bg-slate-200/70 rounded relative overflow-hidden">
+                <div
+                  className="absolute h-full bg-purple-500/80 rounded"
+                  style={{ left: `${left}%`, width: `${width}%` }}
+                />
+              </div>
+              <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono">
+                <span>
+                  {minToHhmm(t.start_minute)} – {minToHhmm(t.end_minute)} ({t.duration_minutes} min)
+                </span>
+                <span className="flex items-center gap-1">
+                  <Users size={10} /> {t.assigned_teams.join(', ') || '—'}
+                </span>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Explanation & Rules */}
-      <div className="text-xs text-slate-600 leading-relaxed bg-purple-50/50 p-3.5 rounded-lg border border-purple-100">
-        <p className="font-semibold text-purple-900 mb-1.5">
-          &ldquo;Compatible maintenance activities are coordinated within the same possession window.&rdquo;
-        </p>
-        <ul className="grid grid-cols-2 gap-2 text-[11px] text-slate-600 pt-1">
-          {data.benefits.map((b, i) => (
-            <li key={i} className="flex items-center gap-1.5">
-              <CheckCircle2 size={13} className="text-purple-600 shrink-0" />
-              <span>{b}</span>
-            </li>
-          ))}
-        </ul>
+      <div className="text-[11px] text-slate-600 space-y-0.5">
+        <div>
+          • Concurrent overlap: <strong>{p.overlap_minutes} min</strong>
+          {p.minimum_overlap_required_minutes != null && (
+            <> ≥ {p.minimum_overlap_required_minutes} min required (S008)</>
+          )}
+        </div>
+        <div>
+          • Department compatibility (C006):{' '}
+          <strong>{p.departments_compatible ?? 'not specified'}</strong> for{' '}
+          {p.tasks[0].department} + {p.tasks[1].department}
+        </div>
+        <div className="text-slate-400 pt-0.5">
+          Derived from the committed plan; no saving or efficiency figure is claimed.
+        </div>
       </div>
     </div>
   );

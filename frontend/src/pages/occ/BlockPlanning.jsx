@@ -7,12 +7,12 @@ import { TrafficContext } from '../../components/timeline/TrafficContext';
 import { WeeklyView } from '../../components/planning/WeeklyView';
 import { MonthlyHeatmap } from '../../components/planning/MonthlyHeatmap';
 import { MetricCard } from '../../components/common/MetricCard';
+import { RecommendationActions } from '../../components/occ/RecommendationActions';
 import { usePlan } from '../../context/PlanContext';
 import corridorsSectionsData from '../../data/corridors_sections.json';
 import {
   Calendar,
   Sparkles,
-  RefreshCw,
   Filter,
   Layers,
   AlertTriangle,
@@ -23,21 +23,81 @@ import {
   Grid,
 } from 'lucide-react';
 
+// Both selectors are derived from the plan the optimizer actually produced, so
+// every option renders a populated timeline. Previously the date and corridor
+// lists were hardcoded to values the demo plan does not use, leaving 11 of 12
+// combinations empty.
+const buildDateOptions = (tasks) => {
+  const counts = {};
+  tasks.forEach((t) => {
+    if (t.date) counts[t.date] = (counts[t.date] || 0) + 1;
+  });
+  return Object.entries(counts)
+    .map(([date, count]) => ({ date, count }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+};
+
+const buildCorridorOptions = (tasks) => {
+  const counts = {};
+  tasks.forEach((t) => {
+    if (t.corridor_id) counts[t.corridor_id] = (counts[t.corridor_id] || 0) + 1;
+  });
+  const names = {};
+  corridorsSectionsData.corridors.forEach((c) => {
+    names[c.corridor_id] = c.corridor_name;
+  });
+  return Object.entries(counts)
+    .map(([id, count]) => ({ id, name: names[id] || id, count }))
+    .sort((a, b) => b.count - a.count || a.id.localeCompare(b.id));
+};
+
 export const BlockPlanning = () => {
   const { scheduledTasks, metrics, isReplanned, activeEvent } = usePlan();
 
-  const [selectedDate, setSelectedDate] = useState('2026-09-07');
-  const [selectedCorridor, setSelectedCorridor] = useState('COR-001');
+  const dateOptions = React.useMemo(() => buildDateOptions(scheduledTasks), [scheduledTasks]);
+  const corridorOptions = React.useMemo(() => buildCorridorOptions(scheduledTasks), [scheduledTasks]);
+
+  // Default to the busiest day and its busiest corridor, so the first view is
+  // dense but scannable (one corridor, a handful of section rows) rather than
+  // every section in the plan. "All corridors" stays one click away.
+  const busiestDate =
+    dateOptions.reduce((best, o) => (!best || o.count > best.count ? o : best), null)?.date ||
+    '2026-09-03';
+  const busiestCorridorOnDate = React.useMemo(() => {
+    const counts = {};
+    scheduledTasks.forEach((t) => {
+      if (t.date === busiestDate) counts[t.corridor_id] = (counts[t.corridor_id] || 0) + 1;
+    });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'ALL';
+  }, [scheduledTasks, busiestDate]);
+  const [selectedDate, setSelectedDate] = useState(busiestDate);
+  const [selectedCorridor, setSelectedCorridor] = useState(busiestCorridorOnDate);
   const [viewMode, setViewMode] = useState('timeline'); // 'timeline', 'weekly', 'monthly'
 
   const [drawerTask, setDrawerTask] = useState(null);
   const [whyArnavOpen, setWhyArnavOpen] = useState(false);
   const [whyArnavTask, setWhyArnavTask] = useState(null);
 
-  // Filter sections for the corridor
-  const sections = corridorsSectionsData.sections.filter(
-    (s) => s.corridor_id === selectedCorridor || s.section_id === 'SEC-0073'
-  );
+  // Only show sections that carry a scheduled possession on the selected date,
+  // optionally narrowed to one corridor. This keeps the timeline dense instead
+  // of rendering dozens of empty section rows.
+  const activeSectionIds = React.useMemo(() => {
+    const ids = new Set();
+    scheduledTasks.forEach((t) => {
+      if (t.date === selectedDate && (selectedCorridor === 'ALL' || t.corridor_id === selectedCorridor)) {
+        ids.add(t.section_id);
+      }
+    });
+    return ids;
+  }, [scheduledTasks, selectedDate, selectedCorridor]);
+
+  const sections = corridorsSectionsData.sections
+    .filter((s) => activeSectionIds.has(s.section_id))
+    .sort((a, b) => a.section_id.localeCompare(b.section_id));
+
+  // Show traffic for the section the operator is looking at: the selected
+  // possession's section, else the first section in the corridor.
+  const trafficSectionId = drawerTask?.section_id || sections[0]?.section_id || 'SEC-0004';
 
   const handleSelectTask = (task) => {
     setDrawerTask(task);
@@ -65,22 +125,17 @@ export const BlockPlanning = () => {
           </p>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2.5">
-          <button
-            onClick={() => alert('Arnav CP-SAT optimizer solved 30,000 tasks across rolling horizon in 0.5s. Schedule refreshed.')}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-all shadow-xs"
-          >
-            <Sparkles size={14} />
-            <span>Generate Block Plan</span>
-          </button>
-          <button
-            onClick={() => alert('Plan synchronization verified against latest physical track blocks.')}
-            className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition-colors"
-          >
-            <RefreshCw size={13} />
-            <span>Update Plan</span>
-          </button>
+        {/* Plan provenance. The solver is Python and is not run from the browser,
+            so this states where the rendered plan came from instead of offering a
+            button that only claims to have solved it. */}
+        <div className="text-right shrink-0">
+          <div className="flex items-center gap-1.5 justify-end text-xs font-semibold text-slate-700">
+            <Sparkles size={14} className="text-blue-600" />
+            <span>Plan generated offline by CP-SAT</span>
+          </div>
+          <p className="text-[11px] text-slate-500 mt-0.5">
+            <code className="font-mono">python demo.py</code> &middot; controller actions below
+          </p>
         </div>
       </div>
 
@@ -123,7 +178,7 @@ export const BlockPlanning = () => {
 
           <div className="h-4 w-px bg-slate-200" />
 
-          {/* Date Selector */}
+          {/* Date Selector — options and counts come from the plan */}
           <div className="flex items-center gap-1.5 text-xs text-slate-700">
             <Calendar size={14} className="text-slate-400" />
             <span className="font-semibold">Planning Date:</span>
@@ -132,14 +187,15 @@ export const BlockPlanning = () => {
               onChange={(e) => setSelectedDate(e.target.value)}
               className="bg-slate-50 border border-slate-200 rounded px-2 py-1 font-mono font-bold text-slate-800"
             >
-              <option value="2026-09-07">2026-09-07 (Original Slot)</option>
-              <option value="2026-09-08">2026-09-08 (Replanned Slot)</option>
-              <option value="2026-09-09">2026-09-09</option>
-              <option value="2026-09-10">2026-09-10</option>
+              {dateOptions.map((o) => (
+                <option key={o.date} value={o.date}>
+                  {o.date} ({o.count} {o.count === 1 ? 'task' : 'tasks'})
+                </option>
+              ))}
             </select>
           </div>
 
-          {/* Corridor Selector */}
+          {/* Corridor Selector — options and counts come from the plan */}
           <div className="flex items-center gap-1.5 text-xs text-slate-700">
             <span className="font-semibold">Corridor:</span>
             <select
@@ -147,20 +203,34 @@ export const BlockPlanning = () => {
               onChange={(e) => setSelectedCorridor(e.target.value)}
               className="bg-slate-50 border border-slate-200 rounded px-2 py-1 font-medium text-slate-800"
             >
-              <option value="COR-001">COR-001 (Delhi–Agra)</option>
-              <option value="COR-008">COR-008 (Bhopal–Itarsi)</option>
-              <option value="COR-010">COR-010 (Mumbai–Surat)</option>
+              <option value="ALL">All corridors ({scheduledTasks.length})</option>
+              {corridorOptions.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.id} — {o.name} ({o.count})
+                </option>
+              ))}
             </select>
           </div>
         </div>
 
-        {/* Status Callout */}
+        {/* Status Callout — the span the demo plan actually covers */}
         <div className="text-xs text-slate-500 font-mono">
-          Horizon: <strong>03 Sep – 09 Sep 2026</strong>
+          {dateOptions.length > 0 && (
+            <>Plan span: <strong>{dateOptions[0].date} – {dateOptions[dateOptions.length - 1].date}</strong></>
+          )}
         </div>
       </div>
 
-      {/* Planning Summary Cards (Section 8) */}
+      {/* Planning Summary Cards — scoped to the scenario rendered below */}
+      <div className="flex items-center justify-between flex-wrap gap-1">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600">
+          Demo Scenario — Solved Subset
+        </h3>
+        <p className="text-[11px] text-slate-500">
+          Reproduce with <code className="font-mono text-slate-600">python demo.py</code> · full-dataset
+          baseline shown on the Overview screen
+        </p>
+      </div>
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
         <div className="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-xs">
           <span className="text-[10px] uppercase font-bold text-red-600 tracking-wider block">Critical Tasks</span>
@@ -177,9 +247,11 @@ export const BlockPlanning = () => {
           <span className="text-[10px] text-slate-400">Neev score 60-79</span>
         </div>
         <div className="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-xs">
-          <span className="text-[10px] uppercase font-bold text-slate-600 tracking-wider block">Total Demand</span>
-          <span className="text-xl font-bold font-mono text-slate-800 mt-1 block">30,000</span>
-          <span className="text-[10px] text-slate-400">Full inventory</span>
+          <span className="text-[10px] uppercase font-bold text-slate-600 tracking-wider block">Tasks Considered</span>
+          <span className="text-xl font-bold font-mono text-slate-800 mt-1 block">
+            {metrics.summary.total_tasks_considered}
+          </span>
+          <span className="text-[10px] text-slate-400">Scenario subset</span>
         </div>
         <div className="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-xs">
           <span className="text-[10px] uppercase font-bold text-blue-600 tracking-wider block">Planned Blocks</span>
@@ -193,7 +265,7 @@ export const BlockPlanning = () => {
           <span className="text-xl font-bold font-mono text-slate-700 mt-1 block">
             {metrics.summary.total_deferred.toLocaleString()}
           </span>
-          <span className="text-[10px] text-slate-400">Rolling horizon</span>
+          <span className="text-[10px] text-slate-400">Not placed in scenario</span>
         </div>
         <div className="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-xs">
           <span className="text-[10px] uppercase font-bold text-purple-600 tracking-wider block">Teams Utilized</span>
@@ -214,6 +286,8 @@ export const BlockPlanning = () => {
       </div>
 
       {/* Main Centerpiece Area: Gantt Timeline / Weekly / Monthly */}
+      <RecommendationActions taskId="TASK-000005" />
+
       {viewMode === 'timeline' && (
         <GanttTimeline
           sections={sections}
@@ -243,7 +317,7 @@ export const BlockPlanning = () => {
       )}
 
       {/* Traffic Context Box (Section 13) */}
-      <TrafficContext sectionId="SEC-0004" />
+      <TrafficContext sectionId={trafficSectionId} />
 
       {/* Smart Bundling Visualization Component (Section 12) */}
       <BundlingView />

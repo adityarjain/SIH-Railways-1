@@ -28,6 +28,7 @@ class ScheduledTaskRecord:
     task_id: str
     asset_id: str
     department: str
+    maintenance_type: str
     section_id: str
     corridor_id: str
     date: str
@@ -210,6 +211,7 @@ def solve_day_batch(
                     task_id=tid,
                     asset_id=task.asset_id,
                     department=task.department,
+                    maintenance_type=task.maintenance_type,
                     section_id=task.section_id,
                     corridor_id=task.corridor_id,
                     date=date_str,
@@ -260,6 +262,7 @@ def solve_day_batch(
                         task_id=r1.task_id,
                         asset_id=r1.asset_id,
                         department=r1.department,
+                        maintenance_type=r1.maintenance_type,
                         section_id=r1.section_id,
                         corridor_id=r1.corridor_id,
                         date=r1.date,

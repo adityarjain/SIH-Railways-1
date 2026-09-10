@@ -1,9 +1,23 @@
 import React from 'react';
 import { useDemoGuide, DEMO_STEPS } from '../../context/DemoGuideContext';
+import { usePlan } from '../../context/PlanContext';
 import { ChevronLeft, ChevronRight, X, Info } from 'lucide-react';
 
 export const DemoGuideBar = ({ onNavigate }) => {
   const { isGuideActive, toggleGuide, currentStepIndex, currentStep, setStep, totalSteps } = useDemoGuide();
+  const { toggleReplan } = usePlan();
+
+  // When the guide opens, land the user on step 1's page/role rather than
+  // showing "Step 1/14" over whatever screen they happened to be on. This
+  // component unmounts when the guide closes, so the effect runs once per open.
+  React.useEffect(() => {
+    if (!isGuideActive) return;
+    const first = DEMO_STEPS[0];
+    setStep(0);
+    if (typeof first.replanned === 'boolean') toggleReplan(first.replanned);
+    if (onNavigate) onNavigate(first.page, first.role);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isGuideActive]);
 
   if (!isGuideActive) return null;
 
@@ -14,6 +28,12 @@ export const DemoGuideBar = ({ onNavigate }) => {
     const target = DEMO_STEPS[index];
     if (!target) return;
     setStep(index);
+    // The replan lands at step 11. Carry that state with the step so the
+    // maintenance card at step 14 shows the 08 Sep window the narration
+    // describes, and so stepping backwards restores the original schedule.
+    if (typeof target.replanned === 'boolean') {
+      toggleReplan(target.replanned);
+    }
     if (onNavigate) {
       onNavigate(target.page, target.role);
     }

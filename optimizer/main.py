@@ -114,7 +114,7 @@ def main() -> int:
         print("============================================================")
         val_res = validate_schedule(paths["csv"], paths["deferred"], bundle)
         if val_res.is_valid:
-            print("  STATUS: PASS - All constraints and invariants verified 100% valid!")
+            print("  STATUS: PASS - All modelled constraints and invariants verified; zero violations.")
             for check in val_res.checks_passed:
                 print(f"    - {check}")
         else:

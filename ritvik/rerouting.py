@@ -30,6 +30,9 @@ class RerouteResult:
     route_cost: float
     reason: str
     inspected_candidates: List[Dict[str, Any]] = field(default_factory=list)
+    # Detour delay in real minutes: bypass traversal time minus direct traversal
+    # time. None when no feasible route was found (there is no detour to time).
+    delay_minutes: Optional[int] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -38,6 +41,7 @@ class RerouteResult:
             "alternative_route": self.alternative_route,
             "route_found": self.route_found,
             "route_cost": self.route_cost,
+            "delay_minutes": self.delay_minutes,
             "reason": self.reason,
             "inspected_candidates": self.inspected_candidates,
         }
@@ -46,10 +50,67 @@ class RerouteResult:
 class ReroutingEngine:
     """Performs graph search over topology to find conflict-free, capacity-compliant bypass routes."""
 
-    def __init__(self, topology: Dict[str, List[str]], capacity_evaluator: CapacityEvaluator, config: RitvikConfig):
+    def __init__(
+        self,
+        topology: Dict[str, List[str]],
+        capacity_evaluator: CapacityEvaluator,
+        config: RitvikConfig,
+        section_meta: Optional[Dict[str, Dict[str, str]]] = None,
+    ):
         self.topology = topology
         self.capacity_evaluator = capacity_evaluator
         self.config = config
+        # section_id -> corridors_sections.csv row. Supplies section_length_km and
+        # maximum_speed_kmph for the traversal-time model.
+        self.section_meta = section_meta or {}
+
+    def _section_traversal_minutes(self, section_id: str, train: TrainMovement) -> Optional[float]:
+        """
+        Time to traverse one section, from its physical length and the lower of the
+        train's scheduled speed and the section's line speed.
+
+        Returns None when the section's length or speed is not in the dataset, so
+        callers can report "not computable" instead of substituting a guess.
+        """
+        meta = self.section_meta.get(section_id)
+        if not meta:
+            return None
+        try:
+            length_km = float(meta.get("section_length_km") or "")
+            line_speed = float(meta.get("maximum_speed_kmph") or "")
+        except ValueError:
+            return None
+        if length_km <= 0 or line_speed <= 0:
+            return None
+
+        effective_speed = min(line_speed, train.scheduled_speed_kmph) if train.scheduled_speed_kmph > 0 else line_speed
+        if effective_speed <= 0:
+            return None
+        return (length_km / effective_speed) * 60.0
+
+    def _path_traversal_minutes(self, path: List[str], train: TrainMovement) -> Optional[float]:
+        """Total traversal time over a path. None if any section lacks physical data."""
+        total = 0.0
+        for section_id in path:
+            minutes = self._section_traversal_minutes(section_id, train)
+            if minutes is None:
+                return None
+            total += minutes
+        return total
+
+    def estimate_detour_delay_minutes(
+        self, direct_section: str, bypass_path: List[str], train: TrainMovement
+    ) -> Optional[int]:
+        """
+        Detour delay = time to traverse the bypass path minus time to traverse the
+        section the train would otherwise have used. None when the dataset lacks
+        the length/speed needed to compute it.
+        """
+        bypass = self._path_traversal_minutes(bypass_path, train)
+        direct = self._section_traversal_minutes(direct_section, train)
+        if bypass is None or direct is None:
+            return None
+        return max(0, int(round(bypass - direct)))
 
     def find_all_paths(
         self,
@@ -113,7 +174,8 @@ class ReroutingEngine:
         # Also search paths bypassing conflict_section if alternate feeder exists
         # E.g., if there are multiple branches from conflict_section
         inspected: List[Dict[str, Any]] = []
-        feasible_candidates: List[Tuple[List[str], float]] = []
+        # (path, cost_minutes, computed_delay_or_None)
+        feasible_candidates: List[Tuple[List[str], float, Optional[int]]] = []
 
         for path in candidate_paths:
             # 1. Verify topology edge connectivity strictly (no invented routes)
@@ -205,27 +267,43 @@ class ReroutingEngine:
                 })
                 continue
 
-            # Route is feasible! Compute cost
+            # Route is feasible. Cost is the detour delay in real minutes, derived
+            # from section length and line/train speed. Where the dataset lacks
+            # those fields we fall back to a per-hop time penalty and say so,
+            # rather than presenting a hop count as if it were minutes.
             hops = len(path) - 1
-            cost = hops * 10.0 + (hops * self.config.reroute_time_penalty_per_hop_minutes)
-            feasible_candidates.append((path, cost))
+            detour_delay = self.estimate_detour_delay_minutes(conflict_section, path, train)
+            if detour_delay is not None:
+                cost = float(detour_delay)
+                basis = f"{detour_delay} min detour computed from section length and line speed"
+            else:
+                cost = float(hops * self.config.reroute_time_penalty_per_hop_minutes)
+                basis = (
+                    f"{int(cost)} min estimated from {hops} hops x "
+                    f"{self.config.reroute_time_penalty_per_hop_minutes} min/hop "
+                    f"(section length/speed unavailable)"
+                )
+
+            feasible_candidates.append((path, cost, detour_delay))
             inspected.append({
                 "path": " -> ".join(path),
                 "status": "FEASIBLE",
                 "cost": cost,
-                "reason": f"Feasible bypass ({hops} hops, capacity available, zero maintenance conflicts)"
+                "delay_minutes": detour_delay,
+                "reason": f"Feasible bypass ({hops} hops, capacity available, zero maintenance conflicts); {basis}",
             })
 
         if feasible_candidates:
-            # Sort by lowest cost
+            # Prefer the lowest added delay.
             feasible_candidates.sort(key=lambda x: x[1])
-            best_path, best_cost = feasible_candidates[0]
+            best_path, best_cost, best_delay = feasible_candidates[0]
             return RerouteResult(
                 train_id=train.train_id,
                 original_route=[conflict_section],
                 alternative_route=best_path,
                 route_found=True,
                 route_cost=best_cost,
+                delay_minutes=best_delay,
                 reason="Feasible alternative route found; bypasses maintenance conflict",
                 inspected_candidates=inspected,
             )

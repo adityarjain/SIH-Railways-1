@@ -53,6 +53,19 @@
       "capacity_delta": 2,
       "reason": "Auxiliary bypass siding cleared and signaled for main-line diversion",
       "notes": "Increases throughput headroom on bypass route SEC-0007"
+    },
+    {
+      "event_id": "EVT-006",
+      "event_type": "NEW_TRAIN",
+      "train_id": "TRN-SIM-006",
+      "train_name": "Ordinary Passenger Service",
+      "section_id": "SEC-0004",
+      "destination_section_id": "SEC-0010",
+      "arrival_minute": 165,
+      "departure_minute": 185,
+      "date": "2026-09-07",
+      "priority_class": 2,
+      "notes": "Low-priority movement arriving near the end of the TASK-000005 possession; with bypasses saturated it can be held until the block is handed back"
     }
   ]
 }

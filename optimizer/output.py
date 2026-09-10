@@ -37,6 +37,7 @@ def write_optimization_outputs(
             "task_id",
             "asset_id",
             "department",
+            "maintenance_type",
             "corridor_id",
             "section_id",
             "date",
@@ -59,6 +60,7 @@ def write_optimization_outputs(
                 rec.task_id,
                 rec.asset_id,
                 rec.department,
+                rec.maintenance_type,
                 rec.corridor_id,
                 rec.section_id,
                 rec.date,
@@ -115,8 +117,18 @@ def write_optimization_outputs(
             ])
 
     # 3. Compute Metrics Breakdown
+    # Tasks a scenario demo never evaluated are carried in deferred_tasks purely
+    # so the inventory check stays complete. Counting them as deferred would
+    # report unexamined work as a scheduling failure and sink the success rate,
+    # so the risk breakdown covers evaluated tasks only. A full solve has no
+    # such records and is unaffected.
+    NOT_EVALUATED = {"not_in_demo_subset"}
+    evaluated_deferred = [
+        r for r in result.deferred_tasks.values() if r.deferral_reason not in NOT_EVALUATED
+    ]
+
     sched_risks = [r.risk_score for r in result.scheduled_tasks.values()]
-    def_risks = [r.risk_score for r in result.deferred_tasks.values()]
+    def_risks = [r.risk_score for r in evaluated_deferred]
 
     critical_sched = sum(1 for r in sched_risks if r > 80.0)
     critical_def = sum(1 for r in def_risks if r > 80.0)
@@ -194,6 +206,7 @@ def write_optimization_outputs(
                 "task_id": r.task_id,
                 "asset_id": r.asset_id,
                 "department": r.department,
+                "maintenance_type": r.maintenance_type,
                 "corridor_id": r.corridor_id,
                 "section_id": r.section_id,
                 "date": r.date,
@@ -203,6 +216,7 @@ def write_optimization_outputs(
                 "block_ids": list(r.block_ids),
                 "assigned_teams": list(r.assigned_team_ids),
                 "is_bundled": r.is_bundled,
+                "sharing_type": r.sharing_type,
                 "bundled_with": list(r.bundled_with_task_ids),
                 "is_night": r.is_night,
                 "risk_score": r.risk_score,

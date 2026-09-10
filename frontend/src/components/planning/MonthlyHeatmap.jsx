@@ -1,16 +1,26 @@
 import React from 'react';
 import { Calendar, Layers } from 'lucide-react';
+import { usePlan } from '../../context/PlanContext';
 
 export const MonthlyHeatmap = ({ onSelectDate }) => {
-  // Generate 30 days for September 2026
+  // Real per-day workload from the plan. This block previously generated its
+  // values from Math.sin(i), which produced a plausible-looking chart that
+  // described nothing.
+  const { scheduledTasks } = usePlan();
+
+  const byDate = scheduledTasks.reduce((acc, task) => {
+    (acc[task.date] = acc[task.date] || []).push(task);
+    return acc;
+  }, {});
+
   const days = Array.from({ length: 30 }, (_, i) => {
     const dayNum = i + 1;
     const dateStr = `2026-09-${String(dayNum).padStart(2, '0')}`;
-    // Pseudo-deterministic data for visual heatmap
-    const tasks = Math.floor(10 + Math.sin(i) * 6 + (i % 7 === 5 || i % 7 === 6 ? 6 : 0));
-    const critical = Math.floor(tasks * 0.25);
-    const blocks = Math.floor(tasks * 1.3);
-    const workload = tasks > 16 ? 'HIGH' : tasks > 11 ? 'MEDIUM' : 'LOW';
+    const dayTasks = byDate[dateStr] || [];
+    const tasks = dayTasks.length;
+    const critical = dayTasks.filter((x) => (x.risk_score ?? 0) >= 80).length;
+    const blocks = new Set(dayTasks.flatMap((x) => x.block_ids || [])).size;
+    const workload = tasks === 0 ? 'NONE' : tasks > 16 ? 'HIGH' : tasks > 8 ? 'MEDIUM' : 'LOW';
 
     return {
       day: dayNum,

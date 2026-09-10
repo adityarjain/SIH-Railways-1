@@ -25,6 +25,7 @@ from optimizer.solver import (
 from optimizer.priority import compute_task_priority
 from optimizer.output import write_optimization_outputs
 from optimizer.validator import validate_schedule
+from optimizer.explain import build_decision_trace
 
 
 def min_to_hhmm(minutes: int) -> str:
@@ -40,7 +41,11 @@ def run_smart_blocking_demo():
     print("================================================================================")
 
     data_dir = Path("Arnav_Optimizer_Clean_Dataset")
-    output_dir = Path(".")
+    # This demo solves a small scenario subset, not the full workload. Its
+    # artifacts go to their own directory so they cannot be mistaken for -- or
+    # written over -- the committed baseline plan that Ritvik and the frontend
+    # read. Regenerate the baseline with optimizer.main, never from here.
+    output_dir = Path("demo_output")
     config = OptimizerConfig(data_dir=data_dir, output_dir=output_dir, solver_time_limit_seconds=3.0, num_workers=2)
 
     # 1. Ingest Data & Preprocess
@@ -66,12 +71,14 @@ def run_smart_blocking_demo():
     scheduled = {**sched_d1, **sched_d5}
     day_deferred = {**def_d1, **def_d5}
 
-    # Populate full 30,000 inventory to ensure 100% validator coverage
+    # The post-solve validator checks the full inventory, so every task must
+    # appear. Tasks outside the demo subset were never evaluated here and are
+    # labelled as such rather than borrowing a solver deferral reason.
     deferred_all = {}
     for tid, task in bundle.tasks.items():
         if tid in scheduled:
             continue
-        reason = day_deferred.get(tid, "no_candidate_window_within_horizon")
+        reason = day_deferred.get(tid, "not_in_demo_subset")
         deferred_all[tid] = DeferredTaskRecord(
             task_id=tid,
             asset_id=task.asset_id,
@@ -92,15 +99,19 @@ def run_smart_blocking_demo():
     conc_bundles = sum(1 for r in scheduled.values() if r.sharing_type == "concurrent") // 2
     ser_shared = sum(1 for r in scheduled.values() if r.sharing_type == "serial") // 2
 
+    # Report the subset this demo actually solved. Counting the untouched
+    # 29,947 tasks as "considered and deferred" made a 53-task scenario read as
+    # a 0.18% success rate on the full workload, which is not what ran here.
+    demo_subset = {**day1_tasks, **day5_tasks}
     result = OptimizationResult(
         scheduled_tasks=scheduled,
         deferred_tasks=deferred_all,
         solver_status="FEASIBLE",
         wall_time_seconds=time.time() - t0,
         objective_value=obj1 + obj5,
-        total_tasks_considered=len(bundle.tasks),
+        total_tasks_considered=len(demo_subset),
         total_scheduled=len(scheduled),
-        total_deferred=len(deferred_all),
+        total_deferred=len(day_deferred),
         total_concurrent_bundles=conc_bundles,
         total_serial_shared=ser_shared,
     )
@@ -163,30 +174,33 @@ def run_smart_blocking_demo():
     print("================================================================================")
     print(f"AVAILABLE BLOCK OPTIONS ({t5.section_id} on {t5.task_date})")
     print("--------------------------------------------------------------------------------")
-    print(f"{'Block Option':<22} {'Time Window':<14} {'Status':<11} {'Physical Reason / Feasibility Analysis'}")
+    print(f"{'Block Option':<24} {'Time Window':<15} {'Status':<10} {'Rule':<12} {'Reason (from dataset)'}")
     print("--------------------------------------------------------------------------------")
 
-    block_options = [
-        ("BLK-009637+BLK-009638", 0, 240, "SELECTED", "Feasible (240m >= 200m, Track Avail, 0 Train Conflicts, TEAM-013 on Shift)"),
-        ("BLK-009639", 240, 360, "REJECTED", "Train Conflict (C002): Superfast TRN-03820 occupying track (1 conflict)"),
-        ("BLK-009640", 360, 480, "REJECTED", "Infrastructure (C003): Track unavailable (track_available == False)"),
-        ("BLK-009641", 480, 600, "REJECTED", "Train Conflict (C002): Express TRN-07921 occupying track (1 conflict)"),
-        ("BLK-009642", 600, 720, "REJECTED", "Infrastructure (C003): Track unavailable (track_available == False)"),
-        ("BLK-009643", 720, 840, "REJECTED", "Infrastructure (C003): Track unavailable & Train Conflict (TRN-09412)"),
-        ("BLK-009644", 840, 960, "REJECTED", "Train Conflict (C002): Active passenger & freight train conflicts (2 conflicts)"),
-        ("BLK-009645+BLK-009646", 960, 1200, "REJECTED", "Team Shift (S005): TRD Night Team-013 off-duty; TRD Day Team-014 shift ends 16:00"),
-        ("BLK-009647", 1200, 1320, "REJECTED", "Train Conflict (C002): Superfast TRN-05112 occupying track (1 conflict)"),
-        ("BLK-009648", 1320, 1440, "REJECTED", "Duration (C001): 120m block is too short for 200m task; neighbor BLK-009647 conflicted"),
-    ]
+    # Recomputed from blocks.csv / train_block_conflicts.csv / teams.csv rather
+    # than narrated, so each rejection cites the row that actually caused it.
+    t5_rec = scheduled["TASK-000005"]
+    trace = build_decision_trace(
+        "TASK-000005",
+        bundle,
+        selected_block_ids=list(t5_rec.block_ids),
+        selected_team_ids=list(t5_rec.assigned_team_ids),
+        selected_date=t5_rec.date,
+        execution_start_minute=t5_rec.execution_start_minute,
+        execution_end_minute=t5_rec.execution_end_minute,
+    )
 
-    for b_opt, s_min, e_min, status, reason in block_options:
-        t_str = f"{min_to_hhmm(s_min)} - {min_to_hhmm(e_min)}"
-        print(f"{b_opt:<22} {t_str:<14} {status:<11} {reason}")
+    for cand in trace["candidates"]:
+        label = "+".join(cand["block_ids"])
+        print(f"{label:<24} {cand['window']:<15} {cand['status']:<10} {cand['rule']:<12} {cand['reason']}")
 
     print("--------------------------------------------------------------------------------")
+    summary = trace["candidate_summary"]
+    print(f"Evaluated {summary['block_windows_considered']} block windows on {summary['date_evaluated']}: "
+          f"{summary['rejected']} pruned by hard constraints {summary['rejected_by_rule']}, "
+          f"{summary['feasible']} feasible.")
     print("Explanation:")
-    print('  "Arnav evaluates every block in the section, filtering out train conflicts, unavailable track,')
-    print('   and shift mismatches before submitting qualified candidates to CP-SAT."')
+    print(f'  "{trace["explanation"]}"')
 
     # ==========================================================================
     # SECTION 4 — SMART BLOCKING DECISION (Optimal Feasible Assignment)
@@ -297,7 +311,7 @@ def run_smart_blocking_demo():
     print(f"• Valid Block Possessions:    {len(prep.all_possessions):,d} conflict-free possessions")
     print(f"• Total Railway Sections:     {len(bundle.corridors_sections)} sections across 20 corridors")
     print(f"• Maintenance Teams Network:  {len(bundle.teams)} teams across 4 departments & 3 shifts")
-    print(f"• Independent Validation:     {'PASS (100% Valid - Zero Violations)' if val_report.is_valid else 'FAIL'}")
+    print(f"• Independent Validation:     {'PASS (zero violations across all validator checks)' if val_report.is_valid else 'FAIL'}")
     print(f"• Demo Wall-Clock Runtime:    {time.time() - t0:.2f} seconds")
     print(f"• Output Artifacts Generated: {paths['json']}, {paths['csv']}, {paths['metrics']}")
     print("================================================================================")

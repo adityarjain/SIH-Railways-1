@@ -1,212 +1,296 @@
 import React from 'react';
 import { Modal } from '../common/Modal';
 import { Badge } from '../common/Badge';
-import { WHY_ARNAV_TRACE_TASK_5 } from '../../data/simulationData';
-import { CheckCircle2, XCircle, Sparkles, ShieldAlert, Clock, Users, Award } from 'lucide-react';
+// Computed by scripts/generate_decision_trace.py from the dataset. Every
+// rejection reason below cites the row that actually caused it, so the table
+// can be checked against train_block_conflicts.csv / blocks.csv / teams.csv.
+import decisionTrace from '../../data/decision_trace.json';
+import { Award } from 'lucide-react';
+
+const STATUS_STYLES = {
+  SELECTED: { row: 'bg-emerald-50/70 font-semibold text-emerald-900', label: 'text-emerald-700' },
+  FEASIBLE: { row: 'text-slate-600', label: 'text-blue-600' },
+  REJECTED: { row: 'text-slate-600', label: 'text-red-600' },
+};
 
 export const WhyArnavModal = ({ isOpen, onClose, task }) => {
-  // Use authoritative trace for TASK-000005, or generic fallback for others
-  const trace = WHY_ARNAV_TRACE_TASK_5;
+  const trace = decisionTrace;
+  const {
+    request, risk_signal: risk, candidate_summary: summary, candidates, selected,
+    train_impact: trainImpact,
+  } = trace;
+
+  // The trace artifact covers one worked example. If the operator opened a
+  // different task, say so rather than presenting this trace as that task's.
+  const isTracedTask = !task?.task_id || task.task_id === request.task_id;
+
+  const ruleCounts = Object.entries(summary.rejected_by_rule)
+    .map(([rule, n]) => `${rule} ×${n}`)
+    .join(' · ');
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       title="Why Did Arnav Select This Block?"
-      subtitle="Mathematical Constraint Programming (Google OR-Tools CP-SAT) Decision Trace"
+      subtitle="Constraint Programming (Google OR-Tools CP-SAT) decision trace, recomputed from the dataset"
       maxWidth="max-w-3xl"
     >
       <div className="space-y-6">
         {/* Banner */}
-        <div className="bg-slate-900 text-slate-100 p-4 rounded-xl border border-slate-800 flex items-center justify-between">
+        <div className="bg-slate-900 text-slate-100 p-4 rounded-xl border border-slate-800 flex items-center justify-between gap-4">
           <div>
             <span className="text-[11px] font-mono font-bold text-blue-400 uppercase tracking-wider block">
-              Automated Reasoning Engine
+              Automated Reasoning Trace
             </span>
             <h4 className="text-sm font-bold text-white mt-0.5">
-              Assignment Trace for Task {task?.task_id || 'TASK-000005'}
+              Assignment trace for {request.task_id} on {request.section_id}
             </h4>
             <p className="text-xs text-slate-400 mt-1">
-              Evaluated against 10 operational and physical constraints across the 7-day rolling horizon.
+              {summary.block_windows_considered} block windows on {summary.date_evaluated} evaluated
+              against hard constraints{ruleCounts ? ` — ${ruleCounts}` : ''}.
             </p>
           </div>
-          <div className="text-right">
-            <span className="text-[10px] text-slate-400 block">Status</span>
-            <span className="text-xs font-bold text-emerald-400 font-mono">FEASIBLE / OPTIMAL</span>
+          <div className="text-right shrink-0">
+            <span className="text-[10px] text-slate-400 block">Outcome</span>
+            <span className="text-xs font-bold text-emerald-400 font-mono">FEASIBLE ASSIGNMENT</span>
           </div>
         </div>
 
-        {/* 5-Step Trace Timeline */}
+        {!isTracedTask && (
+          <div className="text-[11px] text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+            A full candidate trace is published for <strong>{request.task_id}</strong>, the worked
+            example in this demo. You opened <strong>{task.task_id}</strong> — the trace below is for{' '}
+            {request.task_id}. Regenerate for another task with{' '}
+            <code className="font-mono">scripts/generate_decision_trace.py {task.task_id}</code>.
+          </div>
+        )}
+
         <div className="space-y-4">
-          {/* STEP 1: NEEV RISK */}
+          {/* STEP 1 — REQUEST */}
           <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="h-6 w-6 rounded-full bg-red-100 text-red-700 font-bold text-xs flex items-center justify-center">
-                  1
-                </span>
-                <h5 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
-                  Step 1 — Neev AI Failure Risk Signal
-                </h5>
+                <span className="h-6 w-6 rounded-full bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center">1</span>
+                <h5 className="text-xs font-bold text-slate-900 uppercase tracking-wide">Step 1 — Maintenance Request</h5>
               </div>
-              <Badge variant="CRITICAL" size="sm">CRITICAL RISK</Badge>
+              <Badge variant="primary" size="sm">{request.required_duration_minutes} MIN</Badge>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs bg-slate-50 p-3 rounded-lg border border-slate-100">
+              <div>
+                <span className="text-slate-500 block text-[11px]">Type</span>
+                <span className="font-semibold text-slate-800">{request.maintenance_type}</span>
+              </div>
+              <div>
+                <span className="text-slate-500 block text-[11px]">Duration</span>
+                <span className="font-semibold text-slate-800">
+                  {request.required_duration_minutes} min ({request.blocks_required} blocks)
+                </span>
+              </div>
+              <div>
+                <span className="text-slate-500 block text-[11px]">Crew required</span>
+                <span className="font-semibold text-slate-800">
+                  {request.required_team_size} · {request.department}
+                </span>
+              </div>
+              <div>
+                <span className="text-slate-500 block text-[11px]">Deadline</span>
+                <span className="font-semibold text-slate-800 font-mono">{request.deadline}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* STEP 2 — RISK SIGNAL */}
+          <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="h-6 w-6 rounded-full bg-red-100 text-red-700 font-bold text-xs flex items-center justify-center">2</span>
+                <h5 className="text-xs font-bold text-slate-900 uppercase tracking-wide">Step 2 — Neev Failure Risk Signal</h5>
+              </div>
+              <Badge variant="CRITICAL" size="sm">{risk.risk_level} RISK</Badge>
             </div>
             <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-3 rounded-lg border border-slate-100">
               <div>
-                <span className="text-slate-500 block text-[11px]">Asset Failure Risk:</span>
-                <span className="font-bold text-red-600 font-mono text-sm">81.0% (CRITICAL)</span>
+                <span className="text-slate-500 block text-[11px]">Asset failure risk</span>
+                <span className="font-bold text-red-600 font-mono text-sm">
+                  {risk.risk_score.toFixed(1)} / 100 ({risk.risk_level})
+                </span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[11px]">30-Day Degradation:</span>
-                <span className="font-bold text-slate-800 font-mono text-sm">71.1 index</span>
+                <span className="text-slate-500 block text-[11px]">30-day failure probability</span>
+                <span className="font-bold text-slate-800 font-mono text-sm">
+                  {(risk.failure_probability_30d * 100).toFixed(1)}%
+                </span>
               </div>
               <div className="col-span-2 text-slate-600 text-[11px] pt-1">
-                Objective Weighting: High risk generates composite priority score of <strong>1,762.25</strong>, ensuring immediate prioritization within the rolling horizon.
+                Weighted into a composite priority score of{' '}
+                <strong>{risk.priority_score.toLocaleString()}</strong>, which is how the objective
+                ranks this task against competing demand. Source: {risk.source}.
               </div>
             </div>
           </div>
 
-          {/* STEP 2: MAINTENANCE REQUIREMENTS */}
-          <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="h-6 w-6 rounded-full bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center">
-                  2
-                </span>
-                <h5 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
-                  Step 2 — Maintenance Operational Requirements
-                </h5>
-              </div>
-              <Badge variant="primary" size="sm">200 MIN DURATION</Badge>
-            </div>
-            <div className="grid grid-cols-3 gap-2 text-xs bg-slate-50 p-3 rounded-lg border border-slate-100">
-              <div>
-                <span className="text-slate-500 block text-[11px]">Type:</span>
-                <span className="font-semibold text-slate-800">Rail Grinding</span>
-              </div>
-              <div>
-                <span className="text-slate-500 block text-[11px]">Required Duration:</span>
-                <span className="font-semibold text-slate-800">200 min (requires 2 blocks)</span>
-              </div>
-              <div>
-                <span className="text-slate-500 block text-[11px]">Crew Needed:</span>
-                <span className="font-semibold text-slate-800">5 specialists (TRD)</span>
-              </div>
-            </div>
-          </div>
-
-          {/* STEP 3: CANDIDATE PRUNING TABLE */}
+          {/* STEP 3 — CANDIDATES & FILTERS */}
           <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="h-6 w-6 rounded-full bg-purple-100 text-purple-700 font-bold text-xs flex items-center justify-center">
-                  3
-                </span>
+                <span className="h-6 w-6 rounded-full bg-purple-100 text-purple-700 font-bold text-xs flex items-center justify-center">3</span>
                 <h5 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
-                  Step 3 — Candidate Block Evaluation & Physical Pruning
+                  Step 3 — Candidate Evaluation &amp; Feasibility Filters
                 </h5>
               </div>
-              <span className="text-xs text-slate-500 font-mono">10 Block Windows Evaluated</span>
+              <span className="text-xs text-slate-500 font-mono">
+                {summary.block_windows_considered} evaluated · {summary.rejected} pruned
+              </span>
             </div>
             <p className="text-xs text-slate-500">
-              Arnav filters out physical track closures, active passenger/freight collisions, and shift mismatches before CP-SAT optimization:
+              Each window is a contiguous block chain covering {request.required_duration_minutes} min.
+              Hard constraints are applied before the objective chooses among what survives.
             </p>
 
-            <div className="border border-slate-200 rounded-lg overflow-hidden text-xs">
-              <table className="w-full text-left">
+            <div className="border border-slate-200 rounded-lg overflow-x-auto text-xs">
+              <table className="w-full text-left min-w-[560px]">
                 <thead className="bg-slate-100 text-[11px] text-slate-600 font-mono border-b border-slate-200">
                   <tr>
-                    <th className="py-1.5 px-3">Block Option</th>
-                    <th className="py-1.5 px-3">Time Window</th>
+                    <th className="py-1.5 px-3">Block Window</th>
+                    <th className="py-1.5 px-3">Time</th>
                     <th className="py-1.5 px-3">Status</th>
-                    <th className="py-1.5 px-3">Physical Reason / Pruning Rule</th>
+                    <th className="py-1.5 px-3">Rule</th>
+                    <th className="py-1.5 px-3">Reason (from dataset)</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
-                  <tr className="bg-emerald-50/70 font-semibold text-emerald-900">
-                    <td className="py-2 px-3">BLK-009637 + BLK-009638</td>
-                    <td className="py-2 px-3">00:00 - 04:00</td>
-                    <td className="py-2 px-3 text-emerald-700">SELECTED</td>
-                    <td className="py-2 px-3 font-sans text-slate-700 font-normal">
-                      Feasible (240m &ge; 200m, 0 train conflicts, track available, TEAM-013 on shift)
-                    </td>
-                  </tr>
-                  <tr className="text-slate-600">
-                    <td className="py-1.5 px-3">BLK-009639</td>
-                    <td className="py-1.5 px-3">04:00 - 06:00</td>
-                    <td className="py-1.5 px-3 text-red-600">REJECTED</td>
-                    <td className="py-1.5 px-3 font-sans text-slate-500">Train Conflict (C002): Superfast TRN-03820 occupying track</td>
-                  </tr>
-                  <tr className="text-slate-600">
-                    <td className="py-1.5 px-3">BLK-009640</td>
-                    <td className="py-1.5 px-3">06:00 - 08:00</td>
-                    <td className="py-1.5 px-3 text-red-600">REJECTED</td>
-                    <td className="py-1.5 px-3 font-sans text-slate-500">Infrastructure (C003): Track unavailable (track_available == False)</td>
-                  </tr>
-                  <tr className="text-slate-600">
-                    <td className="py-1.5 px-3">BLK-009641</td>
-                    <td className="py-1.5 px-3">08:00 - 10:00</td>
-                    <td className="py-1.5 px-3 text-red-600">REJECTED</td>
-                    <td className="py-1.5 px-3 font-sans text-slate-500">Train Conflict (C002): Express TRN-07921 occupying track</td>
-                  </tr>
-                  <tr className="text-slate-600">
-                    <td className="py-1.5 px-3">BLK-009642</td>
-                    <td className="py-1.5 px-3">10:00 - 12:00</td>
-                    <td className="py-1.5 px-3 text-red-600">REJECTED</td>
-                    <td className="py-1.5 px-3 font-sans text-slate-500">Infrastructure (C003): Track unavailable</td>
-                  </tr>
-                  <tr className="text-slate-600">
-                    <td className="py-1.5 px-3">BLK-009645 + BLK-009646</td>
-                    <td className="py-1.5 px-3">16:00 - 20:00</td>
-                    <td className="py-1.5 px-3 text-red-600">REJECTED</td>
-                    <td className="py-1.5 px-3 font-sans text-slate-500">Team Shift (S005): TRD Night Team-013 off-duty; TRD Day Team-014 shift ends 16:00</td>
-                  </tr>
+                  {candidates.map((c) => {
+                    const style = STATUS_STYLES[c.status] || STATUS_STYLES.REJECTED;
+                    return (
+                      <tr key={c.block_ids.join('+') + c.window} className={style.row}>
+                        <td className="py-2 px-3 whitespace-nowrap">{c.block_ids.join(' + ')}</td>
+                        <td className="py-2 px-3 whitespace-nowrap">{c.window}</td>
+                        <td className={`py-2 px-3 font-semibold ${style.label}`}>{c.status}</td>
+                        <td className="py-2 px-3 text-slate-500">{c.rule}</td>
+                        <td className="py-2 px-3 font-sans text-slate-600 font-normal">{c.reason}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
           </div>
 
-          {/* STEP 4: TEAM CHECK */}
+          {/* STEP 4 — SELECTED TEAM */}
           <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="h-6 w-6 rounded-full bg-emerald-100 text-emerald-700 font-bold text-xs flex items-center justify-center">
-                  4
-                </span>
+                <span className="h-6 w-6 rounded-full bg-emerald-100 text-emerald-700 font-bold text-xs flex items-center justify-center">4</span>
                 <h5 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
-                  Step 4 — Team Availability & Department Check
+                  Step 4 — Team Feasibility (S005 / S006)
                 </h5>
               </div>
               <Badge variant="success" size="sm">CREW QUALIFIED</Badge>
             </div>
             <div className="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100 space-y-1">
-              <div>• Assigned: <strong>TEAM-013</strong> (Electrical / TRD Night Shift: 00:00 - 08:00)</div>
-              <div>• Crew Size: 6 specialists available &ge; 5 required</div>
-              <div>• Global overlap check: 0 concurrent conflicting tasks assigned to TEAM-013 across network.</div>
+              {selected.teams.map((t) => (
+                <div key={t.team_id}>
+                  • <strong>{t.team_id}</strong> ({t.department}, shift {t.shift}) — crew{' '}
+                  {t.team_size} ≥ {t.required_team_size} required
+                </div>
+              ))}
+              <div className="text-slate-500 pt-1">
+                Global non-overlap (S007) is enforced across the network by the solver, so an assigned
+                crew cannot hold two possessions at once.
+              </div>
             </div>
           </div>
 
-          {/* STEP 5: FINAL DECISION */}
+          {/* STEP 4b — TRAIN IMPACT */}
+          <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="h-6 w-6 rounded-full bg-sky-100 text-sky-700 font-bold text-xs flex items-center justify-center">5</span>
+                <h5 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
+                  Step 5 — Affected Train Services
+                </h5>
+              </div>
+              <Badge variant={trainImpact?.conflicting?.length ? 'CRITICAL' : 'success'} size="sm">
+                {trainImpact?.conflicting?.length ?? 0} CONFLICTS
+              </Badge>
+            </div>
+
+            <div className="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100 space-y-2">
+              <div>
+                <span className="font-semibold text-slate-700">Conflicting movements (C002):</span>{' '}
+                {trainImpact?.conflicting?.length ? (
+                  <span className="font-mono text-red-700">
+                    {trainImpact.conflicting.map((t) => t.train_id).join(', ')}
+                  </span>
+                ) : (
+                  <span className="text-emerald-700 font-semibold">
+                    none — no train movement overlaps this possession
+                  </span>
+                )}
+              </div>
+
+              <div>
+                <span className="font-semibold text-slate-700">
+                  Adjacent services (±{trainImpact?.adjacency_buffer_minutes ?? 60} min, C008):
+                </span>{' '}
+                {trainImpact?.adjacent?.length ? (
+                  <span className="font-mono">
+                    {trainImpact.adjacent
+                      .map((t) => `${t.train_type} ${t.train_id} ${t.window}`)
+                      .join(' · ')}
+                  </span>
+                ) : (
+                  <span className="text-emerald-700 font-semibold">
+                    none — the nearest passenger service is outside the buffer
+                  </span>
+                )}
+              </div>
+
+              <p className="text-[11px] text-slate-500 leading-snug pt-0.5">
+                {trainImpact?.note}
+              </p>
+
+              {/* No estimated delay is shown here: this possession displaces no
+                  train, so there is no delay to report. Reroute delay appears on
+                  the Live Operations screen when a train is actually diverted. */}
+              <p className="text-[11px] text-slate-500 leading-snug">
+                <span className="font-semibold">Estimated train delay:</span>{' '}
+                {trainImpact?.conflicting?.length
+                  ? 'see Live Operations for the computed reroute or hold delay'
+                  : '0 min — no service is displaced by this possession'}
+              </p>
+            </div>
+          </div>
+
+          {/* STEP 6 — DECISION */}
           <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/50 space-y-2">
             <div className="flex items-center gap-2">
               <Award size={18} className="text-emerald-700" />
               <h5 className="text-xs font-bold text-emerald-900 uppercase tracking-wide">
-                Step 5 — Final Optimization Decision
+                Step 6 — Selected Assignment
               </h5>
             </div>
-            <p className="text-xs text-emerald-950 font-medium leading-relaxed">
-              &ldquo;Best feasible assignment found by the optimizer. Selected because the block satisfies duration, section availability, train conflict, team availability and deadline constraints while capturing the night maintenance bonus.&rdquo;
-            </p>
+            <div className="text-xs text-emerald-950 font-mono bg-white/70 border border-emerald-200 rounded-lg px-3 py-2">
+              {selected.block_ids.join(' + ')} · {selected.date} · {selected.window} ·{' '}
+              {selected.teams.map((t) => t.team_id).join(', ')}
+            </div>
+            <p className="text-xs text-emerald-950 leading-relaxed">{trace.explanation}</p>
           </div>
         </div>
 
-        {/* Modal Footer */}
-        <div className="pt-2 flex justify-end">
+        {/* Footer */}
+        <div className="pt-2 flex items-center justify-between gap-3">
+          <p className="text-[10px] text-slate-400 leading-tight">
+            Recomputed by{' '}
+            <code className="font-mono">scripts/generate_decision_trace.py</code> from{' '}
+            {trace.provenance?.dataset}. Synthetic demonstration data.
+          </p>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-semibold transition-colors"
+            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-semibold transition-colors shrink-0"
           >
-            Close Decision Trace
+            Close
           </button>
         </div>
       </div>

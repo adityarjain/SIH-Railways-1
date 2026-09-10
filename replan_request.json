@@ -16,6 +16,28 @@
   ],
   "rerouting_attempted": true,
   "alternative_route_available": false,
+  "rejected_route_candidates": [
+    {
+      "path": "SEC-0004 -> SEC-0005 -> SEC-0008 -> SEC-0010",
+      "status": "REJECTED",
+      "reason": "Capacity exhausted on SEC-0005 (1/0 slots occupied)"
+    },
+    {
+      "path": "SEC-0004 -> SEC-0007 -> SEC-0008 -> SEC-0010",
+      "status": "REJECTED",
+      "reason": "Capacity exhausted on SEC-0007 (0/0 slots occupied)"
+    },
+    {
+      "path": "SEC-0004 -> SEC-0007 -> SEC-0009 -> SEC-0010",
+      "status": "REJECTED",
+      "reason": "Capacity exhausted on SEC-0007 (0/0 slots occupied)"
+    },
+    {
+      "path": "SEC-0004 -> SEC-0005 -> SEC-0006 -> SEC-0008 -> SEC-0010",
+      "status": "REJECTED",
+      "reason": "Capacity exhausted on SEC-0005 (1/0 slots occupied)"
+    }
+  ],
   "action_required": "REPLAN_MAINTENANCE_BLOCK",
-  "notes": "Rerouting failed for TRN-SIM-002: All candidate bypass routes are infeasible due to capacity, secondary maintenance, or track closures"
+  "notes": "No feasible operational action for TRN-SIM-002 (rerouting: All candidate bypass routes are infeasible due to capacity, secondary maintenance, or track closures; holding exceeds the 45 min limit)."
 }

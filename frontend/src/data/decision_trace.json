@@ -1,0 +1,230 @@
+{
+  "request": {
+    "task_id": "TASK-000005",
+    "asset_id": "AST-120005",
+    "maintenance_type": "Rail Grinding",
+    "department": "Electrical / TRD",
+    "section_id": "SEC-0004",
+    "section_name": "Delhi\u2013Agra Section 4",
+    "corridor_id": "COR-001",
+    "required_duration_minutes": 200,
+    "required_team_size": 5,
+    "blocks_required": 2,
+    "task_date": "2026-09-07",
+    "deadline": "2026-09-08"
+  },
+  "risk_signal": {
+    "source": "Neev predictive model (neev_predictions_for_optimizer.csv)",
+    "risk_score": 81.0,
+    "risk_level": "CRITICAL",
+    "failure_probability_30d": 0.8103,
+    "actual_degradation_30d": 77.5,
+    "priority_score": 67.5
+  },
+  "candidate_summary": {
+    "date_evaluated": "2026-09-07",
+    "block_windows_considered": 12,
+    "rejected": 10,
+    "feasible": 2,
+    "rejected_by_rule": {
+      "C001 / S002": 1,
+      "C002": 4,
+      "C003": 5
+    }
+  },
+  "candidates": [
+    {
+      "block_ids": [
+        "BLK-009637",
+        "BLK-009638"
+      ],
+      "window": "00:00 - 04:00",
+      "start_minute": 0,
+      "status": "SELECTED",
+      "rule": "\u2014",
+      "reason": "Feasible: 240 min capacity \u2265 200 min required, track available, 0 train conflicts, TEAM-013 on shift.",
+      "eligible_teams": [
+        "TEAM-013",
+        "TEAM-016",
+        "TEAM-019"
+      ]
+    },
+    {
+      "block_ids": [
+        "BLK-009638",
+        "BLK-009639"
+      ],
+      "window": "02:00 - 06:00",
+      "start_minute": 120,
+      "status": "REJECTED",
+      "rule": "C002",
+      "reason": "Train conflict: EMU TRN-08879 occupying the section (1 conflict).",
+      "conflicting_trains": [
+        "TRN-08879"
+      ]
+    },
+    {
+      "block_ids": [
+        "BLK-009639",
+        "BLK-009640"
+      ],
+      "window": "04:00 - 08:00",
+      "start_minute": 240,
+      "status": "REJECTED",
+      "rule": "C003",
+      "reason": "Infrastructure: track_available == No on BLK-009640."
+    },
+    {
+      "block_ids": [
+        "BLK-009640",
+        "BLK-009641"
+      ],
+      "window": "06:00 - 10:00",
+      "start_minute": 360,
+      "status": "REJECTED",
+      "rule": "C003",
+      "reason": "Infrastructure: track_available == No on BLK-009640."
+    },
+    {
+      "block_ids": [
+        "BLK-009641",
+        "BLK-009642"
+      ],
+      "window": "08:00 - 12:00",
+      "start_minute": 480,
+      "status": "REJECTED",
+      "rule": "C003",
+      "reason": "Infrastructure: track_available == No on BLK-009642."
+    },
+    {
+      "block_ids": [
+        "BLK-009642",
+        "BLK-009643"
+      ],
+      "window": "10:00 - 14:00",
+      "start_minute": 600,
+      "status": "REJECTED",
+      "rule": "C003",
+      "reason": "Infrastructure: track_available == No on BLK-009642, BLK-009643."
+    },
+    {
+      "block_ids": [
+        "BLK-009643",
+        "BLK-009644"
+      ],
+      "window": "12:00 - 16:00",
+      "start_minute": 720,
+      "status": "REJECTED",
+      "rule": "C003",
+      "reason": "Infrastructure: track_available == No on BLK-009643."
+    },
+    {
+      "block_ids": [
+        "BLK-009644",
+        "BLK-009645"
+      ],
+      "window": "14:00 - 18:00",
+      "start_minute": 840,
+      "status": "REJECTED",
+      "rule": "C002",
+      "reason": "Train conflict: Passenger TRN-01469, EMU TRN-08173 occupying the section (2 conflicts).",
+      "conflicting_trains": [
+        "TRN-01469",
+        "TRN-08173"
+      ]
+    },
+    {
+      "block_ids": [
+        "BLK-009645",
+        "BLK-009646"
+      ],
+      "window": "16:00 - 20:00",
+      "start_minute": 960,
+      "status": "FEASIBLE",
+      "rule": "\u2014",
+      "reason": "Feasible alternative (240 min capacity, 3 qualified teams on shift); not chosen by the objective.",
+      "eligible_teams": [
+        "TEAM-015",
+        "TEAM-018",
+        "TEAM-021"
+      ]
+    },
+    {
+      "block_ids": [
+        "BLK-009646",
+        "BLK-009647"
+      ],
+      "window": "18:00 - 22:00",
+      "start_minute": 1080,
+      "status": "REJECTED",
+      "rule": "C002",
+      "reason": "Train conflict: Passenger TRN-05959 occupying the section (1 conflict).",
+      "conflicting_trains": [
+        "TRN-05959"
+      ]
+    },
+    {
+      "block_ids": [
+        "BLK-009647",
+        "BLK-009648"
+      ],
+      "window": "20:00 - 24:00",
+      "start_minute": 1200,
+      "status": "REJECTED",
+      "rule": "C002",
+      "reason": "Train conflict: Passenger TRN-05959 occupying the section (1 conflict).",
+      "conflicting_trains": [
+        "TRN-05959"
+      ]
+    },
+    {
+      "block_ids": [
+        "BLK-009648"
+      ],
+      "window": "22:00 - 24:00",
+      "start_minute": 1320,
+      "status": "REJECTED",
+      "rule": "C001 / S002",
+      "reason": "Duration: 120 min available from this start; 200 min required and no contiguous follow-on block completes the chain."
+    }
+  ],
+  "selected": {
+    "block_ids": [
+      "BLK-009637",
+      "BLK-009638"
+    ],
+    "date": "2026-09-07",
+    "window": "00:00 - 03:20",
+    "teams": [
+      {
+        "team_id": "TEAM-013",
+        "team_name": "OHE Team",
+        "department": "Electrical / TRD",
+        "team_size": 6,
+        "required_team_size": 5,
+        "shift": "00:00 - 08:00"
+      }
+    ]
+  },
+  "train_impact": {
+    "conflicting": [],
+    "adjacent": [],
+    "adjacency_buffer_minutes": 60,
+    "note": "Conflicting trains block the possession and must be zero for a valid plan (C002). Adjacent trains run near the window and are weighted by the C008 passenger-impact term; they are not conflicts."
+  },
+  "explanation": "12 block windows on SEC-0004 were evaluated for 2026-09-07. 10 were pruned by hard constraints (track availability, train conflicts, duration coverage and crew shift). Of the 2 feasible options the objective selected BLK-009637 + BLK-009638, which satisfies duration, section availability, train-conflict and team-shift constraints before the 2026-09-08 deadline.",
+  "provenance": {
+    "scope": "DECISION_TRACE",
+    "description": "Per-candidate evaluation of every block window on the task's section and date, recomputed from the dataset. Not a narrative.",
+    "generator": "scripts/generate_decision_trace.py (optimizer/explain.py)",
+    "plan_artifact": "optimized_block_plan.json",
+    "dataset": "Arnav_Optimizer_Clean_Dataset",
+    "sources": [
+      "blocks.csv (track_available, block windows)",
+      "train_block_conflicts.csv (conflicting train ids)",
+      "trains.csv (train types)",
+      "teams.csv (department, shift windows, crew size)",
+      "maintenance_tasks.csv (duration, deadline, crew requirement)"
+    ]
+  }
+}

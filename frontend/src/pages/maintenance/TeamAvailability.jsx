@@ -58,7 +58,7 @@ export const TeamAvailability = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {deptTeams.map((team) => {
           const isTeam13 = team.team_id === 'TEAM-013';
-          const isTeam18 = team.team_id === 'TEAM-018';
+          const isTeam18 = team.team_id === 'TEAM-015';
 
           return (
             <div

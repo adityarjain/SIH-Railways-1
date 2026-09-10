@@ -16,7 +16,10 @@ import {
 import { BarChart3, Clock, Sparkles, CheckCircle2, ShieldAlert } from 'lucide-react';
 
 export const Analytics = () => {
-  const { metrics } = usePlan();
+  const { metrics, scheduledTasks } = usePlan();
+
+  // Total scheduled tasks, from the metrics artifact rather than a literal 53.
+  const totalScheduled = metrics.summary.total_scheduled;
 
   const riskData = [
     { name: 'Critical (≥80)', count: metrics.risk_breakdown.critical_risk_scheduled, color: '#DC2626' },
@@ -25,16 +28,29 @@ export const Analytics = () => {
     { name: 'Low (<40)', count: metrics.risk_breakdown.low_risk_scheduled, color: '#16A34A' },
   ];
 
-  const departmentData = [
-    { name: 'Track / Civil', count: 18, fill: '#2563EB' },
-    { name: 'Electrical / TRD', count: 16, fill: '#7C3AED' },
-    { name: 'Signal & Telecom', count: 11, fill: '#059669' },
-    { name: 'Mechanical / Rolling', count: 8, fill: '#D97706' },
-  ];
+  // Counted from the scheduled plan, so the chart moves with the data.
+  const DEPT_COLORS = {
+    'Track / Civil Engineering': '#2563EB',
+    'Electrical / TRD': '#7C3AED',
+    'Signal & Telecommunications (S&T)': '#059669',
+    'Mechanical / Rolling Stock': '#D97706',
+  };
+  const departmentData = Object.entries(
+    scheduledTasks.reduce((acc, task) => {
+      acc[task.department] = (acc[task.department] || 0) + 1;
+      return acc;
+    }, {})
+  )
+    .map(([name, count]) => ({
+      name: name.replace(' Engineering', '').replace(' (S&T)', '').replace(' Stock', ''),
+      count,
+      fill: DEPT_COLORS[name] || '#64748B',
+    }))
+    .sort((a, b) => b.count - a.count);
 
   const nightDayData = [
     { name: 'Night Window (00:00 - 08:00)', value: metrics.operational_metrics.night_maintenance_tasks, color: '#1E40AF' },
-    { name: 'Day Window (08:00 - 16:00)', value: 53 - metrics.operational_metrics.night_maintenance_tasks, color: '#F59E0B' },
+    { name: 'Day Window (08:00 - 16:00)', value: totalScheduled - metrics.operational_metrics.night_maintenance_tasks, color: '#F59E0B' },
   ];
 
   return (
@@ -49,7 +65,9 @@ export const Analytics = () => {
           Optimization Metrics & Solver Telemetry
         </h2>
         <p className="text-xs text-slate-500 mt-0.5">
-          Mathematical telemetry extracted from Google OR-Tools CP-SAT solver and Neev risk distribution.
+          Solver telemetry and Neev risk distribution for the <strong>demo scenario</strong> (62
+          tasks solved by <code className="font-mono">demo.py</code>). Full-dataset baseline figures
+          are on the Overview screen.
         </p>
       </div>
 
@@ -61,7 +79,7 @@ export const Analytics = () => {
             {metrics.summary.runtime_seconds}s
           </span>
           <span className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1 mt-1">
-            <CheckCircle2 size={12} /> Near-instantaneous solve
+            <CheckCircle2 size={12} /> Demo scenario solve time
           </span>
         </div>
 
@@ -78,10 +96,10 @@ export const Analytics = () => {
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
           <span className="text-[10px] uppercase font-bold text-slate-400 block font-mono">Night Window Preference</span>
           <span className="text-2xl font-bold font-mono text-indigo-700 mt-1 block">
-            {((metrics.operational_metrics.night_maintenance_tasks / 53) * 100).toFixed(0)}%
+            {((metrics.operational_metrics.night_maintenance_tasks / totalScheduled) * 100).toFixed(0)}%
           </span>
           <span className="text-[11px] text-slate-500 mt-1 block">
-            44 of 53 tasks in night slot
+            {metrics.operational_metrics.night_maintenance_tasks} of {totalScheduled} tasks in night slot
           </span>
         </div>
 
@@ -91,7 +109,7 @@ export const Analytics = () => {
             {metrics.operational_metrics.total_team_maintenance_hours}h
           </span>
           <span className="text-[11px] text-slate-500 mt-1 block">
-            Across 27 deployed crews
+            Across {metrics.operational_metrics.teams_utilized} deployed crews
           </span>
         </div>
       </div>

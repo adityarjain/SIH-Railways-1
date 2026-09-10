@@ -18,8 +18,15 @@ export const Header = () => {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
           </span>
-          <span className="text-xs font-semibold text-slate-700 tracking-wide uppercase">Operational</span>
+          <span className="text-xs font-semibold text-slate-700 tracking-wide uppercase">Simulation Active</span>
         </div>
+
+        <span
+          className="text-[10px] font-semibold uppercase tracking-wider text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5"
+          title="This interface runs on a synthetic dataset and simulated operational events. It is not connected to any railway system."
+        >
+          Synthetic Data
+        </span>
 
         <div className="h-4 w-px bg-slate-200" />
 

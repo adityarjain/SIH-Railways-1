@@ -4,6 +4,7 @@ import { Badge } from '../../components/common/Badge';
 import { MetricCard } from '../../components/common/MetricCard';
 import { useAuth } from '../../context/AuthContext';
 import { usePlan } from '../../context/PlanContext';
+import { minToHhmm } from '../../utils/time';
 import {
   Wrench,
   Clock,
@@ -18,13 +19,18 @@ import {
 
 export const MaintDashboard = ({ onNavigate }) => {
   const { selectedDept } = useAuth();
-  const { tasksInventory, scheduledTasks } = usePlan();
+  const { tasksInventory, completedWork } = usePlan();
 
   // Filter tasks for the selected department
   const deptTasks = tasksInventory.filter((t) => t.department === selectedDept);
   const pendingTasks = deptTasks.filter((t) => t.status === 'Pending');
   const criticalTasks = deptTasks.filter((t) => t.risk_score >= 80);
-  const scheduledDeptTasks = scheduledTasks.filter((t) => t.department === selectedDept);
+  // Inventory records carry both the work-order fields and the scheduling facts,
+  // so the cards below need no fallbacks.
+  const scheduledDeptTasks = deptTasks.filter((t) => t.status !== 'Pending' && t.scheduled_date);
+  const completedDeptWork = completedWork.filter((j) => j.department === selectedDept);
+  // Crews actually assigned to this department's scheduled possessions.
+  const activeCrews = new Set(scheduledDeptTasks.flatMap((t) => t.assigned_teams || []));
 
   return (
     <div className="space-y-6">
@@ -75,17 +81,17 @@ export const MaintDashboard = ({ onNavigate }) => {
           onClick={() => onNavigate('my-tasks')}
         />
         <MetricCard
-          title="Active Teams"
-          value="8 crews"
-          subtext="Across 3 shifts"
+          title="Assigned Crews"
+          value={activeCrews.size}
+          subtext="Distinct crews in block plan"
           icon={Users}
           color="purple"
           onClick={() => onNavigate('teams')}
         />
         <MetricCard
           title="Completed Work"
-          value="14 jobs"
-          subtext="This rolling horizon"
+          value={completedDeptWork.length}
+          subtext="Possessions handed back"
           icon={CheckCircle2}
           color="green"
           onClick={() => onNavigate('completed')}
@@ -115,7 +121,7 @@ export const MaintDashboard = ({ onNavigate }) => {
               <div className="flex items-start justify-between">
                 <div>
                   <span className="font-mono font-bold text-slate-900 text-sm">{t.task_id}</span>
-                  <h4 className="text-xs font-bold text-slate-800 mt-0.5">{t.maintenance_type || 'Rail Maintenance'}</h4>
+                  <h4 className="text-xs font-bold text-slate-800 mt-0.5">{t.maintenance_type || '\u2014'}</h4>
                   <p className="text-[11px] text-slate-500">{t.section_id} • Asset {t.asset_id}</p>
                 </div>
                 <Badge variant={t.risk_score >= 80 ? 'CRITICAL' : 'primary'} size="sm">
@@ -127,7 +133,7 @@ export const MaintDashboard = ({ onNavigate }) => {
                 <div className="flex justify-between text-slate-700">
                   <span className="text-slate-400 font-sans">Window:</span>
                   <span className="font-bold">
-                    {t.date} | {Math.floor(t.start_minute / 60)}:00 – {Math.floor(t.end_minute / 60)}:00
+                    {t.scheduled_date} | {minToHhmm(t.start_minute)} – {minToHhmm(t.end_minute)}
                   </span>
                 </div>
                 <div className="flex justify-between text-slate-700">
@@ -139,7 +145,7 @@ export const MaintDashboard = ({ onNavigate }) => {
               </div>
 
               <div className="flex items-center justify-between pt-1">
-                <span className="text-[11px] text-slate-500">Duration: {t.duration_minutes}m</span>
+                <span className="text-[11px] text-slate-500">Duration: {t.required_duration_minutes}m</span>
                 <button
                   onClick={() => onNavigate('my-tasks')}
                   className="px-2.5 py-1 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded text-xs font-semibold transition-colors"

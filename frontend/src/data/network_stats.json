@@ -1,0 +1,13 @@
+{
+  "total_block_windows": 33600,
+  "track_available_block_windows": 27412,
+  "track_availability_percent": 81.6,
+  "sections": 200,
+  "corridors": 20,
+  "horizon_days": 14,
+  "provenance": {
+    "scope": "NETWORK_AVAILABILITY",
+    "source": "Arnav_Optimizer_Clean_Dataset/blocks.csv (track_available column)",
+    "generator": "scripts/generate_tasks_inventory.py"
+  }
+}

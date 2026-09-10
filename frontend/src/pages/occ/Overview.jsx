@@ -4,6 +4,8 @@ import { Card } from '../../components/common/Card';
 import { Badge } from '../../components/common/Badge';
 import { usePlan } from '../../context/PlanContext';
 import corridorsSectionsData from '../../data/corridors_sections.json';
+import networkStats from '../../data/network_stats.json';
+import teamsData from '../../data/teams.json';
 import {
   AlertTriangle,
   Clock,
@@ -20,8 +22,12 @@ import {
 } from 'lucide-react';
 
 export const Overview = ({ onNavigate }) => {
-  const { metrics, scheduledTasks, activeEvent } = usePlan();
+  // These KPIs report the full 30,000-task optimizer run, not the scenario
+  // rendered on the planning screen. The row is captioned accordingly so the
+  // two are never read as one number.
+  const { baselineMetrics: metrics, scheduledTasks, activeEvent } = usePlan();
   const [selectedCorridorId, setSelectedCorridorId] = useState('COR-001');
+  const teamsTotal = teamsData.length;
 
   const corridors = corridorsSectionsData.corridors;
   const sections = corridorsSectionsData.sections;
@@ -65,7 +71,16 @@ export const Overview = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* 6 Core KPIs */}
+      {/* 6 Core KPIs — full-dataset optimizer baseline */}
+      <div className="flex items-center justify-between flex-wrap gap-1">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600">
+          Optimizer Baseline — Full Dataset
+        </h3>
+        <p className="text-[11px] text-slate-500">
+          30,000 tasks · 14-day horizon · CP-SAT run recorded in{' '}
+          <code className="font-mono text-slate-600">benchmarks/full_run_metrics.json</code>
+        </p>
+      </div>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
         <MetricCard
           title="Critical Maintenance"
@@ -78,7 +93,7 @@ export const Overview = ({ onNavigate }) => {
         <MetricCard
           title="Pending Demand"
           value={metrics.summary.total_deferred.toLocaleString()}
-          subtext="Tasks in 30k inventory"
+          subtext="Not scheduled in this horizon"
           icon={Clock}
           color="amber"
           onClick={() => onNavigate('demand')}
@@ -101,15 +116,15 @@ export const Overview = ({ onNavigate }) => {
         />
         <MetricCard
           title="Teams Utilized"
-          value={`${metrics.operational_metrics.teams_utilized}/39`}
+          value={`${metrics.operational_metrics.teams_utilized}/${teamsTotal}`}
           subtext="Specialist maintenance crews"
           icon={Users}
           color="purple"
         />
         <MetricCard
-          title="Network Status"
-          value="94.2%"
-          subtext="Section availability index"
+          title="Track Availability"
+          value={`${networkStats.track_availability_percent}%`}
+          subtext={`${networkStats.track_available_block_windows.toLocaleString()} of ${networkStats.total_block_windows.toLocaleString()} block windows`}
           icon={ShieldCheck}
           color="green"
         />
@@ -121,7 +136,7 @@ export const Overview = ({ onNavigate }) => {
         <div className="lg:col-span-2 space-y-4">
           <Card
             title="Railway Network & Corridor Sections Overview"
-            subtitle="Real-time track possession availability, electrification, and active maintenance"
+            subtitle="Track possession availability, electrification and active maintenance, from the synthetic network dataset"
             action={
               <div className="flex items-center gap-2">
                 <span className="text-xs text-slate-500 font-medium">Corridor:</span>

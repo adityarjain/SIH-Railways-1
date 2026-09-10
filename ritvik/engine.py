@@ -36,7 +36,7 @@ class RitvikEngine:
         self.events: List[OperationalEvent] = []
         self.corridor_meta: Dict[str, Dict[str, str]] = {}
 
-        self.conflict_detector = ConflictDetector()
+        self.conflict_detector = ConflictDetector(self.config.safety_buffer_minutes)
         self.capacity_evaluator = CapacityEvaluator(self.config)
         self.rerouting_engine: Optional[ReroutingEngine] = None
 
@@ -45,10 +45,6 @@ class RitvikEngine:
         if self.config.plan_json_path.exists():
             self.maintenance_plan = load_maintenance_plan(self.config.plan_json_path)
 
-        if self.config.topology_path.exists():
-            self.topology = load_route_topology(self.config.topology_path)
-            self.rerouting_engine = ReroutingEngine(self.topology, self.capacity_evaluator, self.config)
-
         trains_csv = self.config.data_dir / "trains.csv"
         if trains_csv.exists():
             self.existing_trains = load_trains_csv(trains_csv)
@@ -56,6 +52,14 @@ class RitvikEngine:
         sections_csv = self.config.data_dir / "corridors_sections.csv"
         if sections_csv.exists():
             self.corridor_meta = load_corridors_sections(sections_csv)
+
+        # Built after corridor_meta so the rerouting engine can compute detour
+        # delay from real section length and line speed.
+        if self.config.topology_path.exists():
+            self.topology = load_route_topology(self.config.topology_path)
+            self.rerouting_engine = ReroutingEngine(
+                self.topology, self.capacity_evaluator, self.config, section_meta=self.corridor_meta
+            )
 
         if self.config.events_path.exists():
             self.events = load_operational_events(self.config.events_path)
@@ -110,6 +114,7 @@ class RitvikEngine:
             maint=maint,
             conflict_report=conflict_report,
             reroute_results=reroute_results,
+            max_hold_minutes=self.config.max_acceptable_hold_minutes,
         )
 
         return decision, conflict_report, reroute_results
@@ -131,7 +136,9 @@ class RitvikEngine:
             dec_path = serialize_operational_decision(decision, self.config.output_decision_path)
             paths["decision"] = str(dec_path)
             if decision.replanning_required:
-                rep_path = serialize_replan_request(decision, conflict_report, self.config.replan_request_path)
+                rep_path = serialize_replan_request(
+                    decision, conflict_report, self.config.replan_request_path, reroute_results
+                )
                 paths["replan_request"] = str(rep_path)
 
         return {

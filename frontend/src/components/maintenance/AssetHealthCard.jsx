@@ -6,9 +6,10 @@ export const AssetHealthCard = ({ asset }) => {
   const isCritical = asset.risk_score >= 80;
   const isHigh = asset.risk_score >= 60 && asset.risk_score < 80;
 
-  // Human-readable indicators
-  const recentFaults = isCritical ? 'High (3 alarms in 7d)' : isHigh ? 'Moderate' : 'Low';
-  const wearLevel = isCritical ? 'Severe Mechanical Wear' : isHigh ? 'Accelerated Degradation' : 'Normal Operational Wear';
+  // Risk banding, which is a restatement of the model's own risk_level -- not a
+  // separate physical observation. Fault counts and wear readings were shown here
+  // previously; the pipeline carries neither, so they have been removed rather
+  // than derived from the risk score and presented as sensor data.
 
   return (
     <div className={`p-4 rounded-xl border bg-white shadow-xs transition-all hover:shadow-md ${
@@ -59,24 +60,26 @@ export const AssetHealthCard = ({ asset }) => {
         <div className="p-2 rounded bg-slate-50 border border-slate-100">
           <span className="text-[10px] text-slate-400 block">30-Day Degradation</span>
           <span className="font-mono font-bold text-slate-800">
-            {asset.forecast_30d_degradation ? asset.forecast_30d_degradation.toFixed(1) : '71.1'} index
+            {asset.forecast_30d_degradation != null ? `${asset.forecast_30d_degradation.toFixed(1)} index` : '\u2014'}
           </span>
         </div>
         <div className="p-2 rounded bg-slate-50 border border-slate-100">
           <span className="text-[10px] text-slate-400 block">Failure Probability</span>
           <span className="font-mono font-bold text-slate-800">
-            {asset.failure_probability_30d ? (asset.failure_probability_30d * 100).toFixed(0) : '81'}%
+            {asset.failure_probability_30d != null ? `${(asset.failure_probability_30d * 100).toFixed(1)}%` : '\u2014'}
           </span>
         </div>
         <div className="p-2 rounded bg-slate-50 border border-slate-100">
-          <span className="text-[10px] text-slate-400 block">Recent Faults</span>
+          <span className="text-[10px] text-slate-400 block">Risk Band</span>
           <span className={`font-semibold ${isCritical ? 'text-red-700' : 'text-slate-700'}`}>
-            {recentFaults}
+            {asset.risk_level || '—'}
           </span>
         </div>
         <div className="p-2 rounded bg-slate-50 border border-slate-100">
-          <span className="text-[10px] text-slate-400 block">Wear Level</span>
-          <span className="font-semibold text-slate-700 truncate block">{wearLevel}</span>
+          <span className="text-[10px] text-slate-400 block">Maintenance Type</span>
+          <span className="font-semibold text-slate-700 truncate block">
+            {asset.maintenance_type || '—'}
+          </span>
         </div>
       </div>
     </div>

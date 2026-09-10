@@ -37,7 +37,7 @@ export const Network = ({ onNavigate }) => {
             Corridors & Track Sections Browser
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Complete topology of 200 railway sections across 20 major Indian Railways corridors.
+            Synthetic network of 200 sections across 20 corridors, modelled on Indian Railways naming. Rerouting adjacency is a prototype covering 22 of these sections; conflicts elsewhere escalate to replanning rather than being rerouted.
           </p>
         </div>
         <div className="text-xs text-slate-500 font-mono">

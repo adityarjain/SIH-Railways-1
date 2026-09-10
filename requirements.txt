@@ -4,3 +4,7 @@ numpy>=2.0.0
 pytest>=8.0.0
 joblib>=1.3.0
 scikit-learn>=1.3.0
+# Required to load the Neev failure-risk classifier (neev_failure_risk_model.cbm)
+# in NEEV_FINAL_MODULE/neev_model_demo.ipynb. Not needed by the optimizer, which
+# consumes the exported predictions CSV.
+catboost>=1.2

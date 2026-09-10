@@ -94,6 +94,7 @@ def validate_schedule(
     # 3. Read deferred tasks from CSV
     deferred_tasks: Dict[str, Dict[str, Any]] = {}
     valid_deferral_reasons = {
+        # Produced by a full solve (optimizer.main)
         "no_feasible_track_block",
         "no_qualifying_team_shift",
         "block_capacity_exhausted",
@@ -101,6 +102,12 @@ def validate_schedule(
         "solver_objective_outranked",
         "batch_limit_excluded_on_deadline",
         "no_candidate_window_within_horizon",
+        # Carried over by a targeted replan, which re-solves one task and cannot
+        # re-derive why the base solve deferred the rest (optimizer.replan).
+        "deferred_in_base_plan",
+        # Outside the subset a scenario demo actually solved (demo.py). Present
+        # only so the inventory check sees every task; not a solver outcome.
+        "not_in_demo_subset",
     }
 
     with open(deferred_csv_path, "r", encoding="utf-8") as f:

@@ -80,7 +80,9 @@ export const GeneralPortal = () => {
           Verify Completed Work
         </h2>
         <p className="text-xs text-slate-500 mt-0.5">
-          Public and field auditor portal to certify completed maintenance possessions or report incorrect closures.
+          Public and field auditor portal to certify completed maintenance possessions or report
+          incorrect closures. Demo records are held for the current session only — nothing is written
+          to an external audit register and no notifications are sent.
         </p>
       </div>
 

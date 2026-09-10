@@ -44,6 +44,7 @@ node_modules/
 
 # Generated optimizer / replanning artifacts
 replan_output/
+demo_output/
 deferred_tasks.csv
 
 # Logs

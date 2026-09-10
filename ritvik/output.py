@@ -5,10 +5,11 @@ Generates ritvik_operational_decision.json (for Aditya) and replan_request.json 
 
 import json
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, List, Optional
 
 from ritvik.decision import OperationalDecision
 from ritvik.conflict_detector import ConflictReport
+from ritvik.rerouting import RerouteResult
 
 
 def serialize_operational_decision(
@@ -27,6 +28,7 @@ def serialize_replan_request(
     decision: OperationalDecision,
     conflict_report: Optional[ConflictReport],
     output_path: Path,
+    reroute_results: Optional[List[RerouteResult]] = None,
 ) -> Path:
     """
     Serializes a targeted replan request for Arnav.
@@ -42,6 +44,16 @@ def serialize_replan_request(
         end_time = f"{e_m // 60:02d}:{e_m % 60:02d}"
         conflicting_train_ids = [t.train_id for t in conflict_report.conflicting_trains]
 
+    # Derived from what actually ran. A BLOCK_UNAVAILABLE closure short-circuits
+    # detection before any route search, so reporting "rerouting_attempted: true"
+    # there would describe work the engine never did.
+    results = reroute_results or []
+    rerouting_attempted = len(results) > 0
+    alternative_route_available = any(r.route_found for r in results)
+    rejected_candidates = [
+        c for r in results for c in r.inspected_candidates if c.get("status") == "REJECTED"
+    ]
+
     data: Dict[str, Any] = {
         "event": "REPLAN_REQUEST",
         "reason": decision.replan_reason or "UNRESOLVED_OPERATIONAL_CONFLICT",
@@ -53,8 +65,9 @@ def serialize_replan_request(
             "end": end_time,
         },
         "conflicting_trains": conflicting_train_ids,
-        "rerouting_attempted": True,
-        "alternative_route_available": False,
+        "rerouting_attempted": rerouting_attempted,
+        "alternative_route_available": alternative_route_available,
+        "rejected_route_candidates": rejected_candidates,
         "action_required": "REPLAN_MAINTENANCE_BLOCK",
         "notes": decision.details,
     }

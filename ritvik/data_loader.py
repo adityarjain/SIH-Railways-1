@@ -176,5 +176,9 @@ def load_corridors_sections(csv_path: Path) -> Dict[str, Dict[str, str]]:
                 "section_name": r["section_name"],
                 "region": r.get("region", ""),
                 "track_type": r.get("track_type", ""),
+                # Physical characteristics. These were previously dropped, which left
+                # the rerouting engine with no way to express delay in real minutes.
+                "section_length_km": r.get("section_length_km", ""),
+                "maximum_speed_kmph": r.get("maximum_speed_kmph", ""),
             }
     return meta

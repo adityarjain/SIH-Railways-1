@@ -55,7 +55,7 @@ def run_closed_loop_demo():
     print(f"Neev Risk Score:      {init_task.risk_score:.1f} / 100.0 (CRITICAL)")
 
     # ==========================================================================
-    # STEP 2: REAL-TIME OPERATIONAL DISRUPTION
+    # STEP 2: SIMULATED OPERATIONAL DISRUPTION
     # ==========================================================================
     print("\n[STEP 2] OPERATIONAL DISRUPTION INJECTED")
     print("--------------------------------------------------------------------------------")

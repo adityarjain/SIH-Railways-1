@@ -81,7 +81,7 @@ export const Demand = ({ onNavigate }) => {
           <option value="ALL">All Departments</option>
           <option value="Track / Civil Engineering">Track / Civil Engineering</option>
           <option value="Electrical / TRD">Electrical / TRD</option>
-          <option value="Signal & Telecommunications">Signal & Telecommunications</option>
+          <option value="Signal & Telecommunications (S&T)">Signal &amp; Telecommunications (S&amp;T)</option>
           <option value="Mechanical / Rolling Stock">Mechanical / Rolling Stock</option>
         </select>
 

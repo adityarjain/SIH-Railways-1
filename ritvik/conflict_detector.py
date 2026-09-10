@@ -25,6 +25,13 @@ class ConflictReport:
 class ConflictDetector:
     """Evaluates time overlaps and physical track state against maintenance plans."""
 
+    def __init__(self, safety_buffer_minutes: int = 0):
+        # Widens the possession window on both sides before testing for overlap,
+        # so a train passing immediately either side of a possession is treated as
+        # a conflict. Configured by RitvikConfig.safety_buffer_minutes, which was
+        # previously defined but never applied.
+        self.safety_buffer_minutes = max(0, safety_buffer_minutes)
+
     @staticmethod
     def check_time_overlap(
         start_1: int, end_1: int, start_2: int, end_2: int
@@ -79,8 +86,8 @@ class ConflictDetector:
                     and evt.departure_minute is not None
                 ):
                     overlaps, window = self.check_time_overlap(
-                        maint.start_minute,
-                        maint.end_minute,
+                        maint.start_minute - self.safety_buffer_minutes,
+                        maint.end_minute + self.safety_buffer_minutes,
                         evt.arrival_minute,
                         evt.departure_minute,
                     )
@@ -109,7 +116,10 @@ class ConflictDetector:
                 continue
             if tr.date == maint.date and tr.section_id == maint.section_id:
                 overlaps, window = self.check_time_overlap(
-                    maint.start_minute, maint.end_minute, tr.arrival_minute, tr.departure_minute
+                    maint.start_minute - self.safety_buffer_minutes,
+                    maint.end_minute + self.safety_buffer_minutes,
+                    tr.arrival_minute,
+                    tr.departure_minute,
                 )
                 if overlaps and window:
                     conflicting_trains.append(tr)

@@ -51,5 +51,13 @@ class RitvikConfig:
 
     # Search and routing limits
     max_search_depth: int = 6
+    # Fallback only: used to estimate detour time for sections whose length or
+    # line speed is missing from corridors_sections.csv. Where those fields are
+    # present the delay is computed from them instead.
     reroute_time_penalty_per_hop_minutes: int = 15
     safety_buffer_minutes: int = 0
+
+    # Holding: a conflicting train may wait for the possession to be handed back
+    # instead of being rerouted. Beyond this many minutes holding is treated as
+    # unacceptable operational disruption and the maintenance is replanned instead.
+    max_acceptable_hold_minutes: int = 45

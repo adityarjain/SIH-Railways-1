@@ -4,6 +4,7 @@ import { Badge } from '../../components/common/Badge';
 import { TaskActionModal } from '../../components/maintenance/TaskActionModal';
 import { useAuth } from '../../context/AuthContext';
 import { usePlan } from '../../context/PlanContext';
+import { minToHhmm } from '../../utils/time';
 import {
   Wrench,
   Clock,
@@ -87,18 +88,26 @@ export const MyTasks = () => {
                 </Badge>
               </div>
 
-              {/* Specs Box */}
+              {/* Specs Box — every value is this task's own, from the generated plan */}
               <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 text-xs space-y-1.5 font-mono">
                 <div className="flex justify-between text-slate-700">
                   <span className="text-slate-400 font-sans">Scheduled:</span>
                   <span className="font-bold text-slate-900">
-                    {t.task_date} | {t.status === 'Replanned' ? '18:00 – 21:20' : '00:00 – 03:20'}
+                    {t.scheduled_date
+                      ? `${t.scheduled_date} | ${minToHhmm(t.start_minute)} – ${minToHhmm(t.end_minute)}`
+                      : `Not yet scheduled (due ${t.deadline})`}
                   </span>
                 </div>
                 <div className="flex justify-between text-slate-700">
                   <span className="text-slate-400 font-sans">Assigned Team:</span>
                   <span className="font-bold text-blue-700">
-                    {t.status === 'Replanned' ? 'TEAM-018 (Evening/Night)' : 'TEAM-013 (Night Shift)'}
+                    {t.assigned_teams?.length ? t.assigned_teams.join(', ') : '—'}
+                  </span>
+                </div>
+                <div className="flex justify-between text-slate-700">
+                  <span className="text-slate-400 font-sans">Block Possession:</span>
+                  <span className="font-bold text-slate-900">
+                    {t.block_ids?.length ? t.block_ids.join(' + ') : '—'}
                   </span>
                 </div>
                 <div className="flex justify-between text-slate-700">

@@ -79,7 +79,14 @@ def replan_from_request(
 
     solver = cp_model.CpSolver()
     solver.parameters.max_time_in_seconds = config.solver_time_limit_seconds
-    solver.parameters.num_search_workers = config.num_workers
+    # A replan re-solves a single task, and several crews are usually equally
+    # optimal for the chosen window. Parallel workers broke that tie differently
+    # from run to run, so the same demo produced TEAM-015 or TEAM-018 at random
+    # and disagreed with the walkthrough. One worker with a fixed seed makes the
+    # choice reproducible; the model and objective are unchanged, and the cost is
+    # negligible for a one-task solve.
+    solver.parameters.num_search_workers = 1
+    solver.parameters.random_seed = 20260907
     status_code = solver.Solve(model_builder.model)
     status_name = solver.StatusName(status_code)
 
@@ -111,6 +118,7 @@ def replan_from_request(
         task_id=task.task_id,
         asset_id=task.asset_id,
         department=task.department,
+        maintenance_type=task.maintenance_type,
         section_id=task.section_id,
         corridor_id=task.corridor_id,
         date=selected_cand.date,
@@ -140,10 +148,20 @@ def replan_from_request(
             updated_scheduled[tid] = new_record
         else:
             t_obj = bundle.tasks.get(tid)
+            if t_obj is None:
+                # Every task in the plan must exist in the authoritative dataset with
+                # a Neev prediction. Substituting a default risk here would invent a
+                # prediction the model never made, so fail loudly instead.
+                raise KeyError(
+                    f"Task {tid} is present in {plan_json_path} but missing from the "
+                    f"dataset bundle, so its Neev risk cannot be resolved. Refusing to "
+                    f"substitute a placeholder risk value."
+                )
             updated_scheduled[tid] = ScheduledTaskRecord(
                 task_id=tid,
                 asset_id=item["asset_id"],
                 department=item["department"],
+                maintenance_type=item.get("maintenance_type", t_obj.maintenance_type),
                 section_id=item["section_id"],
                 corridor_id=item.get("corridor_id", ""),
                 date=item["date"],
@@ -157,8 +175,8 @@ def replan_from_request(
                 bundled_with_task_ids=tuple(item.get("bundled_with", [])),
                 is_night=bool(item.get("is_night", False)),
                 risk_score=float(item.get("risk_score", 0.0)),
-                risk_level=t_obj.risk_level if t_obj else "CRITICAL",
-                failure_probability_30d=t_obj.failure_probability_30d if t_obj else 0.5,
+                risk_level=t_obj.risk_level,
+                failure_probability_30d=t_obj.failure_probability_30d,
                 priority_score=float(item.get("priority_score", 0.0)),
             )
 

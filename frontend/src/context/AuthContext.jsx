@@ -11,7 +11,7 @@ export const ROLES = {
 export const DEPARTMENTS = [
   'Track / Civil Engineering',
   'Electrical / TRD',
-  'Signal & Telecommunications',
+  'Signal & Telecommunications (S&T)',
   'Mechanical / Rolling Stock',
 ];
 

@@ -37,7 +37,8 @@ export const GanttTimeline = ({
             BLOCK PLANNING TIMELINE — {selectedDate}
           </span>
           <span className="text-xs text-slate-500">
-            ({scheduledTasks.filter((t) => t.date === selectedDate).length} active possessions)
+            ({sections.reduce((n, sec) => n + (tasksBySection[sec.section_id] || []).length, 0)} possessions
+            {' '}across {sections.length} sections)
           </span>
         </div>
 
@@ -81,6 +82,11 @@ export const GanttTimeline = ({
 
           {/* Section Rows */}
           <div className="divide-y divide-slate-100">
+            {sections.length === 0 && (
+              <div className="px-4 py-10 text-center text-xs text-slate-400">
+                No scheduled possessions for this date and corridor. Pick another option above.
+              </div>
+            )}
             {sections.map((sec) => {
               const tasks = tasksBySection[sec.section_id] || [];
               return (

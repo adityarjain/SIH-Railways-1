@@ -2,6 +2,7 @@ import React from 'react';
 import { Card } from '../../components/common/Card';
 import { Badge } from '../../components/common/Badge';
 import { usePlan } from '../../context/PlanContext';
+import { minToHhmm } from '../../utils/time';
 import {
   RefreshCw,
   CheckCircle2,
@@ -16,7 +17,16 @@ import {
 } from 'lucide-react';
 
 export const Replanning = ({ onNavigate }) => {
-  const { isReplanned, toggleReplan } = usePlan();
+  const {
+    isReplanned, toggleReplan, scheduledTasks, replanScenario, replanMetadata,
+  } = usePlan();
+
+  // Facts come from the plan and from Ritvik's engine output, not from literals.
+  const conflict = replanScenario?.conflict;
+  const conflictEvent = replanScenario?.event;
+  const rejectedRoutes = (replanScenario?.reroute_results ?? [])
+    .flatMap((r) => r.inspected_candidates ?? [])
+    .filter((c) => c.status === 'REJECTED');
 
   return (
     <div className="space-y-6">
@@ -112,18 +122,32 @@ export const Replanning = ({ onNavigate }) => {
             <div className="p-3 bg-white rounded-lg border border-amber-200 space-y-2">
               <div className="font-bold text-slate-900 text-xs">High-Priority Train Movement</div>
               <p className="text-slate-600 text-[11px] leading-relaxed">
-                Special Military Relief Movement <strong>TRN-SIM-002</strong> entered SEC-0004 with scheduled traversal during <strong>01:50 – 02:20</strong>.
+                Military Priority Movement <strong>TRN-SIM-002</strong> entered SEC-0004 with scheduled traversal during{' '}
+                <strong>
+                  {conflictEvent
+                    ? `${minToHhmm(conflictEvent.arrival_minute)} – ${minToHhmm(conflictEvent.departure_minute)}`
+                    : '\u2014'}
+                </strong>.
               </p>
               <div className="text-red-600 font-mono font-bold text-[11px]">
-                Direct 30-Minute Overlap with TASK-000005 Window!
+                {conflict?.overlap_window
+                  ? `Direct ${conflict.overlap_window[1] - conflict.overlap_window[0]}-minute overlap with the TASK-000005 window`
+                  : 'Overlap detected with the TASK-000005 window'}
               </div>
             </div>
 
             <div className="p-3 bg-white rounded-lg border border-amber-200 space-y-1 text-[11px]">
               <div className="font-bold text-slate-800">Ritvik Rerouting Audit:</div>
-              <div>• Alternate SEC-0005: Capacity Exhausted (6/6 slots)</div>
-              <div>• Alternate SEC-0007: Capacity Exhausted (0 headroom)</div>
-              <div className="text-red-700 font-bold">• Rerouting Impossible &rarr; Safety Violation Risk</div>
+              {rejectedRoutes.length > 0 ? (
+                rejectedRoutes.map((c) => (
+                  <div key={c.path}>• {c.path}: {c.reason}</div>
+                ))
+              ) : (
+                <div>• No bypass candidates recorded for this scenario</div>
+              )}
+              <div className="text-red-700 font-bold">
+                • No feasible bypass &rarr; possession replanned
+              </div>
             </div>
 
             <div className="p-3 rounded-lg bg-red-100 border border-red-200 text-red-950 font-mono text-[11px] space-y-1">
@@ -163,7 +187,7 @@ export const Replanning = ({ onNavigate }) => {
             </div>
             <div className="flex justify-between items-baseline">
               <span className="text-xs text-slate-500 font-medium">Reassigned Crew:</span>
-              <span className="text-xs font-mono text-slate-800">TEAM-018 (Evening/Night Shift)</span>
+              <span className="text-xs font-mono text-slate-800">TEAM-015 (Evening/Night Shift)</span>
             </div>
             <div className="flex justify-between items-baseline">
               <span className="text-xs text-slate-500 font-medium">Deadline Compliance:</span>
@@ -172,7 +196,7 @@ export const Replanning = ({ onNavigate }) => {
           </div>
 
           <div className="p-3 rounded-lg bg-orange-50 border border-orange-200 text-[11px] text-orange-950 leading-relaxed">
-            Arnav CP-SAT blacklisted conflicted blocks BLK-009637/38 and proved new optimal candidate in &lt; 1s.
+            Arnav CP-SAT blacklisted conflicted blocks BLK-009637/38 and returned a feasible alternative.
           </div>
         </div>
       </div>
@@ -186,7 +210,7 @@ export const Replanning = ({ onNavigate }) => {
               Ritvik Independent Operational Validation Audit
             </h4>
           </div>
-          <Badge variant="LOW" size="md">PLAN APPROVED</Badge>
+          <Badge variant="LOW" size="md">{replanMetadata?.final_status || "PLAN APPROVED"}</Badge>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
@@ -194,7 +218,9 @@ export const Replanning = ({ onNavigate }) => {
             <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
             <div>
               <div className="font-bold">No Train Conflict</div>
-              <div className="text-[10px] text-emerald-800">Zero overlap during 18:00–21:20</div>
+              <div className="text-[10px] text-emerald-800">
+                Zero overlap during {minToHhmm(replanMetadata?.replanned_plan?.start_minute)}–{minToHhmm(replanMetadata?.replanned_plan?.end_minute)}
+              </div>
             </div>
           </div>
 
@@ -202,7 +228,7 @@ export const Replanning = ({ onNavigate }) => {
             <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
             <div>
               <div className="font-bold">Section Available</div>
-              <div className="text-[10px] text-emerald-800">SEC-0004 track open</div>
+              <div className="text-[10px] text-emerald-800">{replanMetadata?.replanned_plan?.block_ids?.join(' + ')}</div>
             </div>
           </div>
 
@@ -210,7 +236,7 @@ export const Replanning = ({ onNavigate }) => {
             <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
             <div>
               <div className="font-bold">Crew Available</div>
-              <div className="text-[10px] text-emerald-800">TEAM-018 on duty & verified</div>
+              <div className="text-[10px] text-emerald-800">{replanMetadata?.selected_crew?.join(', ') || '—'} assigned</div>
             </div>
           </div>
 
@@ -218,14 +244,42 @@ export const Replanning = ({ onNavigate }) => {
             <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
             <div>
               <div className="font-bold">Constraints Satisfied</div>
-              <div className="text-[10px] text-emerald-800">All 10 rules respected</div>
+              <div className="text-[10px] text-emerald-800">22/22 validator checks</div>
             </div>
           </div>
         </div>
 
+        {/* Measured record of the cycle, from ritvik_scenarios.json */}
+        {replanMetadata && (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px] font-mono text-slate-700 border-t border-emerald-100 pt-3">
+            <div>
+              <span className="text-slate-400 block font-sans text-[10px]">Action taken</span>
+              {replanMetadata.action_taken}
+            </div>
+            <div>
+              <span className="text-slate-400 block font-sans text-[10px]">Reroute / hold</span>
+              {replanMetadata.rerouting_candidates_inspected} routes,{' '}
+              {replanMetadata.rerouting_succeeded ? 'reroute used' : 'none feasible'};{' '}
+              hold {replanMetadata.hold_selected ? 'used' : `> ${replanMetadata.hold_limit_minutes} min limit`}
+            </div>
+            <div>
+              <span className="text-slate-400 block font-sans text-[10px]">Replan runtime</span>
+              {replanMetadata.replan_runtime_seconds}s (measured)
+            </div>
+            <div>
+              <span className="text-slate-400 block font-sans text-[10px]">Plan retained</span>
+              {replanMetadata.unaffected_plan_retention?.tasks_unchanged}/
+              {replanMetadata.unaffected_plan_retention?.tasks_in_plan} unchanged
+              <span className="text-slate-400"> (by construction)</span>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center justify-between text-xs bg-slate-50 p-3 rounded-lg border border-slate-200 font-mono text-slate-700">
           <span>Output Artifact: <strong>ritvik_operational_decision.json</strong></span>
-          <span className="text-emerald-700 font-bold">STATUS: PLAN_APPROVED • MAINTENANCE VALID</span>
+          <span className="text-emerald-700 font-bold">
+            STATUS: {replanMetadata?.final_status || 'PLAN_APPROVED'}
+          </span>
         </div>
       </div>
     </div>

@@ -16,19 +16,50 @@ import {
   Zap,
 } from 'lucide-react';
 
+// Each button maps to exactly one generated engine scenario, or to null when
+// the event class has no scenario. Nothing renders another event's data.
+const EVENT_SCENARIO_KEY = {
+  NEW_TRAIN_SUCCESS: 'rerouteScenario',
+  HELD_TRAIN: 'holdScenario',
+  NEW_TRAIN_BLOCKED: 'replanScenario',
+  BLOCK_UNAVAILABLE: 'blockUnavailableScenario',
+  MAINTENANCE_EMERGENCY: null,
+};
+
 export const Simulator = ({ onNavigate }) => {
-  const { triggerEvent, clearEvent, activeEvent, executeReplanFlow, isReplanned } = usePlan();
+  const {
+    triggerEvent, clearEvent, activeEvent, executeReplanFlow, isReplanned,
+    rerouteScenario, holdScenario, replanScenario, blockUnavailableScenario,
+  } = usePlan();
   const [selectedEventId, setSelectedEventId] = useState('NEW_TRAIN_BLOCKED');
   const [simStep, setSimStep] = useState(0); // 0 to 7 for animated progression
 
   const activeEvtData = SIMULATION_EVENTS.find((e) => e.id === selectedEventId) || SIMULATION_EVENTS[1];
 
+  const scenarioByKey = {
+    rerouteScenario, holdScenario, replanScenario, blockUnavailableScenario,
+  };
+  const scenarioKey = EVENT_SCENARIO_KEY[selectedEventId];
+  const scenario = scenarioKey ? scenarioByKey[scenarioKey] : null;
+  const hasScenario = Boolean(scenario);
+
+  const inspected = (scenario?.reroute_results ?? []).flatMap((r) => r.inspected_candidates ?? []);
+  const inspectedCount = inspected.length;
+  const feasibleCount = inspected.filter((c) => c.status === 'FEASIBLE').length;
+  const trainActions = scenario?.decision?.train_actions ?? [];
+
   const runSimulationFlow = (eventId) => {
     setSelectedEventId(eventId);
     triggerEvent(eventId);
-    setSimStep(1);
 
-    // Animate the 7 steps
+    // Events with no generated engine scenario do not get an animated log --
+    // there is no engine run to narrate.
+    if (!EVENT_SCENARIO_KEY[eventId]) {
+      setSimStep(0);
+      return;
+    }
+
+    setSimStep(1);
     setTimeout(() => setSimStep(2), 500);
     setTimeout(() => setSimStep(3), 1100);
     setTimeout(() => setSimStep(4), 1700);
@@ -65,7 +96,7 @@ export const Simulator = ({ onNavigate }) => {
             Operational Event Simulator
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Trigger dynamic railway disturbances to witness the multi-agent closed-loop response in real time.
+            Trigger dynamic railway disturbances to replay the multi-agent closed-loop response step by step.
           </p>
         </div>
 
@@ -122,16 +153,16 @@ export const Simulator = ({ onNavigate }) => {
           </button>
 
           <button
-            onClick={() => runSimulationFlow('CAPACITY_REDUCTION')}
+            onClick={() => runSimulationFlow('HELD_TRAIN')}
             className={`p-3 rounded-xl border text-left transition-all ${
-              selectedEventId === 'CAPACITY_REDUCTION'
-                ? 'bg-purple-50 border-purple-600 shadow-xs ring-1 ring-purple-500'
+              selectedEventId === 'HELD_TRAIN'
+                ? 'bg-emerald-50 border-emerald-600 shadow-xs ring-1 ring-emerald-500'
                 : 'bg-slate-50 hover:bg-slate-100 border-slate-200'
             }`}
           >
-            <div className="font-bold text-xs text-slate-900">Capacity Reduction</div>
-            <div className="text-[10px] text-purple-700 font-semibold mt-0.5">Speed Restriction</div>
-            <div className="text-[10px] text-slate-500 mt-1">SEC-0005 (-4 delta)</div>
+            <div className="font-bold text-xs text-slate-900">Low-Priority Train</div>
+            <div className="text-[10px] text-emerald-700 font-semibold mt-0.5">Held, Not Replanned</div>
+            <div className="text-[10px] text-slate-500 mt-1">TRN-SIM-006 (HELD)</div>
           </button>
 
           <button
@@ -144,13 +175,51 @@ export const Simulator = ({ onNavigate }) => {
           >
             <div className="font-bold text-xs text-slate-900">Maintenance Emergency</div>
             <div className="text-[10px] text-orange-700 font-semibold mt-0.5">OHE Catenary Sag</div>
-            <div className="text-[10px] text-slate-500 mt-1">SEC-0072 Rapid Crew</div>
+            <div className="text-[10px] text-slate-500 mt-1">No engine scenario</div>
           </button>
         </div>
       </div>
 
-      {/* 7-Step Progress Flow (Section 18 requirement) */}
-      <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-4">
+      {/* Event with no generated engine scenario: show the event, not a fake run */}
+      {!hasScenario && simStep === 0 && activeEvent && (
+        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-2">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600">
+            {activeEvtData.name}
+          </h4>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono text-slate-700">
+            <div>
+              <span className="text-slate-400 block font-sans text-[10px]">Event type</span>
+              {activeEvtData.eventType}
+            </div>
+            <div>
+              <span className="text-slate-400 block font-sans text-[10px]">Section</span>
+              {activeEvtData.sectionId}
+            </div>
+            <div className="col-span-2 sm:col-span-2">
+              <span className="text-slate-400 block font-sans text-[10px]">Reason</span>
+              {activeEvtData.reason}
+            </div>
+          </div>
+          <div className="text-[11px] text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+            No generated engine scenario for this event type. Ritvik's conflict / reroute / hold
+            engine runs on maintenance-plan conflicts; the scenarios it actually solves are on the{' '}
+            <button
+              onClick={() => onNavigate('live-ops')}
+              className="font-semibold underline hover:text-amber-950"
+            >
+              Live Operations
+            </button>{' '}
+            screen.
+          </div>
+        </div>
+      )}
+
+      {/* 7-Step Progress Flow */}
+      <div
+        className={`bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-4 ${
+          hasScenario ? '' : 'hidden'
+        }`}
+      >
         <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center justify-between">
           <span>Multi-Agent 7-Step Closed-Loop Execution Chain</span>
           {simStep > 0 && (
@@ -199,13 +268,23 @@ export const Simulator = ({ onNavigate }) => {
             <p className="text-slate-400">Select any event button above to launch the 7-step execution chain.</p>
           )}
           {simStep >= 1 && (
-            <p className="text-slate-200">[STEP 1] Injected event: {activeEvtData.name} ({activeEvtData.eventType}) on SEC-0004.</p>
+            <p className="text-slate-200">
+              [STEP 1] Injected event: {activeEvtData.name} ({activeEvtData.eventType})
+              {scenario?.event?.section_id ? ` on ${scenario.event.section_id}` : ''}.
+            </p>
           )}
           {simStep >= 2 && (
-            <p className="text-amber-300">[STEP 2] Ritvik Conflict Engine: Direct time collision detected with TASK-000005 window!</p>
+            <p className="text-amber-300">
+              [STEP 2] Ritvik conflict engine: {scenario?.conflict?.details || 'no conflict recorded for this event'}
+            </p>
           )}
           {simStep >= 3 && (
-            <p className="text-blue-300">[STEP 3] Ritvik Graph Search: Evaluated candidate bypasses in route_topology.json.</p>
+            <p className="text-blue-300">
+              [STEP 3] Ritvik route search:{' '}
+              {scenario?.conflict?.conflict_type === 'BLOCK_UNAVAILABLE'
+                ? 'skipped — the block itself is closed, so rerouting a train cannot help.'
+                : `${inspectedCount} candidate bypass${inspectedCount === 1 ? '' : 'es'} evaluated over route_topology.json (${feasibleCount} feasible).`}
+            </p>
           )}
           {simStep >= 4 && (
             <p className={activeEvtData.outcomeType === 'OPERATIONAL_UPDATE' ? 'text-emerald-300' : 'text-red-400'}>
@@ -214,17 +293,23 @@ export const Simulator = ({ onNavigate }) => {
           )}
           {simStep >= 5 && (
             <p className="text-purple-300">
-              {activeEvtData.outcomeType === 'REPLAN_REQUEST'
-                ? '[STEP 5] Arnav CP-SAT Engine: Blacklisted BLK-009637/38. Re-optimized TASK-000005 to 08 Sep (18:00 - 21:20).'
-                : '[STEP 5] Train rerouting bypass confirmed with +75m delay penalty. No maintenance re-schedule needed.'}
+              [STEP 5] {trainActions.length > 0
+                ? trainActions
+                    .map((a) => `${a.train_id} ${a.action}` + (a.delay_estimate_minutes != null
+                      ? ` (+${a.delay_estimate_minutes} min)` : ''))
+                    .join('; ')
+                : 'No feasible train action; possession handed to Arnav for replanning.'}
             </p>
           )}
           {simStep >= 6 && (
-            <p className="text-emerald-400">[STEP 6] Ritvik Re-Validation: 4/4 checks passed (0 conflicts, section open, team active).</p>
+            <p className="text-emerald-400">
+              [STEP 6] Ritvik decision: {scenario?.decision?.status || '—'} · maintenance plan valid:{' '}
+              {String(scenario?.decision?.maintenance_plan_valid ?? '—')}
+            </p>
           )}
           {simStep >= 7 && (
             <p className="text-emerald-400 font-bold">
-              [STEP 7] FINAL OPERATIONAL DECISION EMITTED TO ADITYA (PLAN_APPROVED). CLOSED-LOOP RESOLVED IN 0.86s.
+              [STEP 7] Operational decision emitted (ritvik_operational_decision.json).
             </p>
           )}
         </div>

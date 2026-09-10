@@ -1,0 +1,50 @@
+{
+  "summary": {
+    "total_tasks_considered": 30000,
+    "total_scheduled": 1598,
+    "total_deferred": 28402,
+    "scheduled_percentage": 5.33,
+    "solver_status": "FEASIBLE",
+    "runtime_seconds": 867.82,
+    "objective_value": -3484466250.0
+  },
+  "risk_breakdown": {
+    "critical_risk_scheduled": 1542,
+    "critical_risk_deferred": 3672,
+    "critical_scheduled_rate": 29.57,
+    "high_risk_scheduled": 49,
+    "high_risk_deferred": 3142,
+    "moderate_risk_scheduled": 7,
+    "low_risk_scheduled": 0
+  },
+  "operational_metrics": {
+    "unique_blocks_utilized": 2248,
+    "bundled_tasks_count": 85,
+    "concurrent_bundles_count": 42,
+    "serial_shared_possessions_count": 0,
+    "total_batch_excluded_instances": 130329,
+    "night_maintenance_tasks": 860,
+    "teams_utilized": 39,
+    "total_team_maintenance_hours": 3224.6
+  },
+  "deferral_reasons": {
+    "batch_limit_excluded_on_deadline": 27034,
+    "team_capacity_exhausted": 1288,
+    "no_qualifying_team_shift": 75,
+    "block_capacity_exhausted": 4,
+    "solver_objective_outranked": 1
+  },
+  "provenance": {
+    "scope": "BASELINE_FULL_RUN",
+    "description": "Complete optimizer run over the entire clean dataset.",
+    "command": "PYTHONPATH=. python -m optimizer.main --data-dir Arnav_Optimizer_Clean_Dataset --output-dir <dir>",
+    "dataset": "Arnav_Optimizer_Clean_Dataset",
+    "dataset_tasks": 30000,
+    "dataset_blocks": 33600,
+    "planning_horizon": "2026-09-03 .. 2026-09-16 (14 days)",
+    "solver_time_limit_seconds_per_day": 60.0,
+    "max_daily_candidate_pool": 700,
+    "post_solve_validation": "PASS (22/22 checks)",
+    "runtime_note": "Wall time is machine-dependent; 867.82 s measured on the development machine."
+  }
+}

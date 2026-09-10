@@ -1,0 +1,466 @@
+{
+  "reroute": {
+    "event": {
+      "event_id": "EVT-001",
+      "event_type": "NEW_TRAIN",
+      "train_id": "TRN-SIM-001",
+      "train_name": "Special Rajdhani Relief Express",
+      "section_id": "SEC-0004",
+      "date": "2026-09-07",
+      "arrival_minute": 70,
+      "departure_minute": 95,
+      "priority_class": 2
+    },
+    "conflict": {
+      "has_conflict": true,
+      "conflict_type": "NEW_TRAIN_CONFLICT",
+      "overlap_window": [
+        70,
+        95
+      ],
+      "affected_blocks": [
+        "BLK-009637",
+        "BLK-009638"
+      ],
+      "conflicting_trains": [
+        "TRN-SIM-001"
+      ],
+      "details": "Train movement conflict with TRN-SIM-001 during window 70-95 min"
+    },
+    "reroute_results": [
+      {
+        "train_id": "TRN-SIM-001",
+        "original_route": [
+          "SEC-0004"
+        ],
+        "alternative_route": [
+          "SEC-0004",
+          "SEC-0007",
+          "SEC-0008",
+          "SEC-0010"
+        ],
+        "route_found": true,
+        "route_cost": 16.0,
+        "delay_minutes": 16,
+        "reason": "Feasible alternative route found; bypasses maintenance conflict",
+        "inspected_candidates": [
+          {
+            "path": "SEC-0004 -> SEC-0005 -> SEC-0008 -> SEC-0010",
+            "status": "REJECTED",
+            "reason": "Capacity exhausted on SEC-0005 (1/0 slots occupied)"
+          },
+          {
+            "path": "SEC-0004 -> SEC-0007 -> SEC-0008 -> SEC-0010",
+            "status": "FEASIBLE",
+            "cost": 16.0,
+            "delay_minutes": 16,
+            "reason": "Feasible bypass (3 hops, capacity available, zero maintenance conflicts); 16 min detour computed from section length and line speed"
+          },
+          {
+            "path": "SEC-0004 -> SEC-0007 -> SEC-0009 -> SEC-0010",
+            "status": "FEASIBLE",
+            "cost": 18.0,
+            "delay_minutes": 18,
+            "reason": "Feasible bypass (3 hops, capacity available, zero maintenance conflicts); 18 min detour computed from section length and line speed"
+          },
+          {
+            "path": "SEC-0004 -> SEC-0005 -> SEC-0006 -> SEC-0008 -> SEC-0010",
+            "status": "REJECTED",
+            "reason": "Capacity exhausted on SEC-0005 (1/0 slots occupied)"
+          }
+        ]
+      }
+    ],
+    "decision": {
+      "status": "OPERATIONAL_UPDATE",
+      "maintenance_plan_valid": true,
+      "maintenance_task_id": "TASK-000005",
+      "block_ids": [
+        "BLK-009637",
+        "BLK-009638"
+      ],
+      "train_actions": [
+        {
+          "train_id": "TRN-SIM-001",
+          "action": "REROUTED",
+          "new_route": [
+            "SEC-0004",
+            "SEC-0007",
+            "SEC-0008",
+            "SEC-0010"
+          ],
+          "delay_estimate_minutes": 16,
+          "delay_basis": "Detour time from section length and line speed"
+        }
+      ],
+      "replanning_required": false
+    },
+    "details": "Conflict resolved operationally: rerouted TRN-SIM-001.",
+    "section_capacities_applied": {
+      "SEC-0005": 0,
+      "SEC-0007": 8
+    }
+  },
+  "hold": {
+    "event": {
+      "event_id": "EVT-006",
+      "event_type": "NEW_TRAIN",
+      "train_id": "TRN-SIM-006",
+      "train_name": "Ordinary Passenger Service",
+      "section_id": "SEC-0004",
+      "date": "2026-09-07",
+      "arrival_minute": 165,
+      "departure_minute": 185,
+      "priority_class": 2
+    },
+    "conflict": {
+      "has_conflict": true,
+      "conflict_type": "NEW_TRAIN_CONFLICT",
+      "overlap_window": [
+        165,
+        185
+      ],
+      "affected_blocks": [
+        "BLK-009637",
+        "BLK-009638"
+      ],
+      "conflicting_trains": [
+        "TRN-SIM-006"
+      ],
+      "details": "Train movement conflict with TRN-SIM-006 during window 165-185 min"
+    },
+    "reroute_results": [
+      {
+        "train_id": "TRN-SIM-006",
+        "original_route": [
+          "SEC-0004"
+        ],
+        "alternative_route": null,
+        "route_found": false,
+        "route_cost": 0.0,
+        "delay_minutes": null,
+        "reason": "All candidate bypass routes are infeasible due to capacity, secondary maintenance, or track closures",
+        "inspected_candidates": [
+          {
+            "path": "SEC-0004 -> SEC-0005 -> SEC-0008 -> SEC-0010",
+            "status": "REJECTED",
+            "reason": "Capacity exhausted on SEC-0005 (1/0 slots occupied)"
+          },
+          {
+            "path": "SEC-0004 -> SEC-0007 -> SEC-0008 -> SEC-0010",
+            "status": "REJECTED",
+            "reason": "Capacity exhausted on SEC-0007 (1/0 slots occupied)"
+          },
+          {
+            "path": "SEC-0004 -> SEC-0007 -> SEC-0009 -> SEC-0010",
+            "status": "REJECTED",
+            "reason": "Capacity exhausted on SEC-0007 (1/0 slots occupied)"
+          },
+          {
+            "path": "SEC-0004 -> SEC-0005 -> SEC-0006 -> SEC-0008 -> SEC-0010",
+            "status": "REJECTED",
+            "reason": "Capacity exhausted on SEC-0005 (1/0 slots occupied)"
+          }
+        ]
+      }
+    ],
+    "decision": {
+      "status": "OPERATIONAL_UPDATE",
+      "maintenance_plan_valid": true,
+      "maintenance_task_id": "TASK-000005",
+      "block_ids": [
+        "BLK-009637",
+        "BLK-009638"
+      ],
+      "train_actions": [
+        {
+          "train_id": "TRN-SIM-006",
+          "action": "HELD",
+          "new_route": [
+            "SEC-0004"
+          ],
+          "delay_estimate_minutes": 35,
+          "delay_basis": "Held until possession ends at minute 200 (limit 45 min)"
+        }
+      ],
+      "replanning_required": false
+    },
+    "details": "Conflict resolved operationally: held TRN-SIM-006.",
+    "section_capacities_applied": {
+      "SEC-0005": 0,
+      "SEC-0007": 0
+    }
+  },
+  "replan": {
+    "event": {
+      "event_id": "EVT-002",
+      "event_type": "NEW_TRAIN",
+      "train_id": "TRN-SIM-002",
+      "train_name": "Military Priority Movement",
+      "section_id": "SEC-0004",
+      "date": "2026-09-07",
+      "arrival_minute": 110,
+      "departure_minute": 140,
+      "priority_class": 1
+    },
+    "conflict": {
+      "has_conflict": true,
+      "conflict_type": "NEW_TRAIN_CONFLICT",
+      "overlap_window": [
+        110,
+        140
+      ],
+      "affected_blocks": [
+        "BLK-009637",
+        "BLK-009638"
+      ],
+      "conflicting_trains": [
+        "TRN-SIM-002"
+      ],
+      "details": "Train movement conflict with TRN-SIM-002 during window 110-140 min"
+    },
+    "reroute_results": [
+      {
+        "train_id": "TRN-SIM-002",
+        "original_route": [
+          "SEC-0004"
+        ],
+        "alternative_route": null,
+        "route_found": false,
+        "route_cost": 0.0,
+        "delay_minutes": null,
+        "reason": "All candidate bypass routes are infeasible due to capacity, secondary maintenance, or track closures",
+        "inspected_candidates": [
+          {
+            "path": "SEC-0004 -> SEC-0005 -> SEC-0008 -> SEC-0010",
+            "status": "REJECTED",
+            "reason": "Capacity exhausted on SEC-0005 (1/0 slots occupied)"
+          },
+          {
+            "path": "SEC-0004 -> SEC-0007 -> SEC-0008 -> SEC-0010",
+            "status": "REJECTED",
+            "reason": "Capacity exhausted on SEC-0007 (0/0 slots occupied)"
+          },
+          {
+            "path": "SEC-0004 -> SEC-0007 -> SEC-0009 -> SEC-0010",
+            "status": "REJECTED",
+            "reason": "Capacity exhausted on SEC-0007 (0/0 slots occupied)"
+          },
+          {
+            "path": "SEC-0004 -> SEC-0005 -> SEC-0006 -> SEC-0008 -> SEC-0010",
+            "status": "REJECTED",
+            "reason": "Capacity exhausted on SEC-0005 (1/0 slots occupied)"
+          }
+        ]
+      }
+    ],
+    "decision": {
+      "status": "REPLAN_REQUEST",
+      "maintenance_plan_valid": false,
+      "maintenance_task_id": "TASK-000005",
+      "block_ids": [
+        "BLK-009637",
+        "BLK-009638"
+      ],
+      "train_actions": [],
+      "replanning_required": true,
+      "replan_request_file": "replan_request.json"
+    },
+    "details": "No feasible operational action for TRN-SIM-002 (rerouting: All candidate bypass routes are infeasible due to capacity, secondary maintenance, or track closures; holding exceeds the 45 min limit).",
+    "section_capacities_applied": {
+      "SEC-0005": 0,
+      "SEC-0007": 0
+    }
+  },
+  "block_unavailable": {
+    "event": {
+      "event_id": "EVT-003",
+      "event_type": "BLOCK_UNAVAILABLE",
+      "train_id": null,
+      "train_name": null,
+      "section_id": "SEC-0004",
+      "date": "2026-09-07",
+      "arrival_minute": null,
+      "departure_minute": null,
+      "priority_class": null
+    },
+    "conflict": {
+      "has_conflict": true,
+      "conflict_type": "BLOCK_UNAVAILABLE",
+      "overlap_window": null,
+      "affected_blocks": [
+        "BLK-009637"
+      ],
+      "conflicting_trains": [],
+      "details": "Block closure on BLK-009637: Emergency rail defect discovered during ultrasonic testing"
+    },
+    "reroute_results": [],
+    "decision": {
+      "status": "REPLAN_REQUEST",
+      "maintenance_plan_valid": false,
+      "maintenance_task_id": "TASK-000005",
+      "block_ids": [
+        "BLK-009637"
+      ],
+      "train_actions": [],
+      "replanning_required": true,
+      "replan_request_file": "replan_request.json"
+    },
+    "details": "Track block physical closure: Block closure on BLK-009637: Emergency rail defect discovered during ultrasonic testing",
+    "section_capacities_applied": {}
+  },
+  "replanned_record": {
+    "task_id": "TASK-000005",
+    "asset_id": "AST-120005",
+    "department": "Electrical / TRD",
+    "corridor_id": "COR-001",
+    "section_id": "SEC-0004",
+    "date": "2026-09-08",
+    "start_minute": 1080,
+    "end_minute": 1280,
+    "duration_minutes": 200,
+    "block_ids": [
+      "BLK-012046",
+      "BLK-012047"
+    ],
+    "assigned_teams": [
+      "TEAM-015"
+    ],
+    "is_night": true,
+    "risk_score": 81.0,
+    "priority_score": 1772.25
+  },
+  "replan_metadata": {
+    "affected_task_id": "TASK-000005",
+    "event": {
+      "event_id": "EVT-002",
+      "event_type": "NEW_TRAIN",
+      "train_id": "TRN-SIM-002",
+      "section_id": "SEC-0004",
+      "date": "2026-09-07",
+      "arrival_minute": 110,
+      "departure_minute": 140
+    },
+    "original_plan": {
+      "date": "2026-09-07",
+      "start_minute": 0,
+      "end_minute": 200,
+      "block_ids": [
+        "BLK-009637",
+        "BLK-009638"
+      ],
+      "assigned_teams": [
+        "TEAM-013"
+      ]
+    },
+    "affected_trains": [
+      "TRN-SIM-002"
+    ],
+    "conflict_type": "NEW_TRAIN_CONFLICT",
+    "overlap_window": [
+      110,
+      140
+    ],
+    "rerouting_attempted": true,
+    "rerouting_candidates_inspected": 4,
+    "rerouting_succeeded": false,
+    "rejected_routes": [
+      {
+        "path": "SEC-0004 -> SEC-0005 -> SEC-0008 -> SEC-0010",
+        "status": "REJECTED",
+        "reason": "Capacity exhausted on SEC-0005 (1/0 slots occupied)"
+      },
+      {
+        "path": "SEC-0004 -> SEC-0007 -> SEC-0008 -> SEC-0010",
+        "status": "REJECTED",
+        "reason": "Capacity exhausted on SEC-0007 (0/0 slots occupied)"
+      },
+      {
+        "path": "SEC-0004 -> SEC-0007 -> SEC-0009 -> SEC-0010",
+        "status": "REJECTED",
+        "reason": "Capacity exhausted on SEC-0007 (0/0 slots occupied)"
+      },
+      {
+        "path": "SEC-0004 -> SEC-0005 -> SEC-0006 -> SEC-0008 -> SEC-0010",
+        "status": "REJECTED",
+        "reason": "Capacity exhausted on SEC-0005 (1/0 slots occupied)"
+      }
+    ],
+    "hold_attempted": true,
+    "hold_selected": false,
+    "hold_limit_minutes": 45,
+    "action_taken": "REPLAN_MAINTENANCE",
+    "train_actions": [],
+    "baseline_plan_untouched": true,
+    "replanned_plan": {
+      "date": "2026-09-08",
+      "start_minute": 1080,
+      "end_minute": 1280,
+      "block_ids": [
+        "BLK-012046",
+        "BLK-012047"
+      ],
+      "assigned_teams": [
+        "TEAM-015"
+      ]
+    },
+    "selected_crew": [
+      "TEAM-015"
+    ],
+    "replan_runtime_seconds": 0.142,
+    "replan_artifacts_directory": "replan_output",
+    "unaffected_plan_retention": {
+      "tasks_in_plan": 53,
+      "tasks_re_solved": 1,
+      "tasks_unchanged": 52,
+      "retention_percent": 100.0,
+      "basis": "by_construction",
+      "caveat": "The replan scope is a single task; every other record is copied unchanged. 100% retention follows from that scope and is not a measurement of plan stability under broader re-optimization."
+    }
+  },
+  "criteria_coverage": {
+    "delay": {
+      "status": "COMPUTED",
+      "basis": "section_length_km / min(train speed, line speed)"
+    },
+    "capacity": {
+      "status": "MODELLED",
+      "basis": "RitvikConfig.section_capacities",
+      "limitation": "Capacities are configured constants, not a dataset column."
+    },
+    "train_priority": {
+      "status": "APPLIED",
+      "basis": "trains.csv priority_class; class 1 is never held"
+    },
+    "route_availability": {
+      "status": "SEARCHED",
+      "basis": "route_topology.json adjacency + block closures",
+      "limitation": "Prototype topology: 22 of 200 sections have adjacency data. Conflicts on sections outside it cannot be rerouted and escalate to replanning."
+    },
+    "safety_constraints": {
+      "status": "APPLIED",
+      "basis": "safety_buffer_minutes=0 widens the possession window before overlap testing"
+    },
+    "rerouting": {
+      "status": "IMPLEMENTED",
+      "basis": "BFS over all simple paths, four feasibility gates"
+    },
+    "holding": {
+      "status": "IMPLEMENTED",
+      "basis": "wait <= 45 min and priority_class != 1"
+    },
+    "downstream_impact": {
+      "status": "NOT_IMPLEMENTED",
+      "limitation": "No knock-on delay propagation. trains.csv records one section occupancy per train with no onward itinerary, so downstream impact cannot be derived and is not scored."
+    },
+    "sequencing": {
+      "status": "NOT_IMPLEMENTED",
+      "limitation": "No precedence or platform-ordering model exists."
+    }
+  },
+  "provenance": {
+    "scope": "RITVIK_OPERATIONAL_SCENARIOS",
+    "generator": "scripts/generate_ritvik_scenarios.py",
+    "note": "Engine output. Section capacities are the demo values stated per scenario; delay figures are computed from section length and line speed in corridors_sections.csv."
+  }
+}

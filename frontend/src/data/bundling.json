@@ -1,0 +1,116 @@
+{
+  "concurrent_bundle_pairs": [
+    {
+      "section_id": "SEC-0073",
+      "section_name": "Bhopal\u2013Itarsi Section 3",
+      "corridor_id": "COR-008",
+      "corridor_name": "Bhopal\u2013Itarsi",
+      "date": "2026-09-03",
+      "shared_block_ids": [
+        "BLK-000867"
+      ],
+      "possession_window": {
+        "start_minute": 240,
+        "end_minute": 378
+      },
+      "overlap_minutes": 81,
+      "minimum_overlap_required_minutes": 30,
+      "departments_compatible": "Yes",
+      "tasks": [
+        {
+          "task_id": "TASK-016913",
+          "asset_id": "AST-136913",
+          "department": "Electrical / TRD",
+          "maintenance_type": "Feeder Maintenance",
+          "start_minute": 240,
+          "end_minute": 378,
+          "duration_minutes": 138,
+          "block_ids": [
+            "BLK-000867",
+            "BLK-000868"
+          ],
+          "assigned_teams": [
+            "TEAM-013"
+          ],
+          "risk_score": 84.0
+        },
+        {
+          "task_id": "TASK-018159",
+          "asset_id": "AST-138159",
+          "department": "Track / Civil Engineering",
+          "maintenance_type": "Coach Equipment Maintenance",
+          "start_minute": 240,
+          "end_minute": 321,
+          "duration_minutes": 81,
+          "block_ids": [
+            "BLK-000867"
+          ],
+          "assigned_teams": [
+            "TEAM-001"
+          ],
+          "risk_score": 89.8
+        }
+      ]
+    },
+    {
+      "section_id": "SEC-0092",
+      "section_name": "Howrah\u2013Dhanbad Section 2",
+      "corridor_id": "COR-010",
+      "corridor_name": "Howrah\u2013Dhanbad",
+      "date": "2026-09-03",
+      "shared_block_ids": [
+        "BLK-001093",
+        "BLK-001094"
+      ],
+      "possession_window": {
+        "start_minute": 0,
+        "end_minute": 150
+      },
+      "overlap_minutes": 125,
+      "minimum_overlap_required_minutes": 30,
+      "departments_compatible": "Conditional",
+      "tasks": [
+        {
+          "task_id": "TASK-000001",
+          "asset_id": "AST-120001",
+          "department": "Track / Civil Engineering",
+          "maintenance_type": "Rail Inspection",
+          "start_minute": 0,
+          "end_minute": 125,
+          "duration_minutes": 125,
+          "block_ids": [
+            "BLK-001093",
+            "BLK-001094"
+          ],
+          "assigned_teams": [
+            "TEAM-007"
+          ],
+          "risk_score": 7.3
+        },
+        {
+          "task_id": "TASK-000421",
+          "asset_id": "AST-120421",
+          "department": "Mechanical / Rolling Stock",
+          "maintenance_type": "Switchgear Inspection",
+          "start_minute": 0,
+          "end_minute": 150,
+          "duration_minutes": 150,
+          "block_ids": [
+            "BLK-001093",
+            "BLK-001094"
+          ],
+          "assigned_teams": [
+            "TEAM-031"
+          ],
+          "risk_score": 11.6
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "scope": "BUNDLING_PAIRS",
+    "source": "optimized_block_plan.json (is_bundled / bundled_with) + bundling_rules.csv",
+    "generator": "scripts/generate_bundling.py",
+    "note": "Pairs sharing one possession window. No saving or efficiency figure is reported: no unbundled counterfactual plan exists to measure against."
+  }
+}

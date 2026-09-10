@@ -1,0 +1,41 @@
+{
+  "scope": "NEEV_HELD_OUT_TEST_SPLIT",
+  "rows_evaluated": 30000,
+  "positives": 11479,
+  "negatives": 18521,
+  "threshold": 0.5,
+  "classification": {
+    "roc_auc": 0.8841,
+    "pr_auc_average_precision": 0.8432,
+    "accuracy": 0.813,
+    "precision": 0.7919,
+    "recall": 0.6934,
+    "f1": 0.7394,
+    "confusion_matrix": {
+      "true_negative": 16429,
+      "false_positive": 2092,
+      "false_negative": 3519,
+      "true_positive": 7960
+    }
+  },
+  "regression_degradation_30d": {
+    "mae": 7.1187,
+    "rmse": 8.8994,
+    "r2": 0.6459
+  },
+  "internal_consistency": {
+    "risk_score_equals_probability_x100": true,
+    "risk_level_distribution": {
+      "LOW": 15731,
+      "MODERATE": 5864,
+      "CRITICAL": 5214,
+      "HIGH": 3191
+    }
+  },
+  "provenance": {
+    "predictions_artifact": "NEEV_FINAL_MODULE/output/neev_predictions_for_optimizer.csv",
+    "published_report": "NEEV_FINAL_MODULE/output/NEEV_ML_REPORT.txt",
+    "model_training": "NOT REPRODUCIBLE from this repository (no training script). Frozen artifact evaluation only.",
+    "command": "PYTHONPATH=. python scripts/evaluate_neev.py"
+  }
+}

@@ -38,6 +38,8 @@ class ClosedLoopCycleResult:
     final_decision: Optional[OperationalDecision]
     cycle_success: bool
     summary: str
+    #: Structured record of what the cycle actually did, for the audit UI.
+    metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 class ClosedLoopController:
@@ -63,6 +65,104 @@ class ClosedLoopController:
             self.bundle = load_dataset(self.arnav_config.data_dir)
         if self.prep is None:
             self.prep = preprocess_possessions(self.bundle)
+
+
+    def _build_metadata(
+        self,
+        task_id: str,
+        event: OperationalEvent,
+        initial_maint: ScheduledMaintenance,
+        initial_conflict: ConflictReport,
+        initial_decision: OperationalDecision,
+        initial_reroute: Optional[RerouteResult],
+        replanned_maint: Optional[ScheduledMaintenance] = None,
+        replan_runtime_seconds: Optional[float] = None,
+        replan_output_dir: Optional[Path] = None,
+    ) -> Dict[str, Any]:
+        """
+        Describes the cycle in terms of what was actually attempted and chosen,
+        so the audit UI never has to infer or narrate it.
+        """
+        held = [a for a in initial_decision.train_actions if a.action == "HELD"]
+        rerouted = [a for a in initial_decision.train_actions if a.action == "REROUTED"]
+        inspected = initial_reroute.inspected_candidates if initial_reroute else []
+        rerouting_attempted = initial_reroute is not None
+
+        if rerouted:
+            action = "REROUTE"
+        elif held:
+            action = "HOLD"
+        elif replanned_maint is not None:
+            action = "REPLAN_MAINTENANCE"
+        else:
+            action = "NONE"
+
+        metadata: Dict[str, Any] = {
+            "affected_task_id": task_id,
+            "event": {
+                "event_id": event.event_id,
+                "event_type": event.event_type,
+                "train_id": event.train_id,
+                "section_id": event.section_id,
+                "date": event.date,
+                "arrival_minute": event.arrival_minute,
+                "departure_minute": event.departure_minute,
+            },
+            "original_plan": {
+                "date": initial_maint.date,
+                "start_minute": initial_maint.start_minute,
+                "end_minute": initial_maint.end_minute,
+                "block_ids": list(initial_maint.block_ids),
+                "assigned_teams": list(initial_maint.assigned_teams),
+            },
+            "affected_trains": [tr.train_id for tr in initial_conflict.conflicting_trains],
+            "conflict_type": initial_conflict.conflict_type,
+            "overlap_window": list(initial_conflict.overlap_window) if initial_conflict.overlap_window else None,
+            # Rerouting is only attempted for train conflicts; a BLOCK_UNAVAILABLE
+            # closure short-circuits before any route search.
+            "rerouting_attempted": rerouting_attempted,
+            "rerouting_candidates_inspected": len(inspected),
+            "rerouting_succeeded": bool(initial_reroute and initial_reroute.route_found),
+            "rejected_routes": [c for c in inspected if c.get("status") == "REJECTED"],
+            # Holding is considered only once rerouting has failed.
+            "hold_attempted": rerouting_attempted and not (initial_reroute and initial_reroute.route_found),
+            "hold_selected": bool(held),
+            "hold_limit_minutes": self.ritvik_config.max_acceptable_hold_minutes,
+            "action_taken": action,
+            "train_actions": [a.to_dict() for a in initial_decision.train_actions],
+            "baseline_plan_untouched": True,
+        }
+
+        if replanned_maint is not None:
+            total_records = len(self.ritvik_engine.maintenance_plan)
+            metadata.update(
+                replanned_plan={
+                    "date": replanned_maint.date,
+                    "start_minute": replanned_maint.start_minute,
+                    "end_minute": replanned_maint.end_minute,
+                    "block_ids": list(replanned_maint.block_ids),
+                    "assigned_teams": list(replanned_maint.assigned_teams),
+                },
+                selected_crew=list(replanned_maint.assigned_teams),
+                replan_runtime_seconds=(
+                    round(replan_runtime_seconds, 3) if replan_runtime_seconds is not None else None
+                ),
+                replan_artifacts_directory=str(replan_output_dir) if replan_output_dir else None,
+                unaffected_plan_retention={
+                    "tasks_in_plan": total_records,
+                    "tasks_re_solved": 1,
+                    "tasks_unchanged": max(0, total_records - 1),
+                    "retention_percent": 100.0,
+                    # Stated as a property of the current scope, not a benchmark.
+                    "basis": "by_construction",
+                    "caveat": (
+                        "The replan scope is a single task; every other record is copied "
+                        "unchanged. 100% retention follows from that scope and is not a "
+                        "measurement of plan stability under broader re-optimization."
+                    ),
+                },
+            )
+        return metadata
 
     def run_cycle(
         self,
@@ -105,6 +205,9 @@ class ClosedLoopController:
                 final_decision=initial_decision,
                 cycle_success=True,
                 summary=f"Disruption resolved operationally ({initial_decision.status}); no replanning required.",
+                metadata=self._build_metadata(
+                    task_id, event, initial_maint, initial_conflict, initial_decision, initial_reroute
+                ),
             )
 
         # Step 4: Replanning required -> replan_request.json generated
@@ -161,4 +264,10 @@ class ClosedLoopController:
             final_decision=final_decision,
             cycle_success=cycle_ok,
             summary=summary_msg,
+            metadata=self._build_metadata(
+                task_id, event, initial_maint, initial_conflict, initial_decision, initial_reroute,
+                replanned_maint=replanned_maint,
+                replan_runtime_seconds=opt_res.wall_time_seconds,
+                replan_output_dir=replan_out_dir,
+            ),
         )

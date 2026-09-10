@@ -5,14 +5,16 @@ const DemoGuideContext = createContext();
 export const DEMO_STEPS = [
   {
     step: 1,
+    replanned: false,
     title: "1. Operations Control Center Overview",
     page: "overview",
     role: "Operations Control",
     description: "Start at the OCC dashboard. Overview of the 7-day planning horizon, 6 critical KPIs, active corridor network status, and upcoming maintenance possessions.",
-    tip: "Notice the real-time operational status and network availability metrics from Arnav optimizer."
+    tip: "These KPIs are the full 30,000-task Arnav optimizer run, recorded in benchmarks/full_run_metrics.json."
   },
   {
     step: 2,
+    replanned: false,
     title: "2. Maintenance Demand Inventory",
     page: "demand",
     role: "Operations Control",
@@ -21,6 +23,7 @@ export const DEMO_STEPS = [
   },
   {
     step: 3,
+    replanned: false,
     title: "3. Neev AI Predictive Risk Drawer",
     page: "demand",
     role: "Operations Control",
@@ -30,6 +33,7 @@ export const DEMO_STEPS = [
   },
   {
     step: 4,
+    replanned: false,
     title: "4. Automatic Block Planning Hero Screen",
     page: "block-planning",
     role: "Operations Control",
@@ -38,6 +42,7 @@ export const DEMO_STEPS = [
   },
   {
     step: 5,
+    replanned: false,
     title: "5. 'Why Did Arnav Select This Block?' Trace",
     page: "block-planning",
     role: "Operations Control",
@@ -47,6 +52,7 @@ export const DEMO_STEPS = [
   },
   {
     step: 6,
+    replanned: false,
     title: "6. Smart Cross-Department Bundling",
     page: "block-planning",
     role: "Operations Control",
@@ -55,62 +61,70 @@ export const DEMO_STEPS = [
   },
   {
     step: 7,
+    replanned: false,
     title: "7. Event Simulator: Inject Operational Disruption",
     page: "simulator",
     role: "Operations Control",
-    description: "Open the simulation environment to test dynamic operational responsiveness. Inject an emergency priority train (TRN-SIM-002) into SEC-0004.",
-    tip: "Click 'New Train (Blocked)' to trigger the real-time closed-loop simulation."
+    description: "Open the Event Simulator. Each button loads one real Ritvik engine run. Click 'New Train (Priority)' to inject the priority-1 movement TRN-SIM-002 into SEC-0004.",
+    tip: "The button labelled 'No engine scenario' is deliberate: that event class is not a maintenance-plan conflict, so Ritvik does not run on it."
   },
   {
     step: 8,
-    title: "8. Ritvik Conflict Detection",
-    page: "simulator",
+    replanned: false,
+    title: "8. Live Operations: Conflict Detected",
+    page: "live-ops",
     role: "Operations Control",
-    description: "Ritvik's time-interval collision engine detects a 30-minute direct overlap between the new train (01:50 - 02:20) and TASK-000005 (00:00 - 03:20).",
-    tip: "Calculated via interval overlap: train_arrival < maint_end and train_departure > maint_start."
+    description: "Ritvik's interval-overlap engine flags the collision between TRN-SIM-002 and the TASK-000005 possession on SEC-0004, and identifies it as the affected train.",
+    tip: "Overlap test: train_arrival < possession_end AND train_departure > possession_start."
   },
   {
     step: 9,
-    title: "9. Ritvik Topological Route Feasibility Search",
-    page: "simulator",
+    replanned: false,
+    title: "9. Three Operational Outcomes: Reroute, Hold, Replan",
+    page: "live-ops",
     role: "Operations Control",
-    description: "Ritvik explores alternative bypass routes in route_topology.json: SEC-0005 has capacity exhausted; SEC-0007 is congested.",
-    tip: "Ritvik audits actual graph connectivity—never inventing fictitious railway routes."
+    description: "Ritvik has three responses. REROUTE (train TRN-SIM-001 via SEC-0007, +16 min computed from section length and line speed). HOLD (low-priority train waits 35 min, inside the 45-min limit). REPLAN when neither is feasible. The Criteria Coverage panel states exactly what the layer evaluates and what it does not.",
+    tip: "Every figure on this screen comes from a real engine run in ritvik_scenarios.json. Downstream-impact and sequencing are explicitly marked NOT_IMPLEMENTED."
   },
   {
     step: 10,
-    title: "10. Rerouting Infeasible -> REPLAN REQUEST",
+    replanned: false,
+    title: "10. Rerouting and Holding Both Infeasible -> REPLAN REQUEST",
     page: "simulator",
     role: "Operations Control",
-    description: "Because all bypass paths are saturated, Ritvik emits a targeted replan_request.json back to Arnav instead of risking train delays.",
-    tip: "Ritvik is NOT a maintenance scheduler. It triggers the feedback loop back to Arnav."
+    description: "TRN-SIM-002 is priority 1 (never held) and every bypass is saturated, so the only safe option is to move the possession. Ritvik emits a targeted replan_request.json with the rejected routes attached.",
+    tip: "Ritvik is not a scheduler. It hands the decision back to Arnav's CP-SAT optimizer."
   },
   {
     step: 11,
+    replanned: true,
     title: "11. Arnav CP-SAT Re-Optimization",
     page: "simulator",
     role: "Operations Control",
-    description: "Arnav consumes replan_request.json, blacklists BLK-009637 + BLK-009638, and re-optimizes TASK-000005 to 08 Sep (18:00 - 21:20) with TEAM-018.",
-    tip: "Proves optimality in 0.86s and writes updated optimized_block_plan.json."
+    description: "Arnav consumes replan_request.json, blacklists BLK-009637 + BLK-009638, and re-optimizes TASK-000005 to 08 Sep (18:00 - 21:20) with TEAM-015.",
+    tip: "Returns a feasible alternative in well under a second and writes the revised plan to replan_output/."
   },
   {
     step: 12,
-    title: "12. Original Plan vs Replanned Plan Comparison",
+    replanned: true,
+    title: "12. Replanning Audit: Before, Disruption, After",
     page: "replanning",
     role: "Operations Control",
-    description: "Review the side-by-side comparison interface: Original Plan (07 Sep) -> Conflict Details -> Replanned Plan (08 Sep).",
-    tip: "Clear audit trail of why the schedule moved and how constraints remained satisfied."
+    description: "Side-by-side: original possession (07 Sep, TEAM-013) -> the conflict -> the re-optimized possession (08 Sep 18:00-21:20, BLK-012046+47, TEAM-015). The audit record below shows action taken, routes inspected, hold outcome, measured replan runtime, and 52/53 tasks unchanged (by construction).",
+    tip: "Retention is 100% by construction, not a benchmark: the replan scope is a single task and every other record is copied unchanged."
   },
   {
     step: 13,
-    title: "13. Ritvik Re-Validation -> PLAN APPROVED",
-    page: "replanning",
-    role: "Operations Control",
-    description: "Ritvik audits the updated plan on 08 Sep: 0 train conflicts, section available, team available -> PLAN APPROVED emitted to Aditya.",
-    tip: "The closed loop is 100% closed: both safety and maintenance delivery are preserved."
+    replanned: true,
+    title: "13. Independent Verification of Completed Work",
+    page: "general-verify",
+    role: "General User",
+    description: "Switch to the General User role. Completed possessions are listed for independent certification -- approve, reject, or report a false closure. Records are held for the session only; nothing is written to an external register.",
+    tip: "This closes the loop on the operational side before the field crew picks up the revised work order."
   },
   {
     step: 14,
+    replanned: true,
     title: "14. Maintenance Portal Receives Updated Schedule",
     page: "my-tasks",
     role: "Maintenance Personnel",
