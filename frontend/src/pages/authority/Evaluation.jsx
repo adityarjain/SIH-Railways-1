@@ -1,4 +1,5 @@
 import React from 'react';
+import { useI18n } from '../../i18n';
 import { Panel, PanelHeader, PanelBody, MetricRow, Metric, Alert, ProvenanceNote, ScopeCaption } from '../../components/ui';
 import evaluation from '../../data/model_evaluation.json';
 
@@ -8,6 +9,7 @@ import evaluation from '../../data/model_evaluation.json';
  * claim we cannot re-derive.
  */
 export const Evaluation = () => {
+  const { t: tx } = useI18n();
   const c = evaluation.classification;
   const r = evaluation.regression_degradation_30d;
   const cm = c.confusion_matrix;
@@ -19,43 +21,42 @@ export const Evaluation = () => {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="t-section-title">Maintenance Risk Model — Evaluation</h2>
+        <h2 className="t-section-title">{tx('evaluation.title')}</h2>
         <p className="text-xs text-rail-500 mt-0.5 max-w-3xl leading-relaxed">
-          Classification and degradation-forecast quality on the held-out split, recomputed
-          from the predictions artifact rather than quoted from a report.
+          {tx('evaluation.subtitle')}
         </p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Panel><PanelBody><Metric label="ROC-AUC" value={c.roc_auc.toFixed(4)} tone="ok" scope="Held-out split" /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label="PR-AUC" value={c.pr_auc_average_precision.toFixed(4)} tone="ok" scope="Held-out split" /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label="F1" value={c.f1.toFixed(4)} scope={`threshold ${evaluation.threshold}`} /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label="Rows evaluated" value={evaluation.rows_evaluated.toLocaleString()} sub={`${evaluation.positives.toLocaleString()} positive · ${evaluation.negatives.toLocaleString()} negative`} /></PanelBody></Panel>
+        <Panel><PanelBody><Metric label={tx('evaluation.rocAuc')} value={c.roc_auc.toFixed(4)} tone="ok" scope={tx('scope.heldOut')} /></PanelBody></Panel>
+        <Panel><PanelBody><Metric label={tx('evaluation.prAuc')} value={c.pr_auc_average_precision.toFixed(4)} tone="ok" scope={tx('scope.heldOut')} /></PanelBody></Panel>
+        <Panel><PanelBody><Metric label={tx('evaluation.f1')} value={c.f1.toFixed(4)} scope={tx('evaluation.thresholdScope', { t: evaluation.threshold })} /></PanelBody></Panel>
+        <Panel><PanelBody><Metric label={tx('evaluation.rowsEvaluated')} value={evaluation.rows_evaluated.toLocaleString()} sub={tx('evaluation.rowsSub', { pos: evaluation.positives.toLocaleString(), neg: evaluation.negatives.toLocaleString() })} /></PanelBody></Panel>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Panel>
-          <PanelHeader title="Classification" scope={`Threshold ${evaluation.threshold}`} />
-          <MetricRow label="Accuracy" value={c.accuracy.toFixed(4)} />
-          <MetricRow label="Precision" value={c.precision.toFixed(4)} />
-          <MetricRow label="Recall" value={c.recall.toFixed(4)} tone="warn" sub="misses 30.7% of true failures" />
-          <MetricRow label="F1" value={c.f1.toFixed(4)} />
+          <PanelHeader title={tx('evaluation.classification')} scope={tx('evaluation.thresholdScope', { t: evaluation.threshold })} />
+          <MetricRow label={tx('evaluation.accuracy')} value={c.accuracy.toFixed(4)} />
+          <MetricRow label={tx('evaluation.precision')} value={c.precision.toFixed(4)} />
+          <MetricRow label={tx('evaluation.recall')} value={c.recall.toFixed(4)} tone="warn" sub={tx('evaluation.recallSub')} />
+          <MetricRow label={tx('evaluation.f1')} value={c.f1.toFixed(4)} />
         </Panel>
 
         <Panel>
-          <PanelHeader title="Confusion matrix" scope={`${evaluation.rows_evaluated.toLocaleString()} rows`} />
+          <PanelHeader title={tx('evaluation.confusionMatrix')} scope={tx('evaluation.rowsScope', { count: evaluation.rows_evaluated.toLocaleString() })} />
           <PanelBody>
             <div className="grid grid-cols-2 gap-px bg-line border border-line">
               {[
-                ['True negative', cm.true_negative, 'ok'],
-                ['False positive', cm.false_positive, 'warn'],
-                ['False negative', cm.false_negative, 'critical'],
-                ['True positive', cm.true_positive, 'ok'],
-              ].map(([label, value, t]) => (
+                [tx('evaluation.trueNegative'), cm.true_negative, 'ok'],
+                [tx('evaluation.falsePositive'), cm.false_positive, 'warn'],
+                [tx('evaluation.falseNegative'), cm.false_negative, 'critical'],
+                [tx('evaluation.truePositive'), cm.true_positive, 'ok'],
+              ].map(([label, value, tone]) => (
                 <div key={label} className="bg-surface-panel px-3 py-2.5">
                   <div className="t-label">{label}</div>
                   <div className={`font-mono text-lg font-semibold mt-0.5 ${
-                    t === 'ok' ? 'text-status-ok' : t === 'warn' ? 'text-status-warn' : 'text-status-critical'
+                    tone === 'ok' ? 'text-status-ok' : tone === 'warn' ? 'text-status-warn' : 'text-status-critical'
                   }`}>
                     {value.toLocaleString()}
                   </div>
@@ -63,23 +64,21 @@ export const Evaluation = () => {
               ))}
             </div>
             <p className="text-[10px] text-rail-400 mt-2 leading-relaxed">
-              {cm.false_negative.toLocaleString()} assets that did fail within 30 days scored
-              below the threshold. That is the operationally expensive error, and it is
-              reported rather than tuned away.
+              {tx('evaluation.confusionNote', { count: cm.false_negative.toLocaleString() })}
             </p>
           </PanelBody>
         </Panel>
 
         <Panel>
-          <PanelHeader title="Degradation forecast" scope="30-day regression" />
-          <MetricRow label="MAE" value={r.mae.toFixed(4)} />
-          <MetricRow label="RMSE" value={r.rmse.toFixed(4)} />
-          <MetricRow label="R²" value={r.r2.toFixed(4)} tone="warn" sub="explains 64.6% of variance" />
+          <PanelHeader title={tx('evaluation.degradationForecast')} scope={tx('evaluation.degradationScope')} />
+          <MetricRow label={tx('evaluation.mae')} value={r.mae.toFixed(4)} />
+          <MetricRow label={tx('evaluation.rmse')} value={r.rmse.toFixed(4)} />
+          <MetricRow label={tx('evaluation.r2')} value={r.r2.toFixed(4)} tone="warn" sub={tx('evaluation.r2Sub')} />
         </Panel>
       </div>
 
       <Panel>
-        <PanelHeader title="Risk band distribution" scope={`${evaluation.rows_evaluated.toLocaleString()} predictions`} />
+        <PanelHeader title={tx('evaluation.bandDistribution')} scope={tx('evaluation.predictionsScope', { count: evaluation.rows_evaluated.toLocaleString() })} />
         <PanelBody>
           <div className="space-y-1.5">
             {['CRITICAL', 'HIGH', 'MODERATE', 'LOW'].map((band) => {
@@ -88,9 +87,10 @@ export const Evaluation = () => {
               const tone = band === 'CRITICAL' ? 'bg-status-critical'
                 : band === 'HIGH' ? 'bg-status-warn'
                 : band === 'MODERATE' ? 'bg-status-info' : 'bg-status-ok';
+              const bandKey = { CRITICAL: 'risk.critical', HIGH: 'risk.high', MODERATE: 'risk.moderate', LOW: 'risk.low' }[band];
               return (
                 <div key={band} className="flex items-center gap-3">
-                  <span className="t-label w-20 shrink-0">{band}</span>
+                  <span className="t-label w-20 shrink-0">{tx(bandKey)}</span>
                   <div className="flex-1 h-4 bg-surface-sunken border border-line-subtle relative">
                     <div className={`absolute inset-y-0 left-0 ${tone}`} style={{ width: `${share * 100}%` }} />
                   </div>
@@ -104,11 +104,8 @@ export const Evaluation = () => {
         </PanelBody>
       </Panel>
 
-      <Alert tone="idle" title="Training is not reproducible from this repository">
-        Only evaluation is. Re-fitting would require reconstructing feature engineering that
-        is absent from the shipped dataset, and the degradation regressor was pickled by an
-        older scikit-learn that will not load on current versions. Its forecasts are
-        materialised in the predictions CSV.
+      <Alert tone="idle" title={tx('evaluation.trainingTitle')}>
+        {tx('evaluation.trainingBody')}
       </Alert>
 
       <Panel>
@@ -116,9 +113,9 @@ export const Evaluation = () => {
           <ProvenanceNote
             generatedBy={prov.predictions_artifact}
             command="PYTHONPATH=. python scripts/evaluate_neev.py"
-            note={prov.model_training ? `Model training: ${prov.model_training}` : undefined}
+            note={prov.model_training ? tx('evaluation.modelTraining', { value: prov.model_training }) : undefined}
           />
-          <ScopeCaption className="block mt-2">Scope: {evaluation.scope}</ScopeCaption>
+          <ScopeCaption className="block mt-2">{tx('common.scope')}: {evaluation.scope}</ScopeCaption>
         </PanelBody>
       </Panel>
     </div>

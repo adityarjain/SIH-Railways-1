@@ -11,6 +11,7 @@ import { WeeklyView } from '../../components/planning/WeeklyView';
 import { MonthlyHeatmap } from '../../components/planning/MonthlyHeatmap';
 import { RecommendationActions } from '../../components/occ/RecommendationActions';
 import { usePlan } from '../../context/PlanContext';
+import { useI18n } from '../../i18n';
 import corridorsSectionsData from '../../data/corridors_sections.json';
 
 // Both selectors are derived from the plan the optimizer actually produced, so
@@ -43,6 +44,7 @@ const buildCorridorOptions = (tasks) => {
 
 export const BlockPlanning = () => {
   const { scheduledTasks, metrics, activeEvent } = usePlan();
+  const { t } = useI18n();
 
   const dateOptions = React.useMemo(() => buildDateOptions(scheduledTasks), [scheduledTasks]);
   const corridorOptions = React.useMemo(() => buildCorridorOptions(scheduledTasks), [scheduledTasks]);
@@ -73,9 +75,9 @@ export const BlockPlanning = () => {
   // of rendering dozens of empty section rows.
   const activeSectionIds = React.useMemo(() => {
     const ids = new Set();
-    scheduledTasks.forEach((t) => {
-      if (t.date === selectedDate && (selectedCorridor === 'ALL' || t.corridor_id === selectedCorridor)) {
-        ids.add(t.section_id);
+    scheduledTasks.forEach((task) => {
+      if (task.date === selectedDate && (selectedCorridor === 'ALL' || task.corridor_id === selectedCorridor)) {
+        ids.add(task.section_id);
       }
     });
     return ids;
@@ -110,16 +112,15 @@ export const BlockPlanning = () => {
       {/* Page header */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="t-section-title">Block Planning</h2>
+          <h2 className="t-section-title">{t('blockPlanning.title')}</h2>
           <p className="text-xs text-rail-500 mt-0.5 max-w-3xl leading-relaxed">
-            Maintenance scheduling constrained by asset risk, block availability, train operations
-            and crew shifts. Solved by OR-Tools CP-SAT.
+            {t('blockPlanning.subtitle')}
           </p>
         </div>
         {/* The solver is Python and is not run from the browser, so this states
             where the rendered plan came from rather than implying it solved here. */}
         <div className="text-right shrink-0">
-          <ScopeCaption>Plan generated offline by CP-SAT</ScopeCaption>
+          <ScopeCaption>{t('blockPlanning.generatedOffline')}</ScopeCaption>
           <p className="font-mono text-[10px] text-rail-400 mt-0.5">$ python demo.py</p>
         </div>
       </div>
@@ -128,7 +129,7 @@ export const BlockPlanning = () => {
       <FilterBar className="justify-between">
         <div className="flex flex-wrap items-center gap-2.5">
           <div className="flex items-stretch border border-line">
-            {[['timeline', 'Timeline'], ['weekly', 'Weekly'], ['monthly', 'Monthly']].map(([id, label]) => (
+            {[['timeline', t('blockPlanning.viewTimeline')], ['weekly', t('blockPlanning.viewWeekly')], ['monthly', t('blockPlanning.viewMonthly')]].map(([id, label]) => (
               <button
                 key={id}
                 onClick={() => setViewMode(id)}
@@ -141,16 +142,16 @@ export const BlockPlanning = () => {
             ))}
           </div>
 
-          <Select label="Date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)}>
+          <Select label={t('common.date')} value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)}>
             {dateOptions.map((o) => (
               <option key={o.date} value={o.date}>
-                {o.date} · {o.count} {o.count === 1 ? 'task' : 'tasks'}
+                {o.date} · {o.count} {t('common.tasks')}
               </option>
             ))}
           </Select>
 
-          <Select label="Corridor" value={selectedCorridor} onChange={(e) => setSelectedCorridor(e.target.value)}>
-            <option value="ALL">All corridors · {scheduledTasks.length}</option>
+          <Select label={t('common.corridor')} value={selectedCorridor} onChange={(e) => setSelectedCorridor(e.target.value)}>
+            <option value="ALL">{t('common.allCorridors')} · {scheduledTasks.length}</option>
             {corridorOptions.map((o) => (
               <option key={o.id} value={o.id}>
                 {o.id} — {o.name} · {o.count}
@@ -161,27 +162,27 @@ export const BlockPlanning = () => {
 
         {dateOptions.length > 0 && (
           <ScopeCaption>
-            Plan span {dateOptions[0].date} – {dateOptions[dateOptions.length - 1].date}
+            {t('blockPlanning.planSpan', { from: dateOptions[0].date, to: dateOptions[dateOptions.length - 1].date })}
           </ScopeCaption>
         )}
       </FilterBar>
 
       {/* Scenario summary — scoped to the subset rendered below */}
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="t-label">Demo scenario — solved subset</h3>
+        <h3 className="t-label">{t('blockPlanning.scenarioSummary')}</h3>
         <ScopeCaption>
-          Full-dataset baseline is on the Overview screen · reproduce with python demo.py
+          {t('blockPlanning.scenarioScope')}
         </ScopeCaption>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
         {[
-          ['Critical tasks', metrics.risk_breakdown.critical_risk_scheduled, 'Risk score \u2265 80', 'red'],
-          ['High-risk tasks', metrics.risk_breakdown.high_risk_scheduled, 'Risk score 60\u201379', 'amber'],
-          ['Tasks considered', metrics.summary.total_tasks_considered, 'Scenario subset', 'slate'],
-          ['Planned blocks', metrics.operational_metrics.unique_blocks_utilized, 'Block windows used', 'blue'],
-          ['Deferred', metrics.summary.total_deferred.toLocaleString(), 'Not placed in scenario', 'slate'],
-          ['Crews utilized', `${metrics.operational_metrics.teams_utilized}/${teamsData.length}`, 'Of the full roster', 'purple'],
-          ['Train conflicts', activeEvent ? 1 : 0, activeEvent ? 'Simulated event active' : 'None recorded', activeEvent ? 'amber' : 'green'],
+          [t('blockPlanning.criticalTasks'), metrics.risk_breakdown.critical_risk_scheduled, t('blockPlanning.subRiskGte80'), 'red'],
+          [t('blockPlanning.highRiskTasks'), metrics.risk_breakdown.high_risk_scheduled, t('blockPlanning.subRisk6079'), 'amber'],
+          [t('blockPlanning.tasksConsidered'), metrics.summary.total_tasks_considered, t('blockPlanning.subScenarioSubset'), 'slate'],
+          [t('blockPlanning.plannedBlocks'), metrics.operational_metrics.unique_blocks_utilized, t('blockPlanning.subBlockWindows'), 'blue'],
+          [t('blockPlanning.deferred'), metrics.summary.total_deferred.toLocaleString(), t('blockPlanning.subNotPlaced'), 'slate'],
+          [t('blockPlanning.crewsUtilized'), `${metrics.operational_metrics.teams_utilized}/${teamsData.length}`, t('blockPlanning.subOfRoster'), 'purple'],
+          [t('blockPlanning.trainConflicts'), activeEvent ? 1 : 0, activeEvent ? t('blockPlanning.subSimActive') : t('blockPlanning.subNoneRecorded'), activeEvent ? 'amber' : 'green'],
         ].map(([title, value, subtext, color]) => (
           <MetricCard key={title} title={title} value={value} subtext={subtext} color={color} />
         ))}
@@ -197,7 +198,7 @@ export const BlockPlanning = () => {
           selectedDate={selectedDate}
           corridorLabel={corridorLabel}
           onSelectTask={handleSelectTask}
-          scope="Demo scenario"
+          scope={t('scope.demoScenario')}
         />
       )}
 

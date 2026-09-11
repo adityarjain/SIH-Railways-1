@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { AuthProvider, useAuth, ROLES } from './context/AuthContext';
+import { I18nProvider } from './i18n';
 import { PlanContext_Provider } from './context/PlanContext';
 import { DemoGuideProvider } from './context/DemoGuideContext';
 
@@ -118,16 +119,18 @@ export default function App() {
   // Development reference for the design system. Not part of either operational
   // role, and reachable only by explicit URL.
   if (typeof window !== 'undefined' && window.location.pathname.startsWith('/style-guide')) {
-    return <StyleGuide />;
+    return <I18nProvider><StyleGuide /></I18nProvider>;
   }
 
   return (
-    <AuthProvider>
-      <PlanContext_Provider>
-        <DemoGuideProvider>
-          <AppShell />
-        </DemoGuideProvider>
-      </PlanContext_Provider>
-    </AuthProvider>
+    <I18nProvider>
+      <AuthProvider>
+        <PlanContext_Provider>
+          <DemoGuideProvider>
+            <AppShell />
+          </DemoGuideProvider>
+        </PlanContext_Provider>
+      </AuthProvider>
+    </I18nProvider>
   );
 }

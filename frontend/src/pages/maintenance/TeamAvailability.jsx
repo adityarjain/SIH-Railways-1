@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { usePlan } from '../../context/PlanContext';
+import { useI18n } from '../../i18n';
 import {
   Panel, PanelHeader, PanelBody, Metric, DataTable, StatusBadge,
   Select, TextInput, EmptyState, Alert, ScopeCaption,
@@ -16,6 +17,7 @@ import teamsData from '../../data/teams.json';
  */
 export const TeamAvailability = ({ onNavigate }) => {
   const { scheduledTasks, baselineMetrics, isReplanned } = usePlan();
+  const { t: tx } = useI18n();
   const [query, setQuery] = useState('');
   const [deptFilter, setDeptFilter] = useState('ALL');
   const [shiftFilter, setShiftFilter] = useState('ALL');
@@ -67,76 +69,76 @@ export const TeamAvailability = ({ onNavigate }) => {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="t-section-title">Resources</h2>
+        <h2 className="t-section-title">{tx('resources.title')}</h2>
         <p className="text-xs text-rail-500 mt-0.5 max-w-3xl leading-relaxed">
-          Maintenance crews, their shift windows, and the possessions the plan assigned them.
+          {tx('resources.subtitle')}
         </p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Panel><PanelBody><Metric label="Crews on roster" value={teamsData.length} scope="teams.csv" /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label="Assigned in this plan" value={assignedCount} tone={assignedCount ? 'ok' : 'idle'} scope="Demo scenario" /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label="Crews utilized" value={`${baselineMetrics.operational_metrics?.teams_utilized ?? 0} / ${teamsData.length}`} tone="warn" scope="Full run" /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label="Total crew" value={totalCrew} sub="across all departments" scope="teams.csv" /></PanelBody></Panel>
+        <Panel><PanelBody><Metric label={tx('resources.crewsOnRoster')} value={teamsData.length} scope="teams.csv" /></PanelBody></Panel>
+        <Panel><PanelBody><Metric label={tx('resources.assignedInPlan')} value={assignedCount} tone={assignedCount ? 'ok' : 'idle'} scope={tx('scope.demoScenario')} /></PanelBody></Panel>
+        <Panel><PanelBody><Metric label={tx('resources.crewsUtilized')} value={`${baselineMetrics.operational_metrics?.teams_utilized ?? 0} / ${teamsData.length}`} tone="warn" scope={tx('scope.fullRun')} /></PanelBody></Panel>
+        <Panel><PanelBody><Metric label={tx('resources.totalCrew')} value={totalCrew} sub={tx('resources.totalCrewSub')} scope="teams.csv" /></PanelBody></Panel>
       </div>
 
       <Panel>
         <PanelHeader
-          title="Crew roster"
-          scope={`${rows.length} of ${teamsData.length} crews`}
+          title={tx('resources.roster')}
+          scope={tx('resources.rosterScope', { shown: rows.length, total: teamsData.length })}
         />
         <PanelBody className="border-b border-line flex flex-wrap items-center gap-2.5">
           <TextInput
-            placeholder="Search crew id, name, department…"
+            placeholder={tx('resources.searchPlaceholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="min-w-[220px] flex-1"
           />
-          <Select label="Dept" value={deptFilter} onChange={(e) => setDeptFilter(e.target.value)}>
-            <option value="ALL">All departments</option>
+          <Select label={tx('common.dept')} value={deptFilter} onChange={(e) => setDeptFilter(e.target.value)}>
+            <option value="ALL">{tx('common.allDepartments')}</option>
             {departments.map((d) => <option key={d} value={d}>{d}</option>)}
           </Select>
-          <Select label="Filter" value={shiftFilter} onChange={(e) => setShiftFilter(e.target.value)}>
-            <option value="ALL">All crews</option>
-            <option value="ASSIGNED">Assigned in this plan</option>
-            <option value="IDLE">Not assigned</option>
-            <option value="Night">Night shift</option>
-            <option value="Day">Day shift</option>
-            <option value="Evening">Evening shift</option>
+          <Select label={tx('common.filter')} value={shiftFilter} onChange={(e) => setShiftFilter(e.target.value)}>
+            <option value="ALL">{tx('resources.filterAll')}</option>
+            <option value="ASSIGNED">{tx('resources.filterAssigned')}</option>
+            <option value="IDLE">{tx('resources.filterIdle')}</option>
+            <option value="Night">{tx('resources.filterNight')}</option>
+            <option value="Day">{tx('resources.filterDay')}</option>
+            <option value="Evening">{tx('resources.filterEvening')}</option>
           </Select>
         </PanelBody>
 
         <DataTable
           getKey={(t) => t.team_id}
           columns={[
-            { key: 'team_id', header: 'Crew', render: (t) => (
+            { key: 'team_id', header: tx('common.crew'), render: (t) => (
               <span>
                 <span className="t-mono-id block">{t.team_id}</span>
                 <span className="text-[10px] text-rail-400">{t.team_name}</span>
               </span>
             ) },
-            { key: 'department', header: 'Department', render: (t) => (
+            { key: 'department', header: tx('common.department'), render: (t) => (
               <span className="text-[11px]">{t.department}</span>
             ) },
-            { key: 'shift', header: 'Shift', render: (t) => (
+            { key: 'shift', header: tx('resources.shift'), render: (t) => (
               <span className="font-mono text-[11px]">
                 {t.shift_start_minute != null
                   ? `${minToHhmm(t.shift_start_minute)}–${minToHhmm(t.shift_end_minute)}`
                   : t.shift || '—'}
               </span>
             ) },
-            { key: 'crew_size', header: 'Size', align: 'right', render: (t) => (
+            { key: 'crew_size', header: tx('resources.size'), align: 'right', render: (t) => (
               <span className="font-mono text-[11px]">{t.crew_size ?? t.team_size}</span>
             ) },
-            { key: 'availability_percent', header: 'Availability', align: 'right', render: (t) => (
+            { key: 'availability_percent', header: tx('resources.availability'), align: 'right', render: (t) => (
               <StatusBadge tone={t.availability_percent >= 90 ? 'ok' : t.availability_percent >= 75 ? 'warn' : 'critical'} size="sm">
                 {t.availability_percent}%
               </StatusBadge>
             ) },
-            { key: 'assigned', header: 'Assigned possessions', render: (t) => {
+            { key: 'assigned', header: tx('resources.assignedPossessions'), render: (t) => {
               const list = assignmentsByTeam.get(t.team_id) || [];
               if (list.length === 0) {
-                return <span className="text-[10px] text-rail-400">None in this plan</span>;
+                return <span className="text-[10px] text-rail-400">{tx('resources.noneInPlan')}</span>;
               }
               return (
                 <span className="space-y-0.5 block">
@@ -146,7 +148,7 @@ export const TeamAvailability = ({ onNavigate }) => {
                     </span>
                   ))}
                   {list.length > 3 && (
-                    <span className="block text-[9px] text-rail-400">+{list.length - 3} more</span>
+                    <span className="block text-[9px] text-rail-400">{tx('resources.andMore', { count: list.length - 3 })}</span>
                   )}
                 </span>
               );
@@ -154,25 +156,22 @@ export const TeamAvailability = ({ onNavigate }) => {
           ]}
           rows={rows}
           onRowClick={() => onNavigate && onNavigate('maintenance-blocks')}
-          empty={<EmptyState title="No crew matches the current filters." />}
+          empty={<EmptyState title={tx('resources.noCrewMatch')} />}
         />
       </Panel>
 
       {isReplanned && (
-        <Alert tone="warn" title="Plan is in its replanned state">
-          Assignments shown follow the re-optimized schedule. Crew allocation for the affected
-          possession has changed accordingly.
+        <Alert tone="warn" title={tx('resources.replannedTitle')}>
+          {tx('resources.replannedBody')}
         </Alert>
       )}
 
-      <Alert tone="idle" title="Availability is a roster attribute">
-        <span className="font-mono">availability_percent</span> is a column in teams.csv describing
-        the crew's general availability. It is not a live roster feed and does not reflect
-        sickness, leave, or real-time status.
+      <Alert tone="idle" title={tx('resources.availabilityTitle')}>
+        {tx('resources.availabilityBody')}
       </Alert>
 
       <ScopeCaption className="block">
-        Roster: teams.csv · {teamsData.length} crews. Assignments derived from the committed plan.
+        {tx('resources.rosterScopeNote', { count: teamsData.length })}
       </ScopeCaption>
     </div>
   );

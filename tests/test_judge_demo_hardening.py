@@ -100,9 +100,17 @@ class TestSimulatorTruthfulness:
         assert "outcomeType === 'OPERATIONAL_UPDATE' ? rerouteScenario : replanScenario" not in source
 
     def test_no_scenario_state_points_to_live_operations(self):
+        """
+        The copy now lives in the i18n bundle rather than inline in the JSX, so
+        assert the screen references the key and that the English bundle still
+        carries the disclosure verbatim.
+        """
         source = (FRONTEND / "pages/occ/Simulator.jsx").read_text()
-        assert "No generated engine scenario for this event type" in source
+        assert "simulator.noScenarioTitle" in source
         assert "live-ops" in source
+
+        en = (FRONTEND / "i18n/en.js").read_text()
+        assert "No generated engine scenario for this event type" in en
 
 
 class TestBlockPlanningSelectors:

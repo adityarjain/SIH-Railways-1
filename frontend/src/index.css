@@ -90,3 +90,23 @@
     rgba(194, 48, 59, 0.35) 6px
   );
 }
+
+/* Devanagari needs more vertical room than Latin at the same font-size:
+   ascenders/descenders and the shirorekha collide at our dense line-heights.
+   Scoped to the Hindi document so the English layout is untouched. */
+:root[data-lang='hi'] {
+  --dev-leading: 1.55;
+}
+:root[data-lang='hi'] body,
+:root[data-lang='hi'] .t-label,
+:root[data-lang='hi'] .t-value,
+:root[data-lang='hi'] .t-section-title {
+  line-height: var(--dev-leading);
+}
+:root[data-lang='hi'] .t-label,
+:root[data-lang='hi'] .t-wordmark {
+  /* Devanagari has no case, so uppercasing does nothing but letter-spacing
+     still breaks conjuncts. */
+  text-transform: none;
+  letter-spacing: 0.01em;
+}

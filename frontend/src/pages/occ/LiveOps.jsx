@@ -2,6 +2,7 @@ import React from 'react';
 import { Card } from '../../components/common/Card';
 import { Badge } from '../../components/common/Badge';
 import { usePlan } from '../../context/PlanContext';
+import { useI18n } from '../../i18n';
 import { minToHhmm } from '../../utils/time';
 import {
   AlertTriangle,
@@ -17,6 +18,7 @@ export const LiveOps = ({ onNavigate }) => {
     replanRequest, operationalDecision, rerouteScenario, holdScenario, replanScenario,
     criteriaCoverage,
   } = usePlan();
+  const { t } = useI18n();
 
   // Train actions Ritvik actually produced for the rerouting-success scenario.
   const rerouteActions = rerouteScenario?.decision?.train_actions ?? [];
@@ -42,17 +44,16 @@ export const LiveOps = ({ onNavigate }) => {
       {/* Header */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="t-section-title">Live Operations</h2>
+          <h2 className="t-section-title">{t('liveOps.title')}</h2>
           <p className="text-xs text-rail-500 mt-0.5 max-w-3xl leading-relaxed">
-            Operational validation layer. Evaluates simulated railway state against maintenance
-            possessions, reroutes conflicting trains, or triggers automated replan requests.
+            {t('liveOps.subtitle')}
           </p>
         </div>
         <button
           onClick={() => onNavigate('simulator')}
           className="px-3 py-1.5 bg-rail-900 hover:bg-rail-800 text-white text-xs font-semibold transition-colors flex items-center gap-1.5"
         >
-          <span>Open event simulator</span>
+          <span>{t('liveOps.openSimulator')}</span>
           <ArrowRight size={13} />
         </button>
       </div>
@@ -62,9 +63,9 @@ export const LiveOps = ({ onNavigate }) => {
         <div className="flex items-center justify-between border-b border-line pb-3">
           <div className="flex items-center gap-2">
             <span className={`h-2 w-2 rounded-full ${activeEvent ? 'bg-status-warn' : 'bg-status-ok'}`} />
-            <h3 className="t-label">Simulated network operational state</h3>
+            <h3 className="t-label">{t('liveOps.networkState')}</h3>
           </div>
-          <Badge variant="LOW" size="sm">Validation active</Badge>
+          <Badge variant="LOW" size="sm">{t('liveOps.validationActive')}</Badge>
         </div>
 
         {/* Dynamic Conflict Alert Banner */}
@@ -73,22 +74,22 @@ export const LiveOps = ({ onNavigate }) => {
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2 text-status-warn font-bold text-sm">
                 <AlertTriangle size={18} className="text-status-warn" />
-                <span>ACTIVE OPERATIONAL CONFLICT DETECTED</span>
+                <span>{t('liveOps.conflictDetected')}</span>
               </div>
-              <Badge variant="danger" size="md">Collision Conflict</Badge>
+              <Badge variant="danger" size="md">{t('liveOps.collisionConflict')}</Badge>
             </div>
 
             <div className="grid grid-cols-3 gap-3 text-xs bg-surface-panel p-3 rounded-lg border border-status-warn font-mono">
               <div>
-                <span className="text-rail-500 block text-[11px]">Affected Maintenance:</span>
+                <span className="text-rail-500 block text-[11px]">{t('liveOps.affectedMaintenance')}</span>
                 <span className="font-bold text-rail-900">{replanRequest.maintenance_task_id}</span>
               </div>
               <div>
-                <span className="text-rail-500 block text-[11px]">Occupied Blocks:</span>
+                <span className="text-rail-500 block text-[11px]">{t('liveOps.occupiedBlocks')}</span>
                 <span className="font-bold text-rail-900">{replanRequest.block_ids.join(', ')}</span>
               </div>
               <div>
-                <span className="text-rail-500 block text-[11px]">Conflicting Train(s):</span>
+                <span className="text-rail-500 block text-[11px]">{t('liveOps.conflictingTrains')}</span>
                 <span className="font-bold text-status-critical">
                   {replanRequest.conflicting_trains.join(', ') || activeEvent.trainId}
                 </span>
@@ -166,7 +167,7 @@ export const LiveOps = ({ onNavigate }) => {
                     className="flex items-center gap-2 px-4 py-2 bg-status-critical hover:bg-status-critical text-white rounded-lg text-xs font-bold transition-all "
                   >
                     <RefreshCw size={14} />
-                    <span>Request Replan from Optimizer</span>
+                    <span>{t('liveOps.requestReplan')}</span>
                   </button>
                 ) : (
                   <div className="flex items-center gap-2 text-status-ok text-xs font-bold bg-surface-panel p-2 rounded border border-status-ok">

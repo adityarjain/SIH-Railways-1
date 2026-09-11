@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { usePlan } from '../../context/PlanContext';
+import { useI18n } from '../../i18n';
 import {
   Panel, PanelHeader, PanelBody, Metric, StatusBadge, Button, Alert,
   DataTable, EmptyState, Select, TextInput, ScopeCaption,
@@ -19,36 +20,16 @@ import completedWorkJson from '../../data/completed_work.json';
  */
 
 const ACTIONS = {
-  approve: {
-    label: 'Approve',
-    tone: 'ok',
-    title: 'Approve completed work',
-    blurb: 'Confirm the possession was handed back and the work is accepted. A comment is optional.',
-    requiresComment: false,
-    status: 'Approved',
-  },
-  reject: {
-    label: 'Reject',
-    tone: 'critical',
-    title: 'Reject completed work',
-    blurb: 'Record that the work is not accepted. State the reason — it is kept with the record.',
-    requiresComment: true,
-    status: 'Rejected',
-  },
-  flag: {
-    label: 'Flag for review',
-    tone: 'warn',
-    title: 'Flag closure for review',
-    blurb: 'Record a discrepancy between the closure and what was observed. State what prompted it.',
-    requiresComment: true,
-    status: 'Flagged',
-  },
+  approve: { labelKey: 'verification.approve', tone: 'ok', titleKey: 'verification.approveTitle', blurbKey: 'verification.approveBlurb', requiresComment: false, status: 'Approved' },
+  reject: { labelKey: 'verification.reject', tone: 'critical', titleKey: 'verification.rejectTitle', blurbKey: 'verification.rejectBlurb', requiresComment: true, status: 'Rejected' },
+  flag: { labelKey: 'verification.flag', tone: 'warn', titleKey: 'verification.flagTitle', blurbKey: 'verification.flagBlurb', requiresComment: true, status: 'Flagged' },
 };
 
 const VERDICT_TONE = { Approved: 'ok', Rejected: 'critical', Flagged: 'warn' };
 
 export const GeneralPortal = () => {
   const { verifications, submitVerification } = usePlan();
+  const { t } = useI18n();
   const [query, setQuery] = useState('');
   const [deptFilter, setDeptFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -116,92 +97,92 @@ export const GeneralPortal = () => {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="t-section-title">Verify Completed Work</h2>
+        <h2 className="t-section-title">{t('verification.title')}</h2>
         <p className="text-xs text-rail-500 mt-0.5 max-w-3xl leading-relaxed">
-          Possessions the plan has handed back, for verification by the controlling authority.
+          {t('verification.subtitle')}
         </p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Panel><PanelBody><Metric label="Awaiting verification" value={counts.pending} tone={counts.pending ? 'warn' : 'ok'} scope="This session" /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label="Approved" value={counts.approved} tone="ok" scope="This session" /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label="Rejected" value={counts.rejected} tone="critical" scope="This session" /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label="Flagged for review" value={counts.flagged} tone="warn" scope="This session" /></PanelBody></Panel>
+        <Panel><PanelBody><Metric label={t('verification.awaitingVerification')} value={counts.pending} tone={counts.pending ? 'warn' : 'ok'} scope={t('scope.thisSession')} /></PanelBody></Panel>
+        <Panel><PanelBody><Metric label={t('verification.approved')} value={counts.approved} tone="ok" scope={t('scope.thisSession')} /></PanelBody></Panel>
+        <Panel><PanelBody><Metric label={t('verification.rejected')} value={counts.rejected} tone="critical" scope={t('scope.thisSession')} /></PanelBody></Panel>
+        <Panel><PanelBody><Metric label={t('verification.flaggedForReview')} value={counts.flagged} tone="warn" scope={t('scope.thisSession')} /></PanelBody></Panel>
       </div>
 
       <Panel>
         <PanelHeader
-          title="Completed possessions"
+          title={t('verification.completedPossessions')}
           scope={`${rows.length} of ${completedWorkJson.length} records · completed_work.json`}
         />
         <PanelBody className="border-b border-line flex flex-wrap items-center gap-2.5">
           <TextInput
-            placeholder="Search task, asset, section, type…"
+            placeholder={t('verification.searchPlaceholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="min-w-[240px] flex-1"
           />
-          <Select label="Dept" value={deptFilter} onChange={(e) => setDeptFilter(e.target.value)}>
-            <option value="ALL">All departments</option>
+          <Select label={t('common.dept')} value={deptFilter} onChange={(e) => setDeptFilter(e.target.value)}>
+            <option value="ALL">{t('common.allDepartments')}</option>
             {departments.map((d) => <option key={d} value={d}>{d}</option>)}
           </Select>
-          <Select label="Status" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-            <option value="ALL">All</option>
-            <option value="PENDING">Awaiting verification</option>
-            <option value="Approved">Approved</option>
-            <option value="Rejected">Rejected</option>
-            <option value="Flagged">Flagged</option>
+          <Select label={t('common.status')} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+            <option value="ALL">{t('common.all')}</option>
+            <option value="PENDING">{t('verification.awaitingVerification')}</option>
+            <option value="Approved">{t('verification.approved')}</option>
+            <option value="Rejected">{t('verification.rejected')}</option>
+            <option value="Flagged">{t('status.flagged')}</option>
           </Select>
         </PanelBody>
 
         <DataTable
           getKey={(j) => j.task_id}
           columns={[
-            { key: 'task_id', header: 'Task', render: (j) => (
+            { key: 'task_id', header: t('common.task'), render: (j) => (
               <span>
                 <span className="t-mono-id block">{j.task_id}</span>
                 <span className="text-[10px] text-rail-400">{j.maintenance_type}</span>
               </span>
             ) },
-            { key: 'section_id', header: 'Section', render: (j) => (
+            { key: 'section_id', header: t('common.section'), render: (j) => (
               <span className="font-mono text-[11px]">{j.section_id}<span className="block text-[9px] text-rail-400">{j.corridor_id}</span></span>
             ) },
-            { key: 'execution_date', header: 'Executed', render: (j) => (
+            { key: 'execution_date', header: t('verification.executed'), render: (j) => (
               <span className="font-mono text-[11px]">
                 {j.execution_date}
                 <span className="block text-[9px] text-rail-400">{minToHhmm(j.start_minute)}–{minToHhmm(j.end_minute)}</span>
               </span>
             ) },
-            { key: 'block_ids', header: 'Blocks', render: (j) => (
+            { key: 'block_ids', header: t('common.blocks'), render: (j) => (
               <span className="font-mono text-[10px]">{(j.block_ids || []).join(' + ')}</span>
             ) },
-            { key: 'assigned_teams', header: 'Crew', render: (j) => (
+            { key: 'assigned_teams', header: t('common.crew'), render: (j) => (
               <span className="font-mono text-[10px]">{(j.assigned_teams || []).join(', ')}</span>
             ) },
-            { key: 'risk', header: 'Risk', align: 'right', render: (j) => {
+            { key: 'risk', header: t('common.risk'), align: 'right', render: (j) => {
               const band = bandOf(j);
               return <StatusBadge tone={bandTone(band)} size="sm">{j.risk_score?.toFixed?.(1) ?? '—'}</StatusBadge>;
             } },
-            { key: 'verdict', header: 'Verification', align: 'right', render: (j) => {
+            { key: 'verdict', header: t('verification.verificationCol'), align: 'right', render: (j) => {
               const v = verdictOf(j.task_id);
               return v
                 ? <StatusBadge tone={VERDICT_TONE[v] || 'idle'} size="sm">{v}</StatusBadge>
-                : <span className="text-[10px] text-rail-400">Awaiting</span>;
+                : <span className="text-[10px] text-rail-400">{t('status.awaiting')}</span>;
             } },
             { key: 'actions', header: '', align: 'right', render: (j) => (
               <span className="inline-flex gap-1 justify-end">
-                <Button size="sm" variant="secondary" onClick={() => open(j, 'approve')}>Approve</Button>
-                <Button size="sm" variant="warn" onClick={() => open(j, 'flag')}>Flag</Button>
-                <Button size="sm" variant="secondary" onClick={() => open(j, 'reject')}>Reject</Button>
+                <Button size="sm" variant="secondary" onClick={() => open(j, 'approve')}>{t('verification.approve')}</Button>
+                <Button size="sm" variant="warn" onClick={() => open(j, 'flag')}>{t('verification.flag')}</Button>
+                <Button size="sm" variant="secondary" onClick={() => open(j, 'reject')}>{t('verification.reject')}</Button>
               </span>
             ) },
           ]}
           rows={rows}
-          empty={<EmptyState title="No completed possession matches the current filters." />}
+          empty={<EmptyState title={t('verification.noMatch')} />}
         />
       </Panel>
 
-      <Alert tone="idle" title="Session state only">
+      <Alert tone="idle" title={t('verification.sessionOnlyTitle')}>
         Verification decisions are held in the browser for this session. Nothing is written to an
         external register, no notification is sent, and no maintenance record is amended. This is
         not an audit system and does not claim independent third-party certification.
@@ -215,20 +196,20 @@ export const GeneralPortal = () => {
       <Modal
         isOpen={Boolean(modal)}
         onClose={() => setModal(null)}
-        title={cfg?.title || ''}
+        title={cfg ? t(cfg.titleKey) : ''}
         subtitle={modal ? `${modal.job.task_id} · ${modal.job.maintenance_type} · ${modal.job.section_id}` : ''}
         maxWidth="max-w-lg"
       >
         {modal && (
           <div className="space-y-3">
-            <p className="text-xs text-rail-600 leading-relaxed">{cfg.blurb}</p>
+            <p className="text-xs text-rail-600 leading-relaxed">{t(cfg.blurbKey)}</p>
 
             <div className="grid grid-cols-2 gap-px bg-line border border-line">
               {[
-                ['Executed', modal.job.execution_date],
-                ['Window', `${minToHhmm(modal.job.start_minute)}–${minToHhmm(modal.job.end_minute)}`],
-                ['Blocks', (modal.job.block_ids || []).join(' + ')],
-                ['Crew', (modal.job.assigned_teams || []).join(', ')],
+                [t('verification.executed'), modal.job.execution_date],
+                [t('common.window'), `${minToHhmm(modal.job.start_minute)}–${minToHhmm(modal.job.end_minute)}`],
+                [t('common.blocks'), (modal.job.block_ids || []).join(' + ')],
+                [t('common.crew'), (modal.job.assigned_teams || []).join(', ')],
               ].map(([k, v]) => (
                 <div key={k} className="bg-surface-panel px-3 py-2">
                   <div className="t-label">{k}</div>
@@ -239,25 +220,25 @@ export const GeneralPortal = () => {
 
             <div>
               <label className="t-label block mb-1">
-                Comment {cfg.requiresComment ? <span className="text-status-critical">· required</span> : '· optional'}
+                {t('verification.comment')} {cfg.requiresComment ? <span className="text-status-critical">· {t('verification.required')}</span> : `· ${t('verification.optional')}`}
               </label>
               <textarea
                 rows={3}
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                placeholder={cfg.requiresComment ? 'State the reason for this decision…' : 'Optional note…'}
+                placeholder={cfg.requiresComment ? t('verification.commentPlaceholderRequired') : t('verification.commentPlaceholderOptional')}
                 className="w-full text-xs bg-surface-panel border border-line rounded-sm px-2.5 py-2 text-rail-900 placeholder:text-rail-400 focus:outline-none focus:ring-1 focus:ring-status-info"
               />
             </div>
 
             <div className="flex justify-end gap-2 pt-1">
-              <Button variant="secondary" onClick={() => setModal(null)}>Cancel</Button>
+              <Button variant="secondary" onClick={() => setModal(null)}>{t('common.cancel')}</Button>
               <Button
                 variant={cfg.tone === 'critical' ? 'danger' : cfg.tone === 'warn' ? 'warn' : 'primary'}
                 disabled={cfg.requiresComment && !comment.trim()}
                 onClick={confirm}
               >
-                {cfg.label}
+                {t(cfg.labelKey)}
               </Button>
             </div>
           </div>

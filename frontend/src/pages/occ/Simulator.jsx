@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { SIMULATION_EVENTS } from '../../data/simulationData';
 import { usePlan } from '../../context/PlanContext';
+import { useI18n } from '../../i18n';
 import {
   Panel, PanelHeader, PanelBody, StatusBadge, Button, Alert, ScopeCaption,
 } from '../../components/ui';
@@ -23,29 +24,22 @@ const EVENT_TONE = {
   MAINTENANCE_EMERGENCY: 'idle',
 };
 
-const EVENT_SUMMARY = {
-  NEW_TRAIN_SUCCESS: ['New train', 'Bypass available', 'TRN-SIM-001 rerouted'],
-  NEW_TRAIN_BLOCKED: ['New train (priority)', 'All bypasses blocked', 'Triggers replan'],
-  BLOCK_UNAVAILABLE: ['Block unavailable', 'Track fracture closure', 'BLK-009637 closed'],
-  HELD_TRAIN: ['Low-priority train', 'Held, not replanned', 'TRN-SIM-006 held'],
-  MAINTENANCE_EMERGENCY: ['Maintenance emergency', 'OHE catenary sag', 'No engine scenario'],
+const EVENT_SUMMARY_KEYS = {
+  NEW_TRAIN_SUCCESS: ['simulator.eventNewTrain', 'simulator.eventNewTrainState', 'simulator.eventNewTrainDetail'],
+  NEW_TRAIN_BLOCKED: ['simulator.eventPriority', 'simulator.eventPriorityState', 'simulator.eventPriorityDetail'],
+  BLOCK_UNAVAILABLE: ['simulator.eventBlockUnavailable', 'simulator.eventBlockUnavailableState', 'simulator.eventBlockUnavailableDetail'],
+  HELD_TRAIN: ['simulator.eventLowPriority', 'simulator.eventLowPriorityState', 'simulator.eventLowPriorityDetail'],
+  MAINTENANCE_EMERGENCY: ['simulator.eventEmergency', 'simulator.eventEmergencyState', 'simulator.eventEmergencyDetail'],
 };
 
-const STEPS = [
-  'Inject operational event',
-  'Conflict detection',
-  'Reroute search over topology',
-  'Replan request triggered',
-  'CP-SAT re-optimization',
-  'Re-validation',
-  'Final decision emitted',
-];
+const STEP_KEYS = ['simulator.s1','simulator.s2','simulator.s3','simulator.s4','simulator.s5','simulator.s6','simulator.s7'];
 
 export const Simulator = ({ onNavigate }) => {
   const {
     triggerEvent, activeEvent, executeReplanFlow,
     rerouteScenario, holdScenario, replanScenario, blockUnavailableScenario,
   } = usePlan();
+  const { t } = useI18n();
   const [selectedEventId, setSelectedEventId] = useState('NEW_TRAIN_BLOCKED');
   const [simStep, setSimStep] = useState(0);
 
@@ -96,22 +90,24 @@ export const Simulator = ({ onNavigate }) => {
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="t-section-title">Guided Demo</h2>
+          <h2 className="t-section-title">{t('simulator.title')}</h2>
           <p className="text-xs text-rail-500 mt-0.5 max-w-3xl leading-relaxed">
-            Inject an operational disturbance and replay the closed-loop response, step by step.
-            Every figure comes from a real engine run.
+            {t('simulator.subtitle')}
           </p>
         </div>
-        <StatusBadge tone="warn" size="md">Synthetic simulation environment</StatusBadge>
+        <StatusBadge tone="warn" size="md">{t('simulator.syntheticEnv')}</StatusBadge>
       </div>
 
       <Panel>
-        <PanelHeader title="Select operational disturbance" scope="Each button loads one generated engine run" />
+        <PanelHeader title={t('simulator.selectDisturbance')} scope={t('simulator.selectScope')} />
         <PanelBody>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-2.5">
             {SIMULATION_EVENTS.map((e) => {
               const active = selectedEventId === e.id;
-              const [title, state, detail] = EVENT_SUMMARY[e.id] || [e.name, '', ''];
+              const [tk, sk, dk] = EVENT_SUMMARY_KEYS[e.id] || [];
+              const title = tk ? t(tk) : e.name;
+              const state = sk ? t(sk) : '';
+              const detail = dk ? t(dk) : '';
               return (
                 <button
                   key={e.id}
@@ -141,25 +137,23 @@ export const Simulator = ({ onNavigate }) => {
           <PanelBody className="space-y-3">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
               <div>
-                <span className="t-label">Event type</span>
+                <span className="t-label">{t('simulator.eventType')}</span>
                 <div className="font-mono text-[11px] text-rail-900 mt-0.5">{evt.eventType}</div>
               </div>
               <div>
-                <span className="t-label">Section</span>
+                <span className="t-label">{t('common.section')}</span>
                 <div className="font-mono text-[11px] text-rail-900 mt-0.5">{evt.sectionId}</div>
               </div>
               <div>
-                <span className="t-label">Reason</span>
+                <span className="t-label">{t('common.reason')}</span>
                 <div className="text-[11px] text-rail-700 mt-0.5">{evt.reason}</div>
               </div>
             </div>
-            <Alert tone="idle" title="No generated engine scenario for this event type">
-              The conflict / reroute / hold engine runs on maintenance-plan conflicts. The scenarios
-              it actually solves are on the{' '}
+            <Alert tone="idle" title={t('simulator.noScenarioTitle')}>
+              {t('simulator.noScenarioBody', { link: '' })}{' '}
               <button onClick={() => onNavigate('live-ops')} className="font-semibold underline hover:text-rail-900">
-                Live Operations
-              </button>{' '}
-              screen.
+                {t('nav.liveOps')}
+              </button>
             </Alert>
           </PanelBody>
         </Panel>
@@ -169,15 +163,15 @@ export const Simulator = ({ onNavigate }) => {
       {hasScenario && (
         <Panel>
           <PanelHeader
-            title="Closed-loop response"
-            scope="Conflict detection → reroute/hold → replan → validation"
+            title={t('simulator.closedLoop')}
+            scope={t('simulator.closedLoopScope')}
             action={simStep > 0 && (
-              <span className="font-mono text-[10px] text-rail-500">step {simStep} / 7</span>
+              <span className="font-mono text-[10px] text-rail-500">{t('simulator.stepOf', { n: simStep })}</span>
             )}
           />
           <PanelBody className="space-y-3">
             <div className="grid grid-cols-7 gap-1.5">
-              {STEPS.map((name, i) => {
+              {STEP_KEYS.map((nameKey, i) => {
                 const num = i + 1;
                 const done = simStep >= num;
                 const current = simStep === num;
@@ -193,7 +187,7 @@ export const Simulator = ({ onNavigate }) => {
                     }`}
                   >
                     <div className="font-mono text-[9px] font-bold">STEP {num}</div>
-                    <div className="text-[9px] leading-tight mt-0.5">{name}</div>
+                    <div className="text-[9px] leading-tight mt-0.5">{t(nameKey)}</div>
                   </div>
                 );
               })}
@@ -202,11 +196,11 @@ export const Simulator = ({ onNavigate }) => {
             {/* Reasoning log — every line is bound to a real scenario field */}
             <div className="bg-rail-950 border border-rail-800 p-3 font-mono text-[11px] space-y-1.5">
               <div className="text-rail-500 flex items-center justify-between">
-                <span>REASONING LOG</span>
-                <span>{simStep > 0 ? 'RUNNING' : 'IDLE'}</span>
+                <span>{t('simulator.reasoningLog')}</span>
+                <span>{simStep > 0 ? t('simulator.running') : t('simulator.idle')}</span>
               </div>
               {simStep === 0 && (
-                <p className="text-rail-500">Select an event above to run the response chain.</p>
+                <p className="text-rail-500">{t('simulator.selectToRun')}</p>
               )}
               {simStep >= 1 && (
                 <p className="text-rail-300">
@@ -258,11 +252,11 @@ export const Simulator = ({ onNavigate }) => {
       )}
 
       {simStep === 7 && (
-        <Alert tone="ok" title="Response complete — plan synchronized">
-          TASK-000005 is updated in the block planning timeline and the Ground work order.
+        <Alert tone="ok" title={t('simulator.completeTitle')}>
+          {t('simulator.completeBody')}
           <div className="flex gap-2 mt-2">
-            <Button size="sm" variant="primary" onClick={() => onNavigate('replanning')}>Replanning audit</Button>
-            <Button size="sm" variant="secondary" onClick={() => onNavigate('block-planning')}>Block planner</Button>
+            <Button size="sm" variant="primary" onClick={() => onNavigate('replanning')}>{t('simulator.replanAudit')}</Button>
+            <Button size="sm" variant="secondary" onClick={() => onNavigate('block-planning')}>{t('simulator.blockPlanner')}</Button>
           </div>
         </Alert>
       )}

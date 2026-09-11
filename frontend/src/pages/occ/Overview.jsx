@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { usePlan } from '../../context/PlanContext';
+import { useI18n } from '../../i18n';
 import {
   Panel, PanelHeader, PanelBody, MetricRow, StatusBadge, Button,
   EmptyState, ProvenanceNote, ScopeCaption, Select,
@@ -26,6 +27,7 @@ export const Overview = ({ onNavigate }) => {
     baselineMetrics: metrics, metrics: scenario, scheduledTasks, activeEvent,
     isReplanned, replanRequest, replanScenario,
   } = usePlan();
+  const { t } = useI18n();
 
   const risk = metrics.risk_breakdown || {};
   const op = metrics.operational_metrics || {};
@@ -36,7 +38,7 @@ export const Overview = ({ onNavigate }) => {
   // paint is dense rather than empty.
   const dateOptions = useMemo(() => {
     const counts = {};
-    scheduledTasks.forEach((t) => { counts[t.date] = (counts[t.date] || 0) + 1; });
+    scheduledTasks.forEach((task) => { counts[task.date] = (counts[task.date] || 0) + 1; });
     return Object.entries(counts).map(([date, count]) => ({ date, count })).sort((a, b) => a.date.localeCompare(b.date));
   }, [scheduledTasks]);
 
@@ -49,18 +51,18 @@ export const Overview = ({ onNavigate }) => {
 
   const busiestCorridor = useMemo(() => {
     const counts = {};
-    scheduledTasks.forEach((t) => { if (t.date === activeDate) counts[t.corridor_id] = (counts[t.corridor_id] || 0) + 1; });
+    scheduledTasks.forEach((task) => { if (task.date === activeDate) counts[task.corridor_id] = (counts[task.corridor_id] || 0) + 1; });
     return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0];
   }, [scheduledTasks, activeDate]);
 
   const sections = useMemo(() => {
     const ids = new Set(
       scheduledTasks
-        .filter((t) => t.date === activeDate && (!busiestCorridor || t.corridor_id === busiestCorridor))
-        .map((t) => t.section_id),
+        .filter((task) => task.date === activeDate && (!busiestCorridor || task.corridor_id === busiestCorridor))
+        .map((task) => task.section_id),
     );
     return corridorsSectionsData.sections
-      .filter((s) => ids.has(s.section_id))
+      .filter((sec) => ids.has(sec.section_id))
       .sort((a, b) => a.section_id.localeCompare(b.section_id));
   }, [scheduledTasks, activeDate, busiestCorridor]);
 
@@ -77,9 +79,9 @@ export const Overview = ({ onNavigate }) => {
       const cf = replanScenario?.conflict;
       items.push({
         tone: 'critical',
-        kind: 'Train conflict',
+        kind: t('overview.kindTrainConflict'),
         title: activeEvent.name,
-        meta: cf?.details || `${activeEvent.sectionId || ''} · simulated event`,
+        meta: cf?.details || `${activeEvent.sectionId || ''}`,
         go: 'live-ops',
       });
     }
@@ -87,9 +89,9 @@ export const Overview = ({ onNavigate }) => {
     if (isReplanned || replanRequest?.action_required) {
       items.push({
         tone: 'warn',
-        kind: 'Replan',
-        title: isReplanned ? 'Possession re-optimized' : 'Possession requires re-optimization',
-        meta: `${(replanRequest?.rejected_route_candidates || []).length} bypass routes rejected · no hold possible`,
+        kind: t('overview.kindReplan'),
+        title: isReplanned ? t('overview.possessionReoptimized') : t('overview.possessionNeedsReopt'),
+        meta: t('overview.bypassRejected', { count: (replanRequest?.rejected_route_candidates || []).length }),
         go: 'replanning',
       });
     }
@@ -97,9 +99,9 @@ export const Overview = ({ onNavigate }) => {
     if (risk.critical_risk_deferred) {
       items.push({
         tone: 'critical',
-        kind: 'Critical deferred',
-        title: `${risk.critical_risk_deferred.toLocaleString()} critical-risk tasks deferred`,
-        meta: 'full run · deadline reached outside the daily batch',
+        kind: t('overview.kindCriticalDeferred'),
+        title: t('overview.criticalDeferredTitle', { count: risk.critical_risk_deferred.toLocaleString() }),
+        meta: t('overview.criticalDeferredMeta'),
         go: 'demand',
       });
     }
@@ -107,9 +109,9 @@ export const Overview = ({ onNavigate }) => {
     if (reasons.team_capacity_exhausted) {
       items.push({
         tone: 'warn',
-        kind: 'Capacity',
-        title: `${reasons.team_capacity_exhausted.toLocaleString()} deferrals: crew capacity exhausted`,
-        meta: `${op.teams_utilized ?? 0} of ${teamsData.length} crews utilized`,
+        kind: t('overview.kindCapacity'),
+        title: t('overview.capacityTitle', { count: reasons.team_capacity_exhausted.toLocaleString() }),
+        meta: t('overview.capacityMeta', { used: op.teams_utilized ?? 0, total: teamsData.length }),
         go: 'teams',
       });
     }
@@ -117,9 +119,9 @@ export const Overview = ({ onNavigate }) => {
     if (reasons.no_qualifying_team_shift) {
       items.push({
         tone: 'idle',
-        kind: 'No crew shift',
-        title: `${reasons.no_qualifying_team_shift.toLocaleString()} tasks had no qualifying crew shift`,
-        meta: 'department or shift window did not cover the task',
+        kind: t('overview.kindNoCrewShift'),
+        title: t('overview.noCrewShiftTitle', { count: reasons.no_qualifying_team_shift.toLocaleString() }),
+        meta: t('overview.noCrewShiftMeta'),
         go: 'teams',
       });
     }
@@ -127,11 +129,11 @@ export const Overview = ({ onNavigate }) => {
     return items;
     // risk/reasons/op are stable slices of the static metrics import.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeEvent, isReplanned, replanRequest, replanScenario]);
+  }, [activeEvent, isReplanned, replanRequest, replanScenario, t]);
 
   const upcoming = useMemo(
     () => scheduledTasks
-      .filter((t) => t.date === activeDate)
+      .filter((task) => task.date === activeDate)
       .sort((a, b) => a.start_minute - b.start_minute)
       .slice(0, 6),
     [scheduledTasks, activeDate],
@@ -143,14 +145,14 @@ export const Overview = ({ onNavigate }) => {
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="t-section-title">Operations Overview</h2>
+          <h2 className="t-section-title">{t('overview.title')}</h2>
           <p className="text-xs text-rail-500 mt-0.5 max-w-3xl leading-relaxed">
-            Network state, maintenance risk, and the possessions planned against them.
+            {t('overview.subtitle')}
           </p>
         </div>
-        <Select label="Timeline date" value={activeDate || ''} onChange={(e) => setSelectedDate(e.target.value)}>
+        <Select label={t('overview.timelineDate')} value={activeDate || ''} onChange={(e) => setSelectedDate(e.target.value)}>
           {dateOptions.map((o) => (
-            <option key={o.date} value={o.date}>{o.date} — {o.count} tasks</option>
+            <option key={o.date} value={o.date}>{o.date} — {o.count} {t('common.tasks')}</option>
           ))}
         </Select>
       </div>
@@ -163,15 +165,15 @@ export const Overview = ({ onNavigate }) => {
           selectedDate={activeDate}
           corridorLabel={corridorLabel}
           onSelectTask={() => onNavigate && onNavigate('block-planning')}
-          scope="Demo scenario"
+          scope={t('scope.demoScenario')}
           compact
         />
 
         <Panel>
-          <PanelHeader title="Critical attention" scope="Ranked by operational severity" />
+          <PanelHeader title={t('overview.criticalAttention')} scope={t('overview.criticalAttentionScope')} />
           {attention.length === 0 ? (
-            <EmptyState title="Nothing requires attention.">
-              No active conflict, no pending replan, and no critical-risk deferral recorded.
+            <EmptyState title={t('overview.nothingRequiresAttention')}>
+              {t('overview.nothingRequiresAttentionBody')}
             </EmptyState>
           ) : (
             <div className="divide-y divide-line">
@@ -199,46 +201,46 @@ export const Overview = ({ onNavigate }) => {
       {/* summary panels — each captioned with its own scope */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         <Panel>
-          <PanelHeader title="Maintenance risk" scope={`Full run · ${metrics.summary.total_tasks_considered.toLocaleString()} tasks`} />
-          <MetricRow label="Critical scheduled" value={(risk.critical_risk_scheduled ?? 0).toLocaleString()} tone="ok" />
-          <MetricRow label="Critical deferred" value={(risk.critical_risk_deferred ?? 0).toLocaleString()} tone="critical" />
-          <MetricRow label="High-risk scheduled" value={(risk.high_risk_scheduled ?? 0).toLocaleString()} />
+          <PanelHeader title={t('overview.maintenanceRisk')} scope={t('scope.fullRunTasks', { count: metrics.summary.total_tasks_considered.toLocaleString() })} />
+          <MetricRow label={t('overview.criticalScheduled')} value={(risk.critical_risk_scheduled ?? 0).toLocaleString()} tone="ok" />
+          <MetricRow label={t('overview.criticalDeferred')} value={(risk.critical_risk_deferred ?? 0).toLocaleString()} tone="critical" />
+          <MetricRow label={t('overview.highRiskScheduled')} value={(risk.high_risk_scheduled ?? 0).toLocaleString()} />
           {/* Reported by the run artifact rather than recomputed here, so the
               screen cannot drift from the recorded figure. */}
           <MetricRow
-            label="Critical scheduled rate"
+            label={t('overview.criticalScheduledRate')}
             value={risk.critical_scheduled_rate != null ? `${risk.critical_scheduled_rate}%` : '—'}
             tone="warn"
           />
         </Panel>
 
         <Panel>
-          <PanelHeader title="Block status" scope="Full run · 14-day horizon" />
-          <MetricRow label="Possessions used" value={(op.unique_blocks_utilized ?? 0).toLocaleString()} onClick={() => onNavigate && onNavigate('maintenance-blocks')} />
-          <MetricRow label="Night-window tasks" value={(op.night_maintenance_tasks ?? 0).toLocaleString()} />
-          <MetricRow label="Crews utilized" value={`${op.teams_utilized ?? 0} / ${teamsData.length}`} tone="warn" onClick={() => onNavigate && onNavigate('teams')} />
+          <PanelHeader title={t('overview.blockStatus')} scope={t('overview.blockStatusScope')} />
+          <MetricRow label={t('overview.possessionsUsed')} value={(op.unique_blocks_utilized ?? 0).toLocaleString()} onClick={() => onNavigate && onNavigate('maintenance-blocks')} />
+          <MetricRow label={t('overview.nightWindowTasks')} value={(op.night_maintenance_tasks ?? 0).toLocaleString()} />
+          <MetricRow label={t('overview.crewsUtilized')} value={`${op.teams_utilized ?? 0} / ${teamsData.length}`} tone="warn" onClick={() => onNavigate && onNavigate('teams')} />
           <MetricRow
-            label="Track availability"
+            label={t('overview.trackAvailability')}
             value={`${networkStats.track_availability_percent}%`}
             tone="ok"
-            sub={`${networkStats.track_available_block_windows.toLocaleString()} of ${networkStats.total_block_windows.toLocaleString()} windows`}
+            sub={t('overview.trackAvailabilitySub', { avail: networkStats.track_available_block_windows.toLocaleString(), total: networkStats.total_block_windows.toLocaleString() })}
           />
         </Panel>
 
         <Panel>
-          <PanelHeader title="Train impact" scope={`${decisionTrace.request?.task_id || ''} · decision trace`} />
-          <MetricRow label="Conflicting services" value={(impact.conflicting || []).length} tone={(impact.conflicting || []).length ? 'critical' : 'ok'} sub="must be zero (C002)" />
-          <MetricRow label="Adjacent services" value={(impact.adjacent || []).length} tone="ok" sub={`±${impact.adjacency_buffer_minutes ?? 60} min C008 buffer`} />
-          <MetricRow label="Estimated delay" value="0 min" tone="ok" />
-          <MetricRow label="Downstream impact" value="Not implemented" tone="idle" sub="no onward itinerary in the dataset" onClick={() => onNavigate && onNavigate('train-impact')} />
+          <PanelHeader title={t('overview.trainImpact')} scope={t('overview.trainImpactScope', { task: decisionTrace.request?.task_id || '' })} />
+          <MetricRow label={t('overview.conflictingServices')} value={(impact.conflicting || []).length} tone={(impact.conflicting || []).length ? 'critical' : 'ok'} sub={t('overview.conflictingServicesSub')} />
+          <MetricRow label={t('overview.adjacentServices')} value={(impact.adjacent || []).length} tone="ok" sub={t('overview.adjacentServicesSub', { min: impact.adjacency_buffer_minutes ?? 60 })} />
+          <MetricRow label={t('overview.estimatedDelay')} value="0 min" tone="ok" />
+          <MetricRow label={t('overview.downstreamImpact')} value={t('common.notImplemented')} tone="idle" sub={t('overview.downstreamImpactSub')} onClick={() => onNavigate && onNavigate('train-impact')} />
         </Panel>
 
         <Panel>
-          <PanelHeader title="Optimization" scope="Full run · CP-SAT" />
-          <MetricRow label="Solver status" value={metrics.summary.solver_status} tone={metrics.summary.solver_status === 'OPTIMAL' ? 'ok' : 'warn'} />
-          <MetricRow label="Runtime" value={`${metrics.summary.runtime_seconds} s`} sub="machine-dependent" />
-          <MetricRow label="Scheduled" value={`${metrics.summary.total_scheduled.toLocaleString()} (${metrics.summary.scheduled_percentage}%)`} onClick={() => onNavigate && onNavigate('performance')} />
-          <MetricRow label="Post-solve validation" value={prov.post_solve_validation || 'not recorded'} tone="ok" onClick={() => onNavigate && onNavigate('system-verification')} />
+          <PanelHeader title={t('overview.optimization')} scope={t('overview.optimizationScope')} />
+          <MetricRow label={t('overview.solverStatus')} value={metrics.summary.solver_status} tone={metrics.summary.solver_status === 'OPTIMAL' ? 'ok' : 'warn'} />
+          <MetricRow label={t('overview.runtime')} value={`${metrics.summary.runtime_seconds} s`} sub={t('overview.runtimeSub')} />
+          <MetricRow label={t('overview.scheduled')} value={`${metrics.summary.total_scheduled.toLocaleString()} (${metrics.summary.scheduled_percentage}%)`} onClick={() => onNavigate && onNavigate('performance')} />
+          <MetricRow label={t('overview.postSolveValidation')} value={prov.post_solve_validation || 'not recorded'} tone="ok" onClick={() => onNavigate && onNavigate('system-verification')} />
         </Panel>
       </div>
 
@@ -246,16 +248,16 @@ export const Overview = ({ onNavigate }) => {
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-4 items-start">
         <Panel>
           <PanelHeader
-            title="Optimization recommendation"
+            title={t('overview.recommendation')}
             scope={`${decisionTrace.request?.task_id} · ${decisionTrace.request?.section_id} · ${decisionTrace.candidate_summary?.date_evaluated}`}
-            action={<Button size="sm" variant="secondary" onClick={() => onNavigate && onNavigate('decision-trace')}>Open decision trace</Button>}
+            action={<Button size="sm" variant="secondary" onClick={() => onNavigate && onNavigate('decision-trace')}>{t('overview.openDecisionTrace')}</Button>}
           />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-line">
             {[
-              ['Windows considered', decisionTrace.candidate_summary?.block_windows_considered, undefined],
-              ['Rejected by constraint', decisionTrace.candidate_summary?.rejected, 'text-status-critical'],
-              ['Feasible', decisionTrace.candidate_summary?.feasible, 'text-status-ok'],
-              ['Selected window', decisionTrace.selected?.window, undefined],
+              [t('overview.windowsConsidered'), decisionTrace.candidate_summary?.block_windows_considered, undefined],
+              [t('overview.rejectedByConstraint'), decisionTrace.candidate_summary?.rejected, 'text-status-critical'],
+              [t('overview.feasible'), decisionTrace.candidate_summary?.feasible, 'text-status-ok'],
+              [t('overview.selectedWindow'), decisionTrace.selected?.window, undefined],
             ].map(([label, value, cls]) => (
               <div key={label} className="bg-surface-panel px-3 py-2.5">
                 <div className="t-label">{label}</div>
@@ -271,28 +273,28 @@ export const Overview = ({ onNavigate }) => {
         </Panel>
 
         <Panel>
-          <PanelHeader title="Upcoming possessions" scope={`${activeDate} · demo scenario`} />
+          <PanelHeader title={t('overview.upcoming')} scope={t('overview.upcomingScope', { date: activeDate })} />
           {upcoming.length === 0 ? (
-            <EmptyState title="No possession scheduled on this date." />
+            <EmptyState title={t('overview.noPossessionOnDate')} />
           ) : (
             <div className="divide-y divide-line">
-              {upcoming.map((t) => (
+              {upcoming.map((task) => (
                 <button
-                  key={t.task_id}
+                  key={task.task_id}
                   onClick={() => onNavigate && onNavigate('block-planning')}
                   className="w-full text-left px-3 py-2 flex items-center justify-between gap-3 hover:bg-surface-sunken transition-colors"
                 >
                   <span className="min-w-0">
-                    <span className="t-mono-id block">{t.task_id}</span>
+                    <span className="t-mono-id block">{task.task_id}</span>
                     <span className="block text-[10px] text-rail-400 truncate">
-                      {t.maintenance_type} · {t.section_id}
+                      {task.maintenance_type} · {task.section_id}
                     </span>
                   </span>
                   <span className="text-right shrink-0">
                     <span className="font-mono text-[11px] text-rail-900 block">
-                      {minToHhmm(t.start_minute)}–{minToHhmm(t.end_minute)}
+                      {minToHhmm(task.start_minute)}–{minToHhmm(task.end_minute)}
                     </span>
-                    {bandOf(t) === 'CRITICAL' && <StatusBadge tone="critical" size="sm">critical</StatusBadge>}
+                    {bandOf(task) === 'CRITICAL' && <StatusBadge tone="critical" size="sm">{t('risk.critical')}</StatusBadge>}
                   </span>
                 </button>
               ))}
@@ -303,8 +305,7 @@ export const Overview = ({ onNavigate }) => {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <ScopeCaption>
-          Headline figures: full run, {metrics.summary.total_tasks_considered.toLocaleString()} tasks.
-          Timeline: demo scenario, {scenario.summary.total_tasks_considered} tasks.
+          {t('overview.headlineScope', { full: metrics.summary.total_tasks_considered.toLocaleString(), demo: scenario.summary.total_tasks_considered })}
         </ScopeCaption>
         <ProvenanceNote generatedBy={prov.scope} command={prov.command} dataset={prov.dataset} />
       </div>

@@ -11,7 +11,7 @@ export default {
       // because `fontFamily` was never declared and font-sans/font-mono fell
       // back to the system stacks.
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+        sans: ['Inter', '"Noto Sans Devanagari"', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
       },
       colors: {

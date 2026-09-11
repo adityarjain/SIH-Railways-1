@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { usePlan } from '../../context/PlanContext';
 import { useAuth } from '../../context/AuthContext';
+import { useI18n } from '../../i18n';
 import {
   Panel, PanelHeader, PanelBody, DataTable, StatusBadge, Metric,
   EmptyState, Alert, ScopeCaption,
@@ -20,6 +21,7 @@ const SECTION = Object.fromEntries(corridors.sections.map((s) => [s.section_id, 
 export const BlockStatus = () => {
   const { tasksInventory } = usePlan();
   const { selectedDept } = useAuth();
+  const { t: tx } = useI18n();
 
   const rows = useMemo(
     () =>
@@ -47,56 +49,55 @@ export const BlockStatus = () => {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="t-section-title">Block Status</h2>
+        <h2 className="t-section-title">{tx('ground.blockStatusTitle')}</h2>
         <p className="text-xs text-rail-500 mt-0.5 max-w-3xl leading-relaxed">
-          Possessions allocated to {selectedDept}, and the train movements recorded on the same
-          sections.
+          {tx('ground.blockStatusSubtitle', { dept: selectedDept })}
         </p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Panel><PanelBody><Metric label="Possessions" value={rows.length} scope="Your department" /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label="Night windows" value={nightCount} tone="info" scope="Your department" /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label="Sections" value={new Set(rows.map((t) => t.section_id)).size} scope="Your department" /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label="In progress" value={rows.filter((t) => t.status === 'In Progress').length} tone="info" scope="This session" /></PanelBody></Panel>
+        <Panel><PanelBody><Metric label={tx('ground.possessions')} value={rows.length} scope={tx('scope.yourDepartment')} /></PanelBody></Panel>
+        <Panel><PanelBody><Metric label={tx('ground.nightWindows')} value={nightCount} tone="info" scope={tx('scope.yourDepartment')} /></PanelBody></Panel>
+        <Panel><PanelBody><Metric label={tx('common.sections')} value={new Set(rows.map((t) => t.section_id)).size} scope={tx('scope.yourDepartment')} /></PanelBody></Panel>
+        <Panel><PanelBody><Metric label={tx('ground.inProgressCount')} value={rows.filter((t) => t.status === 'In Progress').length} tone="info" scope={tx('scope.thisSession')} /></PanelBody></Panel>
       </div>
 
       <Panel>
-        <PanelHeader title="Allocated possessions" scope={`${rows.length} block windows`} />
+        <PanelHeader title={tx('ground.allocated')} scope={tx('ground.allocatedScope', { count: rows.length })} />
         <DataTable
           getKey={(t) => t.task_id}
           columns={[
-            { key: 'block_ids', header: 'Block', render: (t) => (
+            { key: 'block_ids', header: tx('common.block'), render: (t) => (
               <span className="font-mono text-[11px] font-semibold">{(t.block_ids || []).join(' + ')}</span>
             ) },
-            { key: 'scheduled_date', header: 'Date', render: (t) => (
+            { key: 'scheduled_date', header: tx('common.date'), render: (t) => (
               <span className="font-mono text-[11px]">{t.scheduled_date || '—'}</span>
             ) },
-            { key: 'window', header: 'Window', render: (t) => (
+            { key: 'window', header: tx('common.window'), render: (t) => (
               <span className="font-mono text-[11px]">
                 {t.start_minute != null ? `${minToHhmm(t.start_minute)}–${minToHhmm(t.end_minute)}` : '—'}
               </span>
             ) },
-            { key: 'section_id', header: 'Section', render: (t) => (
+            { key: 'section_id', header: tx('common.section'), render: (t) => (
               <span>
                 <span className="font-mono text-[11px]">{t.section_id}</span>
                 <span className="block text-[9px] text-rail-400">{SECTION[t.section_id]?.section_name}</span>
               </span>
             ) },
-            { key: 'task_id', header: 'Task', render: (t) => <span className="t-mono-id">{t.task_id}</span> },
-            { key: 'status', header: 'Status', align: 'right', render: (t) => (
-              <StatusBadge tone={statusTone(t.status)} size="sm">{t.status || 'Scheduled'}</StatusBadge>
+            { key: 'task_id', header: tx('common.task'), render: (t) => <span className="t-mono-id">{t.task_id}</span> },
+            { key: 'status', header: tx('common.status'), align: 'right', render: (t) => (
+              <StatusBadge tone={statusTone(t.status)} size="sm">{t.status || tx('status.scheduled')}</StatusBadge>
             ) },
           ]}
           rows={rows}
-          empty={<EmptyState title="No block possession is allocated to your department yet." />}
+          empty={<EmptyState title={tx('ground.noAllocated')} />}
         />
       </Panel>
 
       <Panel>
-        <PanelHeader title="Train movements on your sections" scope="Projected verbatim from trains.csv" />
+        <PanelHeader title={tx('ground.trainMovements')} scope={tx('ground.trainMovementsScope')} />
         {sectionDates.length === 0 ? (
-          <EmptyState title="No scheduled possession, so no section to report movements for." />
+          <EmptyState title={tx('ground.noScheduledSection')} />
         ) : (
           <div className="divide-y divide-line">
             {sectionDates.map(({ section, date }) => {
@@ -108,12 +109,14 @@ export const BlockStatus = () => {
                       {section} · {date}
                     </span>
                     <span className="font-mono text-[10px] text-rail-400">
-                      {trains.length} movement{trains.length === 1 ? '' : 's'}
+                      {trains.length === 1
+                        ? tx('ground.movementCount', { count: trains.length })
+                        : tx('ground.movementCountPlural', { count: trains.length })}
                     </span>
                   </div>
                   {trains.length === 0 ? (
                     <div className="text-[10px] text-rail-400 mt-1">
-                      No train timing records available for this section/date.
+                      {tx('ground.noTrainRecords')}
                     </div>
                   ) : (
                     <div className="flex flex-wrap gap-1.5 mt-2">
@@ -136,14 +139,15 @@ export const BlockStatus = () => {
         )}
       </Panel>
 
-      <Alert tone="idle" title="Movements are context, not clearance">
-        These are the train records the planner scheduled around. They are not a live signalling
-        feed, and they do not constitute authority to occupy the track.
+      <Alert tone="idle" title={tx('ground.contextTitle')}>
+        {tx('ground.contextBody')}
       </Alert>
 
       <ScopeCaption className="block">
-        Train data: {sectionTrains.provenance?.records_emitted} records projected from{' '}
-        {sectionTrains.provenance?.source_rows?.toLocaleString()} source rows.
+        {tx('ground.trainDataScope', {
+          records: sectionTrains.provenance?.records_emitted,
+          source: sectionTrains.provenance?.source_rows?.toLocaleString(),
+        })}
       </ScopeCaption>
     </div>
   );

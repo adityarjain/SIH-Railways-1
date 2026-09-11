@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { usePlan } from '../../context/PlanContext';
 import { useAuth } from '../../context/AuthContext';
+import { useI18n } from '../../i18n';
 import { Panel, PanelHeader, EmptyState, Alert, Button, StatusBadge } from '../../components/ui';
 import { TaskActionModal } from '../../components/maintenance/TaskActionModal';
 import {
@@ -23,6 +24,7 @@ const ACTION_STATUS = {
 export const ActiveBlock = ({ onNavigate }) => {
   const { tasksInventory, updateTaskStatus } = usePlan();
   const { selectedDept } = useAuth();
+  const { t: tx } = useI18n();
   const [action, setAction] = useState(null);
 
   const deptTasks = useMemo(
@@ -51,10 +53,9 @@ export const ActiveBlock = ({ onNavigate }) => {
   if (!active) {
     return (
       <Panel>
-        <PanelHeader title="Active block" scope={selectedDept} />
-        <EmptyState title="No possession is assigned to this department.">
-          Work appears here once the optimizer places a task from your department into a block
-          possession.
+        <PanelHeader title={tx('ground.activeBlockTitle')} scope={selectedDept} />
+        <EmptyState title={tx('ground.noAssignment')}>
+          {tx('ground.noAssignmentBody')}
         </EmptyState>
       </Panel>
     );
@@ -66,13 +67,13 @@ export const ActiveBlock = ({ onNavigate }) => {
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="t-section-title">Active Block</h2>
+          <h2 className="t-section-title">{tx('ground.activeBlockTitle')}</h2>
           <p className="text-xs text-rail-500 mt-0.5">
-            {isStarted ? 'Work is in progress on this possession.' : 'Next possession due for your department.'}
+            {isStarted ? tx('ground.activeBlockInProgress') : tx('ground.activeBlockNext')}
           </p>
         </div>
         <StatusBadge tone={isStarted ? 'info' : 'ok'} size="lg">
-          {isStarted ? 'IN PROGRESS' : 'READY TO START'}
+          {isStarted ? tx('status.inProgressCaps') : tx('status.readyToStart')}
         </StatusBadge>
       </div>
 
@@ -88,11 +89,10 @@ export const ActiveBlock = ({ onNavigate }) => {
         <OperationalGaps />
       </div>
 
-      <Alert tone="idle" title="Session state only">
-        Status changes are held in the browser for this session. Nothing is written to an
-        external register, and no notification is sent.
+      <Alert tone="idle" title={tx('ground.sessionOnlyTitle')}>
+        {tx('ground.sessionOnlyBody')}
         <Button size="sm" variant="ghost" className="ml-2" onClick={() => onNavigate && onNavigate('my-tasks')}>
-          View all assigned work
+          {tx('ground.viewAllWork')}
         </Button>
       </Alert>
 

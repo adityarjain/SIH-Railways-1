@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { usePlan } from '../../context/PlanContext';
 import { useAuth } from '../../context/AuthContext';
+import { useI18n } from '../../i18n';
 import {
   Panel, PanelHeader, PanelBody, Select, Metric, MetricRow,
   EmptyState, NotAvailable, Alert,
@@ -20,6 +21,7 @@ const SECTION = Object.fromEntries(corridors.sections.map((s) => [s.section_id, 
 export const SectionInfo = () => {
   const { tasksInventory } = usePlan();
   const { selectedDept } = useAuth();
+  const { t: tx } = useI18n();
 
   const mySections = useMemo(() => {
     const ids = [...new Set(
@@ -41,8 +43,8 @@ export const SectionInfo = () => {
   if (mySections.length === 0) {
     return (
       <Panel>
-        <PanelHeader title="Section information" scope={selectedDept} />
-        <EmptyState title="No section is assigned to your department yet." />
+        <PanelHeader title={tx('ground.sectionInfoTitle')} scope={selectedDept} />
+        <EmptyState title={tx('ground.noSectionAssigned')} />
       </Panel>
     );
   }
@@ -51,12 +53,12 @@ export const SectionInfo = () => {
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="t-section-title">Section Information</h2>
+          <h2 className="t-section-title">{tx('ground.sectionInfoTitle')}</h2>
           <p className="text-xs text-rail-500 mt-0.5">
-            Reference detail for the sections your department works.
+            {tx('ground.sectionInfoSubtitle')}
           </p>
         </div>
-        <Select label="Section" value={sectionId} onChange={(e) => setSectionId(e.target.value)}>
+        <Select label={tx('common.section')} value={sectionId} onChange={(e) => setSectionId(e.target.value)}>
           {mySections.map((id) => (
             <option key={id} value={id}>{id} — {SECTION[id]?.section_name || ''}</option>
           ))}
@@ -64,53 +66,53 @@ export const SectionInfo = () => {
       </div>
 
       {!sec ? (
-        <EmptyState title="This section is not present in corridors_sections.csv." />
+        <EmptyState title={tx('ground.sectionNotPresent')} />
       ) : (
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Panel><PanelBody><Metric label="Line speed" value={`${sec.maximum_speed_kmph}`} sub="kmph · maximum_speed_kmph" /></PanelBody></Panel>
-            <Panel><PanelBody><Metric label="Length" value={`${sec.section_length_km}`} sub="km · section_length_km" /></PanelBody></Panel>
-            <Panel><PanelBody><Metric label="Electrified" value={sec.electrified} sub="electrified" mono={false} /></PanelBody></Panel>
-            <Panel><PanelBody><Metric label="Your tasks here" value={tasksHere.length} scope={selectedDept} /></PanelBody></Panel>
+            <Panel><PanelBody><Metric label={tx('ground.lineSpeed')} value={`${sec.maximum_speed_kmph}`} sub="kmph · maximum_speed_kmph" /></PanelBody></Panel>
+            <Panel><PanelBody><Metric label={tx('ground.length')} value={`${sec.section_length_km}`} sub="km · section_length_km" /></PanelBody></Panel>
+            <Panel><PanelBody><Metric label={tx('ground.electrified')} value={sec.electrified} sub="electrified" mono={false} /></PanelBody></Panel>
+            <Panel><PanelBody><Metric label={tx('ground.yourTasksHere')} value={tasksHere.length} scope={selectedDept} /></PanelBody></Panel>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Panel>
-              <PanelHeader title="Section record" scope="corridors_sections.csv" />
-              <MetricRow label="Section" value={sec.section_id} sub={sec.section_name} />
-              <MetricRow label="Corridor" value={sec.corridor_id} sub={sec.corridor_name} />
-              <MetricRow label="Region" value={sec.region} />
-              <MetricRow label="Track type" value={sec.track_type} />
-              <MetricRow label="Electrified" value={sec.electrified} />
-              <MetricRow label="Maximum speed" value={`${sec.maximum_speed_kmph} kmph`} />
-              <MetricRow label="Length" value={`${sec.section_length_km} km`} />
+              <PanelHeader title={tx('ground.sectionRecord')} scope="corridors_sections.csv" />
+              <MetricRow label={tx('common.section')} value={sec.section_id} sub={sec.section_name} />
+              <MetricRow label={tx('common.corridor')} value={sec.corridor_id} sub={sec.corridor_name} />
+              <MetricRow label={tx('ground.region')} value={sec.region} />
+              <MetricRow label={tx('ground.trackType')} value={sec.track_type} />
+              <MetricRow label={tx('ground.electrified')} value={sec.electrified} />
+              <MetricRow label={tx('ground.maximumSpeed')} value={`${sec.maximum_speed_kmph} kmph`} />
+              <MetricRow label={tx('ground.length')} value={`${sec.section_length_km} km`} />
             </Panel>
 
             <div className="space-y-4">
               {traffic ? (
                 <Panel>
-                  <PanelHeader title="Traffic profile" scope={`section_traffic.json · ${traffic.date}`} />
-                  <MetricRow label="Passenger services" value={traffic.passenger_trains} />
-                  <MetricRow label="Freight services" value={traffic.expected_freight_trains ?? traffic.freight_trains} />
-                  <MetricRow label="Busiest hour" value={traffic.busiest_hour} tone="warn" />
-                  <MetricRow label="Peak passenger load" value={`${traffic.peak_passenger_load_percent}%`} />
+                  <PanelHeader title={tx('ground.trafficProfile')} scope={`section_traffic.json · ${traffic.date}`} />
+                  <MetricRow label={tx('ground.passengerServices')} value={traffic.passenger_trains} />
+                  <MetricRow label={tx('ground.freightServices')} value={traffic.expected_freight_trains ?? traffic.freight_trains} />
+                  <MetricRow label={tx('ground.busiestHour')} value={traffic.busiest_hour} tone="warn" />
+                  <MetricRow label={tx('ground.peakLoad')} value={`${traffic.peak_passenger_load_percent}%`} />
                   <MetricRow
-                    label="Block windows available"
+                    label={tx('ground.blockWindowsAvailable')}
                     value={`${traffic.available_block_windows} / ${traffic.total_block_windows}`}
                     tone="ok"
                   />
                 </Panel>
               ) : (
                 <Panel>
-                  <PanelHeader title="Traffic profile" />
-                  <EmptyState title="No aggregate traffic profile is published for this section." />
+                  <PanelHeader title={tx('ground.trafficProfile')} />
+                  <EmptyState title={tx('ground.noTrafficProfile')} />
                 </Panel>
               )}
 
               <Panel>
-                <PanelHeader title="Recorded train movements" scope="Projected from trains.csv" />
+                <PanelHeader title={tx('ground.recordedMovements')} scope={tx('ground.projectedFrom')} />
                 {trainDates.length === 0 ? (
-                  <EmptyState title="No train timing records available for this section." />
+                  <EmptyState title={tx('ground.noTrainForSection')} />
                 ) : (
                   <div className="divide-y divide-line-subtle">
                     {trainDates.map((d) => {
@@ -119,7 +121,11 @@ export const SectionInfo = () => {
                         <div key={d} className="px-3 py-2">
                           <div className="flex items-center justify-between">
                             <span className="font-mono text-[11px] text-rail-900">{d}</span>
-                            <span className="font-mono text-[10px] text-rail-400">{trains.length} movements</span>
+                            <span className="font-mono text-[10px] text-rail-400">
+                              {trains.length === 1
+                                ? tx('ground.movementCount', { count: trains.length })
+                                : tx('ground.movementCountPlural', { count: trains.length })}
+                            </span>
                           </div>
                           <div className="flex flex-wrap gap-1 mt-1.5">
                             {trains.map((t) => (
@@ -138,16 +144,15 @@ export const SectionInfo = () => {
           </div>
 
           <Panel>
-            <PanelHeader title="Operational information not available" scope="Absent from the current dataset" />
-            <NotAvailable label="Gradient and curvature" reason="no source column in the dataset" />
-            <NotAvailable label="Level crossings and structures" reason="no source column in the dataset" />
-            <NotAvailable label="Access points and walking routes" reason="no source column in the dataset" />
-            <NotAvailable label="Isolation and earthing arrangements" reason="no source column in the dataset" />
+            <PanelHeader title={tx('ground.gapsTitle')} scope={tx('ground.gapsScope')} />
+            <NotAvailable label={tx('ground.gapGradient')} reason={tx('ground.gapNoColumn')} />
+            <NotAvailable label={tx('ground.gapCrossings')} reason={tx('ground.gapNoColumn')} />
+            <NotAvailable label={tx('ground.gapAccess')} reason={tx('ground.gapNoColumn')} />
+            <NotAvailable label={tx('ground.gapEarthing')} reason={tx('ground.gapNoColumn')} />
           </Panel>
 
-          <Alert tone="idle" title="Reference only">
-            These values describe the synthetic dataset's model of the section. They are not a
-            substitute for the section's own operating documents.
+          <Alert tone="idle" title={tx('ground.referenceTitle')}>
+            {tx('ground.referenceBody')}
           </Alert>
         </>
       )}

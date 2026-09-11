@@ -1,5 +1,6 @@
 import React from 'react';
 import { usePlan } from '../../context/PlanContext';
+import { useI18n } from '../../i18n';
 import { Panel, PanelHeader, PanelBody, MetricRow, StatusBadge, Alert, ProvenanceNote } from '../../components/ui';
 import networkStats from '../../data/network_stats.json';
 import sectionTrains from '../../data/section_trains.json';
@@ -15,15 +16,16 @@ const Row = ({ label, value, tone, sub }) => <MetricRow label={label} value={val
  */
 export const SystemVerification = () => {
   const { baselineMetrics, metrics, criteriaCoverage, scenarioProvenance } = usePlan();
+  const { t: tx } = useI18n();
   const prov = baselineMetrics.provenance || {};
 
   const artifacts = [
-    { name: 'optimized_block_plan.json', scope: 'Demo scenario', detail: `${metrics.summary.total_scheduled} scheduled of ${metrics.summary.total_tasks_considered} considered`, cmd: 'PYTHONPATH=. python demo.py' },
-    { name: 'benchmarks/full_run_metrics.json', scope: 'Baseline full run', detail: `${baselineMetrics.summary.total_scheduled.toLocaleString()} scheduled of ${baselineMetrics.summary.total_tasks_considered.toLocaleString()}`, cmd: 'PYTHONPATH=. python -m optimizer.main' },
-    { name: 'decision_trace.json', scope: 'One task', detail: `${decisionTrace.candidate_summary.block_windows_considered} windows, ${decisionTrace.candidate_summary.rejected} rejected`, cmd: 'PYTHONPATH=. python scripts/generate_decision_trace.py TASK-000005' },
-    { name: 'section_trains.json', scope: 'Gantt train projection', detail: `${sectionTrains.provenance.records_emitted} records across ${sectionTrains.provenance.sections} sections`, cmd: sectionTrains.provenance.command },
-    { name: 'bundling.json', scope: 'Concurrent pairs', detail: `${bundling.concurrent_bundle_pairs.length} pairs`, cmd: 'PYTHONPATH=. python scripts/generate_bundling.py' },
-    { name: 'ritvik_scenarios.json', scope: 'Replanning scenarios', detail: '4 scenarios, each a real engine run', cmd: 'PYTHONPATH=. python scripts/generate_ritvik_scenarios.py' },
+    { name: 'optimized_block_plan.json', scope: tx('systemVerification.scopeDemo'), detail: tx('systemVerification.detailScheduledOf', { scheduled: metrics.summary.total_scheduled, considered: metrics.summary.total_tasks_considered }), cmd: 'PYTHONPATH=. python demo.py' },
+    { name: 'benchmarks/full_run_metrics.json', scope: tx('systemVerification.scopeBaseline'), detail: tx('systemVerification.detailScheduledOf', { scheduled: baselineMetrics.summary.total_scheduled.toLocaleString(), considered: baselineMetrics.summary.total_tasks_considered.toLocaleString() }), cmd: 'PYTHONPATH=. python -m optimizer.main' },
+    { name: 'decision_trace.json', scope: tx('systemVerification.scopeOneTask'), detail: tx('systemVerification.detailWindows', { windows: decisionTrace.candidate_summary.block_windows_considered, rejected: decisionTrace.candidate_summary.rejected }), cmd: 'PYTHONPATH=. python scripts/generate_decision_trace.py TASK-000005' },
+    { name: 'section_trains.json', scope: tx('systemVerification.scopeGantt'), detail: tx('systemVerification.detailRecords', { records: sectionTrains.provenance.records_emitted, sections: sectionTrains.provenance.sections }), cmd: sectionTrains.provenance.command },
+    { name: 'bundling.json', scope: tx('systemVerification.scopePairs'), detail: tx('systemVerification.detailPairs', { count: bundling.concurrent_bundle_pairs.length }), cmd: 'PYTHONPATH=. python scripts/generate_bundling.py' },
+    { name: 'ritvik_scenarios.json', scope: tx('systemVerification.scopeScenarios'), detail: tx('systemVerification.detailScenarios'), cmd: 'PYTHONPATH=. python scripts/generate_ritvik_scenarios.py' },
   ];
 
   const coverage = Object.entries(criteriaCoverage || {});
@@ -31,42 +33,39 @@ export const SystemVerification = () => {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="t-section-title">System Verification</h2>
+        <h2 className="t-section-title">{tx('systemVerification.title')}</h2>
         <p className="text-xs text-rail-500 mt-0.5 max-w-3xl leading-relaxed">
-          Which artifact backs each screen, what the post-solve validator checks, and which
-          capabilities are deliberately not implemented.
+          {tx('systemVerification.subtitle')}
         </p>
       </div>
 
-      <Alert tone="warn" title="This is a demonstration on a synthetic dataset">
-        There is no connection to any railway signalling, dispatch or asset-management system,
-        and no live data feed. Dates, assets, trains, crews and corridors are generated. The
-        browser reads committed JSON artifacts; it does not run the solver.
+      <Alert tone="warn" title={tx('systemVerification.demoWarningTitle')}>
+        {tx('systemVerification.demoWarningBody')}
       </Alert>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Panel>
-          <PanelHeader title="Post-solve validation" scope="Independent of the solver" />
-          <Row label="Validator result" value={prov.post_solve_validation || 'not recorded'} tone="ok" />
-          <Row label="Hard constraints" value="C001–C007" sub="duration, train conflict, infrastructure, crew, deadline, bundling, capacity" />
-          <Row label="Soft constraints" value="C008–C012" sub="passenger impact, congestion, night preference, priority, bundling reward" />
-          <Row label="Structural rules" value="S001–S011" sub="single placement, contiguity, shift window, skill match, team non-overlap" />
-          <Row label="Dataset tasks" value={(prov.dataset_tasks ?? 0).toLocaleString()} />
-          <Row label="Dataset block windows" value={(prov.dataset_blocks ?? 0).toLocaleString()} />
+          <PanelHeader title={tx('systemVerification.postSolve')} scope={tx('systemVerification.postSolveScope')} />
+          <Row label={tx('systemVerification.validatorResult')} value={prov.post_solve_validation || tx('header.notRecorded')} tone="ok" />
+          <Row label={tx('systemVerification.hardConstraints')} value="C001–C007" sub={tx('systemVerification.hardSub')} />
+          <Row label={tx('systemVerification.softConstraints')} value="C008–C012" sub={tx('systemVerification.softSub')} />
+          <Row label={tx('systemVerification.structuralRules')} value="S001–S011" sub={tx('systemVerification.structuralSub')} />
+          <Row label={tx('systemVerification.datasetTasks')} value={(prov.dataset_tasks ?? 0).toLocaleString()} />
+          <Row label={tx('systemVerification.datasetBlocks')} value={(prov.dataset_blocks ?? 0).toLocaleString()} />
         </Panel>
 
         <Panel>
-          <PanelHeader title="Network coverage" scope="blocks.csv · corridors_sections.csv" />
-          <Row label="Track availability" value={`${networkStats.track_availability_percent}%`} tone="ok" sub={`${networkStats.track_available_block_windows.toLocaleString()} of ${networkStats.total_block_windows.toLocaleString()} windows`} />
-          <Row label="Sections / corridors" value={`${networkStats.sections} / ${networkStats.corridors}`} />
-          <Row label="Horizon" value={`${networkStats.horizon_days} days`} />
-          <Row label="Train records projected" value={sectionTrains.provenance.records_emitted.toLocaleString()} sub={`from ${sectionTrains.provenance.source_rows.toLocaleString()} source rows`} />
-          <Row label="Dropped for missing timing" value={sectionTrains.provenance.rows_dropped_missing_timing} tone="ok" sub="dropped, never imputed" />
+          <PanelHeader title={tx('systemVerification.networkCoverage')} scope="blocks.csv · corridors_sections.csv" />
+          <Row label={tx('systemVerification.trackAvailability')} value={`${networkStats.track_availability_percent}%`} tone="ok" sub={`${networkStats.track_available_block_windows.toLocaleString()} ${tx('common.of')} ${networkStats.total_block_windows.toLocaleString()}`} />
+          <Row label={tx('systemVerification.sectionsCorridors')} value={`${networkStats.sections} / ${networkStats.corridors}`} />
+          <Row label={tx('systemVerification.horizon')} value={tx('systemVerification.horizonDays', { count: networkStats.horizon_days })} />
+          <Row label={tx('systemVerification.trainRecords')} value={sectionTrains.provenance.records_emitted.toLocaleString()} sub={tx('systemVerification.trainRecordsSub', { count: sectionTrains.provenance.source_rows.toLocaleString() })} />
+          <Row label={tx('systemVerification.droppedTiming')} value={sectionTrains.provenance.rows_dropped_missing_timing} tone="ok" sub={tx('systemVerification.droppedSub')} />
         </Panel>
       </div>
 
       <Panel>
-        <PanelHeader title="Artifact provenance" scope="Every screen traces to one of these" />
+        <PanelHeader title={tx('systemVerification.artifactProvenance')} scope={tx('systemVerification.artifactScope')} />
         <div className="divide-y divide-line-subtle">
           {artifacts.map((a) => (
             <div key={a.name} className="px-3 py-2.5">
@@ -85,7 +84,7 @@ export const SystemVerification = () => {
 
       {coverage.length > 0 && (
         <Panel>
-          <PanelHeader title="Dynamic allocation — criteria coverage" scope="Reported by the replanning engine" />
+          <PanelHeader title={tx('systemVerification.criteriaCoverage')} scope={tx('systemVerification.criteriaScope')} />
           <div className="divide-y divide-line-subtle">
             {coverage.map(([key, entry]) => {
               const status = entry?.status || 'UNKNOWN';
@@ -114,20 +113,10 @@ export const SystemVerification = () => {
       )}
 
       <Panel>
-        <PanelHeader title="Claims this system does not make" />
+        <PanelHeader title={tx('systemVerification.claimsTitle')} />
         <div className="divide-y divide-line-subtle">
-          {[
-            'No live or real-time railway data; operational events are simulated.',
-            'No REST API or backend service. The frontend reads committed JSON artifacts.',
-            'No integration with any railway operator system.',
-            'No train sequencing or precedence logic.',
-            'No downstream (knock-on) delay propagation — trains.csv has no onward itinerary.',
-            'No equipment or machine identifiers exist in the dataset, so no equipment allocation is claimed.',
-            'No bundling saving or "disruption avoided" figure — that needs an unbundled counterfactual plan.',
-            'Controller decisions and verification actions are session state only.',
-            'Risk-model training is not reproducible here; only evaluation is.',
-          ].map((claim) => (
-            <div key={claim} className="px-3 py-2 text-[11px] text-rail-600 leading-relaxed">— {claim}</div>
+          {['claim1', 'claim2', 'claim3', 'claim4', 'claim5', 'claim6', 'claim7', 'claim8', 'claim9'].map((key) => (
+            <div key={key} className="px-3 py-2 text-[11px] text-rail-600 leading-relaxed">— {tx(`systemVerification.${key}`)}</div>
           ))}
         </div>
       </Panel>
@@ -138,7 +127,7 @@ export const SystemVerification = () => {
             generatedBy={prov.scope}
             command={prov.command}
             dataset={prov.dataset}
-            note={scenarioProvenance?.dataset ? `Scenario dataset: ${scenarioProvenance.dataset}` : undefined}
+            note={scenarioProvenance?.dataset ? tx('systemVerification.scenarioDataset', { value: scenarioProvenance.dataset }) : undefined}
             defaultOpen
           />
         </PanelBody>

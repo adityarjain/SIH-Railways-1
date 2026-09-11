@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { usePlan } from '../../context/PlanContext';
+import { useI18n } from '../../i18n';
 import { makeScale, ticksFor, packLanes, DOMAIN_PRESETS, possessionDomain } from '../../utils/timeScale';
 import { minToHhmm } from '../../utils/time';
 import { bandOf } from '../../utils/risk';
@@ -51,6 +52,7 @@ export const BlockTrainGantt = ({
   compact = false,
 }) => {
   const { activeEvent, rerouteScenario, holdScenario, replanScenario, blockUnavailableScenario, replannedRecord } = usePlan();
+  const { t: tx } = useI18n();
   const [domainId, setDomainId] = useState('day');
 
   const tasksBySection = useMemo(() => {
@@ -172,12 +174,12 @@ export const BlockTrainGantt = ({
       {/* legend */}
       <div className="px-3 py-2 border-b border-line flex flex-wrap items-center gap-x-4 gap-y-1.5">
         {[
-          ['Maintenance block', 'bg-status-info', 10],
-          ['Critical risk ≥ 80', 'bg-status-critical', 10],
-          ['Bundled possession', 'bg-bundle', 10],
-          ['Replanned', 'bg-status-warn', 10],
-          ['Train occupancy', 'bg-rail-400', 5],
-          ['Simulated movement', 'bg-rail-700', 5],
+          [tx('gantt.legendBlock'), 'bg-status-info', 10],
+          [tx('gantt.legendCritical'), 'bg-status-critical', 10],
+          [tx('gantt.legendBundled'), 'bg-bundle', 10],
+          [tx('gantt.legendReplanned'), 'bg-status-warn', 10],
+          [tx('gantt.legendTrain'), 'bg-rail-400', 5],
+          [tx('gantt.legendSimulated'), 'bg-rail-700', 5],
         ].map(([label, cls, h]) => (
           <span key={label} className="inline-flex items-center gap-1.5 text-[10px] text-rail-500">
             <LegendSwatch className={cls} h={h} />
@@ -186,7 +188,7 @@ export const BlockTrainGantt = ({
         ))}
         <span className="inline-flex items-center gap-1.5 text-[10px] text-rail-500">
           <LegendSwatch hatch h={10} />
-          Recorded conflict
+          {tx('gantt.legendConflict')}
         </span>
       </div>
 
@@ -195,7 +197,7 @@ export const BlockTrainGantt = ({
           Change the date or corridor above; the selectors only offer combinations the plan covers.
         </EmptyState>
       ) : (
-        <div className="p-3">
+        <div className="p-3 overflow-x-auto custom-scrollbar">
           <div className="min-w-[720px]">
             {/* ruler — labels absolutely positioned on their own gridline */}
             <div className="flex">

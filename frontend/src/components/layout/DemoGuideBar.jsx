@@ -1,11 +1,13 @@
 import React from 'react';
 import { useDemoGuide, DEMO_STEPS } from '../../context/DemoGuideContext';
 import { usePlan } from '../../context/PlanContext';
+import { useI18n } from '../../i18n';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 export const DemoGuideBar = ({ onNavigate }) => {
   const { isGuideActive, toggleGuide, currentStepIndex, currentStep, setStep, totalSteps } = useDemoGuide();
   const { toggleReplan } = usePlan();
+  const { t } = useI18n();
 
   // Land on the current step's page/role rather than showing "Step n/14" over
   // whatever screen happened to be mounted.
@@ -51,14 +53,14 @@ export const DemoGuideBar = ({ onNavigate }) => {
     <div className="bg-rail-800 text-white px-5 py-2 flex items-center justify-between gap-4 border-b border-rail-700 sticky top-0 z-guide">
       <div className="flex items-center gap-3 min-w-0">
         <span className="bg-status-info text-white text-[10px] font-bold px-2 py-0.5 tracking-wide font-mono shrink-0">
-          STEP {currentStepIndex + 1} / {totalSteps}
+          {t('common.step')} {currentStepIndex + 1} / {totalSteps}
         </span>
         <div className="min-w-0">
           <h4 className="text-[11px] font-semibold text-white flex items-center gap-1.5">
-            <span className="truncate">{currentStep.title}</span>
+            <span className="truncate">{t(currentStep.titleKey)}</span>
             <span className="text-[10px] font-normal text-rail-400 shrink-0">({currentStep.role})</span>
           </h4>
-          <p className="text-[10px] text-rail-300 mt-0.5 truncate">{currentStep.description}</p>
+          <p className="text-[10px] text-rail-300 mt-0.5 truncate">{t(currentStep.descKey)}</p>
         </div>
       </div>
 
@@ -67,7 +69,7 @@ export const DemoGuideBar = ({ onNavigate }) => {
           onClick={handlePrev}
           disabled={currentStepIndex === 0}
           className="p-1 bg-rail-900 border border-rail-700 hover:bg-rail-700 disabled:opacity-30 disabled:cursor-not-allowed text-rail-300 transition-colors"
-          title="Previous step"
+          title={t('common.previous')} aria-label={t('common.previous')}
         >
           <ChevronLeft size={15} />
         </button>
@@ -75,15 +77,15 @@ export const DemoGuideBar = ({ onNavigate }) => {
           onClick={handleNext}
           disabled={currentStepIndex === totalSteps - 1}
           className="flex items-center gap-1 px-2.5 py-1 bg-status-info hover:bg-blue-700 disabled:opacity-30 disabled:cursor-not-allowed text-[11px] font-semibold text-white transition-colors"
-          title="Next step"
+          title={t('common.next')} aria-label={t('common.next')}
         >
-          <span>Next</span>
+          <span>{t('common.next')}</span>
           <ChevronRight size={13} />
         </button>
         <button
           onClick={toggleGuide}
           className="p-1 text-rail-400 hover:text-white transition-colors"
-          title="Exit guide"
+          title={t('common.exit')} aria-label={t('common.exit')}
         >
           <X size={15} />
         </button>

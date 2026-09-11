@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuth, ROLES } from '../../context/AuthContext';
+import { useI18n } from '../../i18n';
 
 /**
  * Single source of truth for which tabs each role can reach. App.jsx derives
@@ -12,66 +13,66 @@ import { useAuth, ROLES } from '../../context/AuthContext';
 export const NAV_SECTIONS_BY_ROLE = {
   [ROLES.AUTHORITY]: [
     {
-      group: 'OPERATIONS',
+      groupKey: 'nav.groupOperations',
       items: [
-        { id: 'overview', label: 'Overview' },
-        { id: 'live-ops', label: 'Live Operations' },
-        { id: 'train-impact', label: 'Train Impact' },
-        { id: 'replanning', label: 'Replanning' },
+        { id: 'overview', labelKey: 'nav.overview' },
+        { id: 'live-ops', labelKey: 'nav.liveOps' },
+        { id: 'train-impact', labelKey: 'nav.trainImpact' },
+        { id: 'replanning', labelKey: 'nav.replanning' },
       ],
     },
     {
-      group: 'MAINTENANCE',
+      groupKey: 'nav.groupMaintenance',
       items: [
-        { id: 'demand', label: 'Risk & Tasks' },
-        { id: 'block-planning', label: 'Block Planning', highlight: true },
-        { id: 'maintenance-blocks', label: 'Maintenance Blocks' },
-        { id: 'teams', label: 'Resources' },
+        { id: 'demand', labelKey: 'nav.riskTasks' },
+        { id: 'block-planning', labelKey: 'nav.blockPlanning', highlight: true },
+        { id: 'maintenance-blocks', labelKey: 'nav.maintenanceBlocks' },
+        { id: 'teams', labelKey: 'nav.resources' },
       ],
     },
     {
-      group: 'ANALYTICS',
+      groupKey: 'nav.groupAnalytics',
       items: [
-        { id: 'analytics', label: 'Risk Analytics' },
-        { id: 'performance', label: 'Performance' },
-        { id: 'evaluation', label: 'Evaluation' },
+        { id: 'analytics', labelKey: 'nav.riskAnalytics' },
+        { id: 'performance', labelKey: 'nav.performance' },
+        { id: 'evaluation', labelKey: 'nav.evaluation' },
       ],
     },
     {
-      group: 'VERIFICATION',
+      groupKey: 'nav.groupVerification',
       items: [
-        { id: 'decision-trace', label: 'Decision Trace' },
-        { id: 'general-verify', label: 'Work Verification' },
-        { id: 'system-verification', label: 'System Verification' },
+        { id: 'decision-trace', labelKey: 'nav.decisionTrace' },
+        { id: 'general-verify', labelKey: 'nav.workVerification' },
+        { id: 'system-verification', labelKey: 'nav.systemVerification' },
       ],
     },
     {
-      group: 'DEMO',
-      items: [{ id: 'simulator', label: 'Guided Demo' }],
+      groupKey: 'nav.groupDemo',
+      items: [{ id: 'simulator', labelKey: 'nav.guidedDemo' }],
     },
   ],
 
   [ROLES.GROUND]: [
     {
-      group: 'MY WORK',
+      groupKey: 'nav.groupMyWork',
       items: [
-        { id: 'maint-dashboard', label: "Today's Tasks" },
-        { id: 'my-tasks', label: 'Assigned Work', highlight: true },
-        { id: 'active-block', label: 'Active Block' },
+        { id: 'maint-dashboard', labelKey: 'nav.todaysTasks' },
+        { id: 'my-tasks', labelKey: 'nav.assignedWork', highlight: true },
+        { id: 'active-block', labelKey: 'nav.activeBlock' },
       ],
     },
     {
-      group: 'OPERATIONS',
+      groupKey: 'nav.groupOperations',
       items: [
-        { id: 'block-status', label: 'Block Status' },
-        { id: 'section-info', label: 'Section Information' },
+        { id: 'block-status', labelKey: 'nav.blockStatus' },
+        { id: 'section-info', labelKey: 'nav.sectionInfo' },
       ],
     },
     {
-      group: 'REPORTING',
+      groupKey: 'nav.groupReporting',
       items: [
-        { id: 'issues', label: 'Issues' },
-        { id: 'completed', label: 'Completion / Handoff' },
+        { id: 'issues', labelKey: 'nav.issues' },
+        { id: 'completed', labelKey: 'nav.completion' },
       ],
     },
   ],
@@ -92,6 +93,7 @@ export const NAV_ITEMS_BY_ROLE = Object.fromEntries(
  */
 export const Sidebar = ({ activeTab, onTabChange }) => {
   const { currentUser, logout } = useAuth();
+  const { t } = useI18n();
   const role = currentUser?.role || ROLES.AUTHORITY;
   const sections = NAV_SECTIONS_BY_ROLE[role] || NAV_SECTIONS_BY_ROLE[ROLES.AUTHORITY];
 
@@ -99,9 +101,9 @@ export const Sidebar = ({ activeTab, onTabChange }) => {
     <aside className="w-56 bg-rail-950 flex flex-col h-screen sticky top-0 shrink-0 select-none border-r border-rail-800">
       <nav className="flex-1 py-3 overflow-y-auto custom-scrollbar">
         {sections.map((section) => (
-          <div key={section.group}>
+          <div key={t(section.groupKey)}>
             <div className="px-4 pt-3.5 pb-1.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-rail-500">
-              {section.group}
+              {t(section.groupKey)}
             </div>
             {section.items.map((item) => {
               const isActive = activeTab === item.id;
@@ -115,7 +117,7 @@ export const Sidebar = ({ activeTab, onTabChange }) => {
                       : 'text-rail-300 hover:bg-rail-900 hover:text-white font-normal border-transparent'
                   }`}
                 >
-                  <span className="flex-1 text-left truncate">{item.label}</span>
+                  <span className="flex-1 text-left truncate">{t(item.labelKey)}</span>
                   {item.highlight && !isActive && (
                     <span className="h-1 w-1 rounded-full bg-status-info shrink-0" />
                   )}
@@ -128,17 +130,17 @@ export const Sidebar = ({ activeTab, onTabChange }) => {
 
       <div className="px-4 py-3 border-t border-rail-800 bg-rail-950 space-y-2">
         <p className="text-[10px] leading-snug text-rail-500">
-          Automatic block planning. Demonstration environment, synthetic dataset.
+          {t('nav.footerNote')}
         </p>
         <div className="flex items-center justify-between">
           <span className="bg-rail-800 text-rail-400 text-[9px] px-1.5 py-0.5 font-mono border border-rail-700">
-            SYNTHETIC
+            {t('nav.synthetic')}
           </span>
           <button
             onClick={logout}
             className="text-rail-400 hover:text-status-critical text-[10px] transition-colors"
           >
-            Sign out
+            {t('nav.signOut')}
           </button>
         </div>
       </div>
