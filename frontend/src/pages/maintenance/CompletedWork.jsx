@@ -1,103 +1,172 @@
-import React from 'react';
-import { Badge } from '../../components/common/Badge';
-import { useAuth } from '../../context/AuthContext';
+import React, { useMemo, useState } from 'react';
 import { usePlan } from '../../context/PlanContext';
+import { useAuth } from '../../context/AuthContext';
+import {
+  Panel, PanelBody, Metric, StatusBadge, EmptyState,
+  Alert, Select, TextInput, ScopeCaption,
+} from '../../components/ui';
 import { minToHhmm } from '../../utils/time';
-import { CheckCircle2, ShieldCheck } from 'lucide-react';
+import { bandOf, bandTone } from '../../utils/risk';
+import corridors from '../../data/corridors_sections.json';
+
+const SECTION = Object.fromEntries(corridors.sections.map((s) => [s.section_id, s]));
+const VERDICT_TONE = { approve: 'ok', reject: 'critical', flag: 'warn' };
+const VERDICT_LABEL = { approve: 'Approved', reject: 'Rejected', flag: 'Flagged' };
 
 /**
- * Possessions already handed back, from `completed_work.json`
- * (scripts/generate_tasks_inventory.py). Every field below is a scheduling fact
- * the optimizer produced.
+ * Ground — Completion / Handoff.
  *
- * Deliberately absent: a "quality index" and a named supervising engineer. The
- * pipeline records no quality metric and no personnel, and inventing either
- * would present fiction as an execution record.
+ * Possessions this department has handed back, and what the controlling
+ * authority did with each. The verification verdict is read from the same
+ * session state the Authority screen writes.
  */
 export const CompletedWork = () => {
-  const { selectedDept } = useAuth();
   const { completedWork, verifications } = usePlan();
+  const { selectedDept } = useAuth();
+  const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState('ALL');
 
-  const jobs = completedWork.filter((j) => j.department === selectedDept);
+  const deptWork = useMemo(
+    () => completedWork.filter((j) => j.department === selectedDept),
+    [completedWork, selectedDept],
+  );
+
+  const rows = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return deptWork
+      .filter((j) => {
+        const v = verifications[j.task_id];
+        if (filter === 'ALL') return true;
+        if (filter === 'PENDING') return !v;
+        return v?.status === filter;
+      })
+      .filter((j) => {
+        if (!q) return true;
+        return (
+          j.task_id.toLowerCase().includes(q) ||
+          j.section_id.toLowerCase().includes(q) ||
+          (j.maintenance_type || '').toLowerCase().includes(q)
+        );
+      })
+      .sort((a, b) => b.execution_date.localeCompare(a.execution_date));
+  }, [deptWork, verifications, query, filter]);
+
+  const counts = useMemo(() => {
+    let verified = 0, rejected = 0, flagged = 0;
+    for (const j of deptWork) {
+      const s = verifications[j.task_id]?.status;
+      if (s === 'approve') verified += 1;
+      else if (s === 'reject') rejected += 1;
+      else if (s === 'flag') flagged += 1;
+    }
+    return { verified, rejected, flagged, pending: deptWork.length - verified - rejected - flagged };
+  }, [deptWork, verifications]);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <div className="flex items-center gap-2 text-xs font-mono font-bold text-emerald-600 uppercase tracking-wider">
-          <CheckCircle2 size={14} className="text-emerald-500" />
-          <span>Execution Log</span>
-        </div>
-        <h2 className="text-xl font-bold tracking-tight text-slate-900 mt-0.5">
-          Completed Maintenance Work Orders
-        </h2>
-        <p className="text-xs text-slate-500 mt-0.5">
-          Possessions for {selectedDept} scheduled before the current simulation date and
-          handed back. Derived from the generated plan.
-        </p>
-      </div>
-
-      {jobs.length === 0 ? (
-        <div className="p-8 text-center bg-slate-50 rounded-xl border border-slate-200/80">
-          <p className="text-sm font-semibold text-slate-700">No completed possessions</p>
-          <p className="text-xs text-slate-500 mt-1">
-            No {selectedDept} work is scheduled before the current simulation date.
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="t-section-title">Completion / Handoff</h2>
+          <p className="text-xs text-rail-500 mt-0.5">
+            {selectedDept} · possessions handed back
           </p>
         </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <TextInput
+            placeholder="Search task, section, type…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="min-w-[200px]"
+          />
+          <Select value={filter} onChange={(e) => setFilter(e.target.value)}>
+            <option value="ALL">All</option>
+            <option value="PENDING">Awaiting verification</option>
+            <option value="approve">Approved</option>
+            <option value="flag">Flagged</option>
+            <option value="reject">Rejected</option>
+          </Select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Panel><PanelBody><Metric label="Handed back" value={deptWork.length} scope="completed_work.json" /></PanelBody></Panel>
+        <Panel><PanelBody><Metric label="Approved" value={counts.verified} tone="ok" scope="This session" /></PanelBody></Panel>
+        <Panel><PanelBody><Metric label="Awaiting verification" value={counts.pending} tone={counts.pending ? 'warn' : 'ok'} scope="This session" /></PanelBody></Panel>
+        <Panel><PanelBody><Metric label="Flagged / rejected" value={counts.flagged + counts.rejected} tone={counts.flagged + counts.rejected ? 'critical' : 'ok'} scope="This session" /></PanelBody></Panel>
+      </div>
+
+      {rows.length === 0 ? (
+        <Panel>
+          <EmptyState title="No completed possession matches the current filters.">
+            Work appears here once a possession for your department has been handed back.
+          </EmptyState>
+        </Panel>
       ) : (
-        <div className="space-y-4">
-          {jobs.map((job) => {
-            const verification = verifications[job.task_id];
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          {rows.map((j) => {
+            const v = verifications[j.task_id];
+            const band = bandOf(j);
+            const sec = SECTION[j.section_id];
             return (
-              <div
-                key={job.task_id}
-                className="p-5 rounded-xl border border-slate-200 bg-white shadow-xs space-y-3"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div className="flex items-center gap-3">
-                    <span className="font-mono font-bold text-slate-900 text-sm">{job.task_id}</span>
-                    <span className="text-xs font-bold text-slate-800">{job.maintenance_type}</span>
+              <Panel key={j.task_id} className="overflow-hidden">
+                <div className="px-3.5 py-3 flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="font-mono text-[14px] font-bold text-rail-900">{j.task_id}</div>
+                    <div className="text-[12px] text-rail-900 mt-0.5">{j.maintenance_type}</div>
+                    <div className="font-mono text-[10px] text-rail-400 mt-0.5">
+                      asset {j.asset_id}
+                    </div>
                   </div>
-                  <Badge variant={verification ? 'success' : 'primary'} size="md">
-                    {verification ? verification.status : 'Awaiting verification'}
-                  </Badge>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100 text-xs font-mono text-slate-600">
-                  <div>
-                    <span className="text-[10px] text-slate-400 block font-sans">Section / Corridor</span>
-                    <span className="font-bold text-slate-900">{job.section_id} • {job.corridor_id}</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 block font-sans">Date &amp; Window</span>
-                    <span className="font-bold text-slate-900">
-                      {job.execution_date} • {minToHhmm(job.start_minute)}–{minToHhmm(job.end_minute)}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 block font-sans">Crew Executed</span>
-                    <span className="font-bold text-slate-900">{job.assigned_teams.join(', ') || '—'}</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 block font-sans">Block Possession</span>
-                    <span className="font-bold text-slate-900">{job.block_ids.join(' + ')}</span>
+                  <div className="text-right shrink-0 space-y-1">
+                    {band && <StatusBadge tone={bandTone(band)} size="sm">{band}</StatusBadge>}
+                    <div>
+                      {v ? (
+                        <StatusBadge tone={VERDICT_TONE[v.status] || 'idle'} size="sm">
+                          {VERDICT_LABEL[v.status] || v.status}
+                        </StatusBadge>
+                      ) : (
+                        <span className="text-[10px] text-rail-400">Awaiting verification</span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                <div className="text-[11px] text-slate-500 flex items-center justify-between pt-1 gap-2 flex-wrap">
-                  <span>
-                    Asset <strong className="font-mono">{job.asset_id}</strong> • Neev risk at planning{' '}
-                    <strong>{job.risk_score.toFixed(1)}</strong> ({job.risk_level})
-                  </span>
-                  <span className="text-emerald-700 font-semibold flex items-center gap-1 font-sans">
-                    <ShieldCheck size={13} />
-                    Possession handed back
-                  </span>
+                <div className="grid grid-cols-2 gap-px bg-line border-y border-line">
+                  {[
+                    ['Executed', j.execution_date, `${minToHhmm(j.start_minute)}–${minToHhmm(j.end_minute)}`],
+                    ['Section', j.section_id, sec?.section_name || j.corridor_id],
+                    ['Blocks', (j.block_ids || []).join(' + '), `${j.duration_minutes} min`],
+                    ['Crew', (j.assigned_teams || []).join(', '), `risk ${j.risk_score?.toFixed?.(1) ?? '—'}`],
+                  ].map(([k, val, sub]) => (
+                    <div key={k} className="bg-surface-panel px-3 py-2">
+                      <div className="t-label">{k}</div>
+                      <div className="font-mono text-[11px] text-rail-900 mt-0.5">{val}</div>
+                      <div className="text-[9px] text-rail-400 mt-0.5">{sub}</div>
+                    </div>
+                  ))}
                 </div>
-              </div>
+
+                {v?.comments && (
+                  <div className="px-3.5 py-2 bg-surface-sunken">
+                    <span className="t-label">Verification note</span>
+                    <p className="text-[11px] text-rail-700 mt-0.5">{v.comments}</p>
+                  </div>
+                )}
+              </Panel>
             );
           })}
         </div>
       )}
+
+      <Alert tone="idle" title="Verification happens in Authority">
+        Completed possessions are verified by the controlling authority, not by the crew that
+        performed the work. Verdicts shown here are session state and are not written to any
+        external register.
+      </Alert>
+
+      <ScopeCaption className="block">
+        Source: completed_work.json · {completedWork.length} possessions across all departments.
+      </ScopeCaption>
     </div>
   );
 };

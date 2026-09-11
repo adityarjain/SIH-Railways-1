@@ -196,6 +196,10 @@ export const PlanContext_Provider = ({ children }) => {
         blockUnavailableScenario: ritvikScenariosJson.block_unavailable,
         replanMetadata: ritvikScenariosJson.replan_metadata,
         criteriaCoverage: ritvikScenariosJson.criteria_coverage,
+        // The timeline colours the replanned possession from this rather than
+        // from a hardcoded task id / date pair.
+        replannedRecord,
+        scenarioProvenance: ritvikScenariosJson.provenance,
         demoEvents: demoEventsJson.events || [],
         updateTaskStatus,
         verifications,

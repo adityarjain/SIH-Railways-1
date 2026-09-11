@@ -14,7 +14,7 @@ export const SIMULATION_EVENTS = [
     bypassRoute: "SEC-0004 -> SEC-0007 -> SEC-0008 -> SEC-0010",
     outcomeType: "OPERATIONAL_UPDATE",
     outcomeTitle: "Train Rerouted Successfully — Maintenance Plan Remains Valid",
-    details: "An unscheduled movement collides with the TASK-000005 possession on SEC-0004. Ritvik searches route_topology.json for a bypass with capacity; the conflict window, the routes it rejected and the resulting delay are reported below from the engine run.",
+    details: "An unscheduled movement collides with the TASK-000005 possession on SEC-0004. The reroute search over route_topology.json looks for a bypass with capacity; the conflict window, the routes it rejected and the resulting delay are reported below from the engine run.",
   },
   {
     id: "NEW_TRAIN_BLOCKED",
@@ -27,8 +27,8 @@ export const SIMULATION_EVENTS = [
     window: "01:50 - 02:20 (30 min)",
     conflictsWith: "TASK-000005 (00:00 - 03:20)",
     outcomeType: "REPLAN_REQUEST",
-    outcomeTitle: "No Safe Alternate Route — Replan Request Sent to Arnav",
-    details: "A high-priority movement collides with the TASK-000005 possession while every bypass is saturated. With no feasible train action, Ritvik emits replan_request.json and the possession is re-optimized; the rejected routes and the revised plan are shown below from the engine run.",
+    outcomeTitle: "No Safe Alternate Route — Replan Request Sent to Optimizer",
+    details: "A high-priority movement collides with the TASK-000005 possession while every bypass is saturated. With no feasible train action, replan_request.json is emitted and the possession is re-optimized; the rejected routes and the revised plan are shown below from the engine run.",
   },
   {
     id: "BLOCK_UNAVAILABLE",
@@ -40,7 +40,7 @@ export const SIMULATION_EVENTS = [
     conflictsWith: "TASK-000005 (uses BLK-009637)",
     outcomeType: "REPLAN_REQUEST",
     outcomeTitle: "Track Block Unavailable — Automated Replan Initiated",
-    details: "The track itself is closed, so rerouting trains cannot help: the possession must move. Ritvik reports BLOCK_UNAVAILABLE and the block is replanned.",
+    details: "The track itself is closed, so rerouting trains cannot help: the possession must move. BLOCK_UNAVAILABLE is reported and the block is replanned.",
   },
   {
     id: "HELD_TRAIN",
@@ -54,7 +54,7 @@ export const SIMULATION_EVENTS = [
     conflictsWith: "TASK-000005 (00:00 - 03:20)",
     outcomeType: "OPERATIONAL_UPDATE",
     outcomeTitle: "Train Held — Maintenance Plan Remains Valid",
-    details: "An ordinary-priority movement collides with the TASK-000005 possession and every bypass is saturated. Because the wait until the block is handed back is within the 45-minute hold limit, Ritvik holds the train rather than replanning the possession.",
+    details: "An ordinary-priority movement collides with the TASK-000005 possession and every bypass is saturated. Because the wait until the block is handed back is within the 45-minute hold limit, the train is held rather than replanning the possession.",
   },
   {
     id: "MAINTENANCE_EMERGENCY",
@@ -64,6 +64,6 @@ export const SIMULATION_EVENTS = [
     reason: "Overhead catenary tensioner failure",
     outcomeType: "EMERGENCY_DISPATCH",
     outcomeTitle: "Emergency Maintenance Crew Dispatched",
-    details: "A rapid-response possession on SEC-0072. This event class is not a maintenance-plan conflict, so Ritvik's conflict/reroute engine does not run on it and no engine scenario is generated. Live Operations shows the scenarios Ritvik actually solves.",
+    details: "A rapid-response possession on SEC-0072. This event class is not a maintenance-plan conflict, so the conflict/reroute engine does not run on it and no engine scenario is generated. Live Operations shows the scenarios the engine actually solves.",
   },
 ];

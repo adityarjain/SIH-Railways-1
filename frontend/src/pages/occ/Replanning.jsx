@@ -1,286 +1,213 @@
 import React from 'react';
-import { Card } from '../../components/common/Card';
-import { Badge } from '../../components/common/Badge';
 import { usePlan } from '../../context/PlanContext';
-import { minToHhmm } from '../../utils/time';
 import {
-  RefreshCw,
-  CheckCircle2,
-  ArrowRight,
-  AlertTriangle,
-  Clock,
-  Calendar,
-  Users,
-  TrainTrack,
-  ShieldCheck,
-  FileCheck,
-} from 'lucide-react';
+  Panel, PanelHeader, PanelBody, MetricRow, StatusBadge, Button,
+  Alert, EmptyState, ScopeCaption, ProvenanceNote,
+} from '../../components/ui';
+import { minToHhmm } from '../../utils/time';
 
+const Row = ({ label, value, mono = true, tone }) => (
+  <div className="px-3 py-2 border-b border-line last:border-b-0 flex items-center justify-between gap-3">
+    <span className="text-xs text-rail-600">{label}</span>
+    <span className={`${mono ? 'font-mono' : ''} text-[11px] font-semibold text-right ${tone || 'text-rail-900'}`}>
+      {value}
+    </span>
+  </div>
+);
+
+/**
+ * Replanning audit — before, disruption, after.
+ *
+ * Every value is read from replan_metadata. The previous version hardcoded both
+ * outer columns as string literals, so the screen would keep asserting the old
+ * window even if the engine produced a different one.
+ */
 export const Replanning = ({ onNavigate }) => {
-  const {
-    isReplanned, toggleReplan, scheduledTasks, replanScenario, replanMetadata,
-  } = usePlan();
+  const { isReplanned, toggleReplan, replanMetadata, baselineMetrics } = usePlan();
 
-  // Facts come from the plan and from Ritvik's engine output, not from literals.
-  const conflict = replanScenario?.conflict;
-  const conflictEvent = replanScenario?.event;
-  const rejectedRoutes = (replanScenario?.reroute_results ?? [])
-    .flatMap((r) => r.inspected_candidates ?? [])
-    .filter((c) => c.status === 'REJECTED');
+  if (!replanMetadata) {
+    return (
+      <Panel>
+        <PanelHeader title="Replanning audit" />
+        <EmptyState title="No replan has been recorded." />
+      </Panel>
+    );
+  }
+
+  const m = replanMetadata;
+  const before = m.original_plan || {};
+  const after = m.replanned_plan || {};
+  const ev = m.event || {};
+  const retention = m.unaffected_plan_retention || {};
+  const overlap = m.overlap_window || [];
+  const overlapMins = overlap.length === 2 ? overlap[1] - overlap[0] : null;
+
+  const win = (p) => (p.start_minute != null ? `${minToHhmm(p.start_minute)} – ${minToHhmm(p.end_minute)}` : '—');
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2 text-xs font-mono font-bold text-blue-600 uppercase tracking-wider">
-            <RefreshCw size={14} className="text-blue-500" />
-            <span>Closed-Loop Replanning Audit Interface</span>
-          </div>
-          <h2 className="text-xl font-bold tracking-tight text-slate-900 mt-0.5">
-            Maintenance Replanning Comparison
-          </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Comparative analysis of the original CP-SAT maintenance block vs the re-optimized schedule following Ritvik operational feedback.
+          <h2 className="t-section-title">Replanning</h2>
+          <p className="text-xs text-rail-500 mt-0.5 max-w-3xl leading-relaxed">
+            The original possession, the disruption that invalidated it, and the re-optimized
+            result. Closed-loop audit of one replan cycle.
           </p>
         </div>
-
-        {/* Toggle between original and replanned for live testing */}
-        <div className="flex items-center gap-2 bg-white p-1 rounded-lg border border-slate-200 shadow-xs">
+        <div className="flex items-stretch border border-line">
           <button
             onClick={() => toggleReplan(false)}
-            className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
-              !isReplanned ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            className={`px-3 py-1.5 text-[10px] font-semibold transition-colors ${
+              !isReplanned ? 'bg-rail-900 text-white' : 'bg-surface-panel text-rail-500 hover:bg-surface-sunken'
             }`}
           >
-            Show Original Plan
+            ORIGINAL PLAN
           </button>
           <button
             onClick={() => toggleReplan(true)}
-            className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
-              isReplanned ? 'bg-orange-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            className={`px-3 py-1.5 text-[10px] font-semibold transition-colors ${
+              isReplanned ? 'bg-status-warn text-white' : 'bg-surface-panel text-rail-500 hover:bg-surface-sunken'
             }`}
           >
-            Show Replanned Plan
+            REPLANNED
           </button>
         </div>
       </div>
 
-      {/* 3-Column Comparison Grid: Original Plan | Conflict Cause | Replanned Plan */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* 1. ORIGINAL PLAN */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <span className="text-xs font-mono font-bold text-slate-500 uppercase">Step 1 — Initial Schedule</span>
-            <Badge variant="primary" size="sm">Original Assignment</Badge>
-          </div>
+      {/* three-column comparison */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+        {/* 1 — before */}
+        <Panel className={!isReplanned ? 'border-status-info' : ''}>
+          <PanelHeader
+            title="1 · Original possession"
+            scope="As first solved"
+            action={<StatusBadge tone={isReplanned ? 'idle' : 'info'} size="sm">{isReplanned ? 'superseded' : 'active'}</StatusBadge>}
+          />
+          <Row label="Task" value={m.affected_task_id} />
+          <Row label="Date" value={before.date} />
+          <Row label="Window" value={win(before)} />
+          <Row label="Blocks" value={(before.block_ids || []).join(' + ')} />
+          <Row label="Crew" value={(before.assigned_teams || []).join(', ')} />
+          <PanelBody className="border-t border-line">
+            <p className="text-[10px] text-rail-500 leading-relaxed">
+              This solution satisfied every hard constraint at the time it was produced. The
+              disruption is new information, not a solver error.
+            </p>
+          </PanelBody>
+        </Panel>
 
-          <div className="space-y-2.5">
-            <div className="flex justify-between items-baseline">
-              <span className="text-xs text-slate-500 font-medium">Task Identifier:</span>
-              <span className="text-sm font-bold font-mono text-slate-900">TASK-000005</span>
-            </div>
-            <div className="flex justify-between items-baseline">
-              <span className="text-xs text-slate-500 font-medium">Maintenance Type:</span>
-              <span className="text-xs font-semibold text-slate-800">Rail Grinding</span>
-            </div>
-            <div className="flex justify-between items-baseline">
-              <span className="text-xs text-slate-500 font-medium">Scheduled Date:</span>
-              <span className="text-xs font-bold text-slate-800 font-mono">07 Sep 2026</span>
-            </div>
-            <div className="flex justify-between items-baseline">
-              <span className="text-xs text-slate-500 font-medium">Time Window:</span>
-              <span className="text-xs font-bold font-mono text-blue-700">00:00 – 03:20 (200m)</span>
-            </div>
-            <div className="flex justify-between items-baseline">
-              <span className="text-xs text-slate-500 font-medium">Assigned Blocks:</span>
-              <span className="text-xs font-mono text-slate-800 font-bold">BLK-009637 + BLK-009638</span>
-            </div>
-            <div className="flex justify-between items-baseline">
-              <span className="text-xs text-slate-500 font-medium">Assigned Crew:</span>
-              <span className="text-xs font-mono text-slate-800">TEAM-013 (Night Shift)</span>
-            </div>
-            <div className="flex justify-between items-baseline">
-              <span className="text-xs text-slate-500 font-medium">Neev Risk Score:</span>
-              <Badge variant="CRITICAL" size="sm">81.0% CRITICAL</Badge>
-            </div>
-          </div>
+        {/* 2 — disruption */}
+        <Panel className="border-status-warn">
+          <PanelHeader
+            title="2 · Disruption"
+            scope={`${m.conflict_type} · ${ev.event_id || ''}`}
+            action={<StatusBadge tone="critical" size="sm">conflict</StatusBadge>}
+          />
+          <Row label="Train" value={ev.train_id} />
+          <Row label="Section / date" value={`${ev.section_id} · ${ev.date}`} />
+          <Row
+            label="Train occupancy"
+            value={ev.arrival_minute != null ? `${minToHhmm(ev.arrival_minute)} – ${minToHhmm(ev.departure_minute)}` : '—'}
+          />
+          <Row
+            label="Overlap"
+            value={overlapMins != null ? `${overlapMins} min (${minToHhmm(overlap[0])}–${minToHhmm(overlap[1])})` : '—'}
+            tone="text-status-critical"
+          />
+          <Row label="Affected trains" value={(m.affected_trains || []).join(', ') || '—'} />
 
-          <div className="p-3 rounded-lg bg-blue-50/70 border border-blue-200 text-[11px] text-blue-900 leading-relaxed">
-            Initial CP-SAT solution satisfied all physical constraints on 07 Sep night window.
-          </div>
-        </div>
-
-        {/* 2. OPERATIONAL CONFLICT DETECTED BY RITVIK */}
-        <div className="bg-amber-50/40 rounded-xl border border-amber-300 shadow-xs p-5 space-y-4">
-          <div className="flex items-center justify-between border-b border-amber-200 pb-3">
-            <span className="text-xs font-mono font-bold text-amber-800 uppercase">Step 2 — Disruption Event</span>
-            <Badge variant="danger" size="sm">Collision Detected</Badge>
-          </div>
-
-          <div className="space-y-3 text-xs">
-            <div className="p-3 bg-white rounded-lg border border-amber-200 space-y-2">
-              <div className="font-bold text-slate-900 text-xs">High-Priority Train Movement</div>
-              <p className="text-slate-600 text-[11px] leading-relaxed">
-                Military Priority Movement <strong>TRN-SIM-002</strong> entered SEC-0004 with scheduled traversal during{' '}
-                <strong>
-                  {conflictEvent
-                    ? `${minToHhmm(conflictEvent.arrival_minute)} – ${minToHhmm(conflictEvent.departure_minute)}`
-                    : '\u2014'}
-                </strong>.
-              </p>
-              <div className="text-red-600 font-mono font-bold text-[11px]">
-                {conflict?.overlap_window
-                  ? `Direct ${conflict.overlap_window[1] - conflict.overlap_window[0]}-minute overlap with the TASK-000005 window`
-                  : 'Overlap detected with the TASK-000005 window'}
+          <PanelBody className="border-t border-line space-y-2">
+            <div>
+              <span className="t-label">Reroute search</span>
+              <div className="mt-1 space-y-1">
+                {(m.rejected_routes || []).map((r) => (
+                  <div key={r.path} className="text-[10px] leading-relaxed">
+                    <span className="font-mono text-rail-700">{r.path}</span>
+                    <span className="block text-status-critical">{r.reason}</span>
+                  </div>
+                ))}
+                {(m.rejected_routes || []).length === 0 && (
+                  <div className="text-[10px] text-rail-400">No bypass candidates recorded.</div>
+                )}
               </div>
             </div>
+            <div className="pt-1 border-t border-line-subtle text-[10px] text-rail-600 leading-relaxed">
+              Hold considered: {m.hold_attempted ? 'yes' : 'no'} · selected:{' '}
+              {m.hold_selected ? 'yes' : 'no'} (limit {m.hold_limit_minutes} min).
+              {' '}With no feasible bypass and no permissible hold, the possession must move.
+            </div>
+          </PanelBody>
+        </Panel>
 
-            <div className="p-3 bg-white rounded-lg border border-amber-200 space-y-1 text-[11px]">
-              <div className="font-bold text-slate-800">Ritvik Rerouting Audit:</div>
-              {rejectedRoutes.length > 0 ? (
-                rejectedRoutes.map((c) => (
-                  <div key={c.path}>• {c.path}: {c.reason}</div>
-                ))
-              ) : (
-                <div>• No bypass candidates recorded for this scenario</div>
-              )}
-              <div className="text-red-700 font-bold">
-                • No feasible bypass &rarr; possession replanned
-              </div>
-            </div>
+        {/* 3 — after */}
+        <Panel className={isReplanned ? 'border-status-warn' : ''}>
+          <PanelHeader
+            title="3 · Re-optimized possession"
+            scope={`Action: ${m.action_taken}`}
+            action={<StatusBadge tone={isReplanned ? 'warn' : 'idle'} size="sm">{isReplanned ? 'active' : 'preview'}</StatusBadge>}
+          />
+          <Row label="Task" value={m.affected_task_id} />
+          <Row label="Date" value={after.date} tone="text-status-warn" />
+          <Row label="Window" value={win(after)} tone="text-status-warn" />
+          <Row label="Blocks" value={(after.block_ids || []).join(' + ')} />
+          <Row label="Crew" value={(m.selected_crew || after.assigned_teams || []).join(', ')} />
+          <PanelBody className="border-t border-line">
+            <p className="text-[10px] text-rail-500 leading-relaxed">
+              The conflicted blocks were excluded and the task re-solved under the same model and
+              the same objective. Runtime {m.replan_runtime_seconds}s (measured; varies per run).
+            </p>
+          </PanelBody>
+        </Panel>
+      </div>
 
-            <div className="p-3 rounded-lg bg-red-100 border border-red-200 text-red-950 font-mono text-[11px] space-y-1">
-              <div className="font-bold">Generated Artifact:</div>
-              <div>replan_request.json &rarr; Handed to Arnav</div>
-            </div>
-          </div>
-        </div>
+      {/* audit record */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Panel>
+          <PanelHeader title="Replan audit record" scope="Produced by the closed-loop run" />
+          <MetricRow label="Action taken" value={m.action_taken} />
+          <MetricRow label="Rerouting attempted" value={m.rerouting_attempted ? 'Yes' : 'No'} />
+          <MetricRow label="Routes inspected" value={m.rerouting_candidates_inspected} sub={`${(m.rejected_routes || []).length} rejected`} />
+          <MetricRow label="Rerouting succeeded" value={m.rerouting_succeeded ? 'Yes' : 'No'} tone={m.rerouting_succeeded ? 'ok' : 'critical'} />
+          <MetricRow label="Hold selected" value={m.hold_selected ? 'Yes' : 'No'} sub={`limit ${m.hold_limit_minutes} min`} />
+          <MetricRow label="Replan runtime" value={`${m.replan_runtime_seconds} s`} sub="wall time, varies per run" />
+          <MetricRow label="Baseline plan untouched" value={m.baseline_plan_untouched ? 'Yes' : 'No'} tone="ok" sub="replanning writes only to replan_output/" />
+          <MetricRow label="Post-solve validation" value={baselineMetrics?.provenance?.post_solve_validation || 'not recorded'} tone="ok" />
+        </Panel>
 
-        {/* 3. REPLANNED PLAN BY ARNAV */}
-        <div className="bg-white rounded-xl border border-orange-300 shadow-xs p-5 space-y-4">
-          <div className="flex items-center justify-between border-b border-orange-100 pb-3">
-            <span className="text-xs font-mono font-bold text-orange-600 uppercase">Step 3 — Re-Optimized Plan</span>
-            <Badge variant="Replanned" size="sm">Optimal Re-Assignment</Badge>
-          </div>
+        <div className="space-y-4">
+          <Panel>
+            <PanelHeader title="Plan retention" scope={`${retention.tasks_in_plan ?? '—'} tasks in plan`} />
+            <MetricRow label="Re-solved" value={retention.tasks_re_solved ?? '—'} tone="warn" />
+            <MetricRow label="Unchanged" value={retention.tasks_unchanged ?? '—'} tone="ok" />
+            <MetricRow label="Retention" value={`${retention.retention_percent ?? '—'}%`} sub={`basis: ${retention.basis || '—'}`} />
+          </Panel>
 
-          <div className="space-y-2.5">
-            <div className="flex justify-between items-baseline">
-              <span className="text-xs text-slate-500 font-medium">Task Identifier:</span>
-              <span className="text-sm font-bold font-mono text-slate-900">TASK-000005</span>
-            </div>
-            <div className="flex justify-between items-baseline">
-              <span className="text-xs text-slate-500 font-medium">Maintenance Type:</span>
-              <span className="text-xs font-semibold text-slate-800">Rail Grinding</span>
-            </div>
-            <div className="flex justify-between items-baseline">
-              <span className="text-xs text-slate-500 font-medium">New Scheduled Date:</span>
-              <span className="text-xs font-bold text-orange-700 font-mono">08 Sep 2026 (Within Deadline)</span>
-            </div>
-            <div className="flex justify-between items-baseline">
-              <span className="text-xs text-slate-500 font-medium">New Time Window:</span>
-              <span className="text-xs font-bold font-mono text-orange-700">18:00 – 21:20 (200m)</span>
-            </div>
-            <div className="flex justify-between items-baseline">
-              <span className="text-xs text-slate-500 font-medium">New Assigned Blocks:</span>
-              <span className="text-xs font-mono text-slate-800 font-bold">BLK-012046 + BLK-012047</span>
-            </div>
-            <div className="flex justify-between items-baseline">
-              <span className="text-xs text-slate-500 font-medium">Reassigned Crew:</span>
-              <span className="text-xs font-mono text-slate-800">TEAM-015 (Evening/Night Shift)</span>
-            </div>
-            <div className="flex justify-between items-baseline">
-              <span className="text-xs text-slate-500 font-medium">Deadline Compliance:</span>
-              <span className="text-xs font-bold text-emerald-600 font-mono">08 Sep &le; 08 Sep Deadline</span>
-            </div>
-          </div>
+          {retention.caveat && (
+            <Alert tone="idle" title="Retention is by construction, not a benchmark">
+              {retention.caveat}
+            </Alert>
+          )}
 
-          <div className="p-3 rounded-lg bg-orange-50 border border-orange-200 text-[11px] text-orange-950 leading-relaxed">
-            Arnav CP-SAT blacklisted conflicted blocks BLK-009637/38 and returned a feasible alternative.
-          </div>
+          <Alert tone="info" title="The replan is deterministic">
+            The solve is pinned to one search worker with a fixed seed, because several crews were
+            equally optimal for the chosen window and parallel workers broke that tie differently
+            each run. The model and objective are unchanged.
+            <Button size="sm" variant="ghost" className="ml-2" onClick={() => onNavigate && onNavigate('live-ops')}>
+              View live operations
+            </Button>
+          </Alert>
         </div>
       </div>
 
-      {/* RITVIK VALIDATION AUDIT (Section 17 requirement) */}
-      <div className="bg-white rounded-xl border border-emerald-300 p-5 shadow-xs space-y-4">
-        <div className="flex items-center justify-between border-b border-emerald-100 pb-3">
-          <div className="flex items-center gap-2">
-            <ShieldCheck size={18} className="text-emerald-600" />
-            <h4 className="text-sm font-bold text-slate-900">
-              Ritvik Independent Operational Validation Audit
-            </h4>
-          </div>
-          <Badge variant="LOW" size="md">{replanMetadata?.final_status || "PLAN APPROVED"}</Badge>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-          <div className="p-3 rounded-lg bg-emerald-50/70 border border-emerald-200 flex items-center gap-2.5 text-emerald-950">
-            <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
-            <div>
-              <div className="font-bold">No Train Conflict</div>
-              <div className="text-[10px] text-emerald-800">
-                Zero overlap during {minToHhmm(replanMetadata?.replanned_plan?.start_minute)}–{minToHhmm(replanMetadata?.replanned_plan?.end_minute)}
-              </div>
-            </div>
-          </div>
-
-          <div className="p-3 rounded-lg bg-emerald-50/70 border border-emerald-200 flex items-center gap-2.5 text-emerald-950">
-            <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
-            <div>
-              <div className="font-bold">Section Available</div>
-              <div className="text-[10px] text-emerald-800">{replanMetadata?.replanned_plan?.block_ids?.join(' + ')}</div>
-            </div>
-          </div>
-
-          <div className="p-3 rounded-lg bg-emerald-50/70 border border-emerald-200 flex items-center gap-2.5 text-emerald-950">
-            <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
-            <div>
-              <div className="font-bold">Crew Available</div>
-              <div className="text-[10px] text-emerald-800">{replanMetadata?.selected_crew?.join(', ') || '—'} assigned</div>
-            </div>
-          </div>
-
-          <div className="p-3 rounded-lg bg-emerald-50/70 border border-emerald-200 flex items-center gap-2.5 text-emerald-950">
-            <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
-            <div>
-              <div className="font-bold">Constraints Satisfied</div>
-              <div className="text-[10px] text-emerald-800">22/22 validator checks</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Measured record of the cycle, from ritvik_scenarios.json */}
-        {replanMetadata && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px] font-mono text-slate-700 border-t border-emerald-100 pt-3">
-            <div>
-              <span className="text-slate-400 block font-sans text-[10px]">Action taken</span>
-              {replanMetadata.action_taken}
-            </div>
-            <div>
-              <span className="text-slate-400 block font-sans text-[10px]">Reroute / hold</span>
-              {replanMetadata.rerouting_candidates_inspected} routes,{' '}
-              {replanMetadata.rerouting_succeeded ? 'reroute used' : 'none feasible'};{' '}
-              hold {replanMetadata.hold_selected ? 'used' : `> ${replanMetadata.hold_limit_minutes} min limit`}
-            </div>
-            <div>
-              <span className="text-slate-400 block font-sans text-[10px]">Replan runtime</span>
-              {replanMetadata.replan_runtime_seconds}s (measured)
-            </div>
-            <div>
-              <span className="text-slate-400 block font-sans text-[10px]">Plan retained</span>
-              {replanMetadata.unaffected_plan_retention?.tasks_unchanged}/
-              {replanMetadata.unaffected_plan_retention?.tasks_in_plan} unchanged
-              <span className="text-slate-400"> (by construction)</span>
-            </div>
-          </div>
-        )}
-
-        <div className="flex items-center justify-between text-xs bg-slate-50 p-3 rounded-lg border border-slate-200 font-mono text-slate-700">
-          <span>Output Artifact: <strong>ritvik_operational_decision.json</strong></span>
-          <span className="text-emerald-700 font-bold">
-            STATUS: {replanMetadata?.final_status || 'PLAN_APPROVED'}
-          </span>
-        </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <ScopeCaption>
+          Scenario scope · artifacts written to {m.replan_artifacts_directory}/
+        </ScopeCaption>
+        <ProvenanceNote
+          generatedBy="scripts/generate_ritvik_scenarios.py"
+          command="PYTHONPATH=. python demo_closed_loop.py"
+          note="The committed baseline plan is an input and is never modified by replanning."
+        />
       </div>
     </div>
   );

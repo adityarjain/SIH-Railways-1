@@ -4,70 +4,89 @@
 
 @layer base {
   body {
-    @apply bg-[#f8f9fa] dark:bg-[#08080a] text-neutral-900 dark:text-neutral-100 font-sans antialiased text-sm;
+    @apply bg-surface-base text-rail-900 font-sans antialiased text-sm;
+    /* Inter character variants. These are only meaningful now that Inter is
+       actually wired into tailwind.config.js fontFamily. */
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Technical values line up in columns: IDs, timestamps, minutes, counts. */
+  .font-mono {
+    font-variant-numeric: tabular-nums;
   }
 }
 
-/* Apple-style restrained glass panels */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+@layer components {
+  /* --- Typographic roles -------------------------------------------------
+     Mono is reserved for IDs, timestamps, minutes and counts. Never prose. */
+
+  .t-label {
+    @apply text-[11px] font-semibold uppercase tracking-wide text-rail-500;
+  }
+
+  .t-value {
+    @apply text-[13px] font-medium text-rail-900;
+  }
+
+  .t-mono-id {
+    @apply font-mono text-xs font-medium text-rail-800;
+  }
+
+  .t-metric {
+    @apply font-mono text-xl font-semibold text-rail-900;
+  }
+
+  .t-section-title {
+    @apply text-[15px] font-semibold text-rail-900;
+  }
+
+  /* The product wordmark is set in the same type as the interface: no logo,
+     no icon mark, no colour treatment. */
+  .t-wordmark {
+    @apply text-[11px] font-semibold uppercase tracking-[0.14em];
+  }
+
+  .t-wordmark-sub {
+    @apply text-[10px] font-medium tracking-wide;
+  }
+
+  /* Scope caption. Every figure carries the artifact scope it came from, so a
+     62-task demo number can never be read as the 30,000-task run. */
+  .t-scope {
+    @apply text-[10px] font-medium uppercase tracking-wide text-rail-400;
+  }
 }
 
-.dark .glass-panel {
-  background: rgba(255, 255, 255, 0.035);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.4);
+/* Used in 5 components (Sidebar, Drawer, Modal, GanttTimeline, Demand) but
+   never actually defined until now. */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(85, 103, 138, 0.32) transparent;
 }
 
-.glass-panel-hover:hover {
-  border-color: rgba(0, 0, 0, 0.16);
-}
-
-.dark .glass-panel-hover:hover {
-  border-color: rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.05);
-}
-
-/* Subtle glass inputs */
-.glass-input {
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  color: inherit;
-}
-
-.dark .glass-input {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-}
-
-.glass-input:focus {
-  outline: none;
-  border-color: rgba(0, 0, 0, 0.3);
-}
-
-.dark .glass-input:focus {
-  border-color: rgba(255, 255, 255, 0.25);
-}
-
-/* Subtle scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(120, 120, 120, 0.2);
-  border-radius: 9999px;
+  background: rgba(85, 103, 138, 0.28);
+  border-radius: 0;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(120, 120, 120, 0.4);
+  background: rgba(85, 103, 138, 0.48);
+}
+
+/* Conflict hatch. Drawn only where an artifact establishes a conflict, never
+   derived by overlap arithmetic in the UI. */
+.conflict-hatch {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(194, 48, 59, 0.9) 0,
+    rgba(194, 48, 59, 0.9) 3px,
+    rgba(194, 48, 59, 0.35) 3px,
+    rgba(194, 48, 59, 0.35) 6px
+  );
 }

@@ -145,11 +145,14 @@ class TestDemoGuide:
     def test_story_order_matches_the_brief(self):
         source = (FRONTEND / "context/DemoGuideContext.jsx").read_text()
         pages = re.findall(r'page: "([a-z-]+)"', source)
-        # planning ... conflict/impact (live-ops) ... replan ... verify ... handoff
+        # Authority -> Ground -> Authority:
+        # planning ... conflict (live-ops) ... replan ... field execution ... verification.
+        # The handoff to the crew now precedes verification, so the work being
+        # verified is work the crew has actually been given.
         assert pages.index("block-planning") < pages.index("live-ops")
         assert pages.index("live-ops") < pages.index("replanning")
-        assert pages.index("replanning") < pages.index("general-verify")
-        assert pages.index("general-verify") < pages.index("my-tasks")
+        assert pages.index("replanning") < pages.index("my-tasks")
+        assert pages.index("my-tasks") < pages.index("general-verify")
 
     def test_every_guide_page_is_routable(self):
         guide = (FRONTEND / "context/DemoGuideContext.jsx").read_text()

@@ -18,7 +18,7 @@ export const BundlingView = () => {
 
   if (pairs.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs text-xs text-slate-500">
+      <div className="bg-surface-panel rounded-lg border border-line p-4  text-xs text-rail-500">
         No concurrent bundles in the current plan.
       </div>
     );
@@ -30,11 +30,11 @@ export const BundlingView = () => {
   const span = Math.max(1, windowEnd - windowStart);
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs space-y-3">
-      <div className="flex items-center justify-between border-b border-slate-100 pb-2.5 gap-2 flex-wrap">
+    <div className="bg-surface-panel rounded-lg border border-line p-4  space-y-3">
+      <div className="flex items-center justify-between border-b border-line-subtle pb-2.5 gap-2 flex-wrap">
         <div className="flex items-center gap-2">
-          <Layers size={16} className="text-purple-600" />
-          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+          <Layers size={16} className="text-bundle" />
+          <h4 className="text-xs font-bold text-rail-900 uppercase tracking-wider">
             Cross-Department Bundling
           </h4>
           <Badge variant="primary" size="sm">
@@ -49,8 +49,8 @@ export const BundlingView = () => {
                 onClick={() => setIndex(i)}
                 className={`px-2 py-0.5 rounded text-[11px] font-semibold font-mono transition-colors ${
                   i === index
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    ? 'bg-bundle text-white'
+                    : 'bg-surface-sunken text-rail-600 hover:bg-line'
                 }`}
               >
                 {cand.section_id}
@@ -60,14 +60,14 @@ export const BundlingView = () => {
         )}
       </div>
 
-      <div className="text-[11px] text-slate-500">
+      <div className="text-[11px] text-rail-500">
         {p.section_id} — {p.section_name} ({p.corridor_name}) · {p.date}
       </div>
 
-      <div className="p-3 rounded-lg bg-slate-50 border border-slate-200/80 space-y-2">
-        <div className="flex items-center justify-between text-[11px] font-mono text-slate-600">
+      <div className="p-3 rounded-lg bg-surface-sunken border border-line/80 space-y-2">
+        <div className="flex items-center justify-between text-[11px] font-mono text-rail-600">
           <span>
-            Shared possession: <strong className="text-slate-900">{p.shared_block_ids.join(' + ')}</strong>
+            Shared possession: <strong className="text-rail-900">{p.shared_block_ids.join(' + ')}</strong>
           </span>
           <span>
             {minToHhmm(windowStart)} – {minToHhmm(windowEnd)}
@@ -80,19 +80,19 @@ export const BundlingView = () => {
           return (
             <div key={t.task_id} className="space-y-1">
               <div className="flex items-center justify-between text-[11px]">
-                <span className="font-mono font-bold text-slate-900">{t.task_id}</span>
-                <span className="text-slate-500">
+                <span className="font-mono font-bold text-rail-900">{t.task_id}</span>
+                <span className="text-rail-500">
                   {t.department} · {t.maintenance_type || '—'}
                 </span>
               </div>
               {/* Bar geometry is the task's real interval within the possession. */}
-              <div className="h-4 w-full bg-slate-200/70 rounded relative overflow-hidden">
+              <div className="h-4 w-full bg-line rounded relative overflow-hidden">
                 <div
-                  className="absolute h-full bg-purple-500/80 rounded"
+                  className="absolute h-full bg-bundle "
                   style={{ left: `${left}%`, width: `${width}%` }}
                 />
               </div>
-              <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono">
+              <div className="flex items-center justify-between text-[10px] text-rail-500 font-mono">
                 <span>
                   {minToHhmm(t.start_minute)} – {minToHhmm(t.end_minute)} ({t.duration_minutes} min)
                 </span>
@@ -105,7 +105,7 @@ export const BundlingView = () => {
         })}
       </div>
 
-      <div className="text-[11px] text-slate-600 space-y-0.5">
+      <div className="text-[11px] text-rail-600 space-y-0.5">
         <div>
           • Concurrent overlap: <strong>{p.overlap_minutes} min</strong>
           {p.minimum_overlap_required_minutes != null && (
@@ -117,7 +117,7 @@ export const BundlingView = () => {
           <strong>{p.departments_compatible ?? 'not specified'}</strong> for{' '}
           {p.tasks[0].department} + {p.tasks[1].department}
         </div>
-        <div className="text-slate-400 pt-0.5">
+        <div className="text-rail-400 pt-0.5">
           Derived from the committed plan; no saving or efficiency figure is claimed.
         </div>
       </div>

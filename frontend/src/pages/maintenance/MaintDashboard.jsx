@@ -1,162 +1,208 @@
-import React from 'react';
-import { Card } from '../../components/common/Card';
-import { Badge } from '../../components/common/Badge';
-import { MetricCard } from '../../components/common/MetricCard';
-import { useAuth } from '../../context/AuthContext';
+import React, { useMemo, useState } from 'react';
 import { usePlan } from '../../context/PlanContext';
-import { minToHhmm } from '../../utils/time';
+import { useAuth } from '../../context/AuthContext';
 import {
-  Wrench,
-  Clock,
-  AlertTriangle,
-  CheckCircle2,
-  Users,
-  Calendar,
-  ArrowRight,
-  ShieldCheck,
-  Zap,
-} from 'lucide-react';
+  Panel, PanelHeader, StatusBadge, Button, Alert, EmptyState,
+} from '../../components/ui';
+import { TaskActionModal } from '../../components/maintenance/TaskActionModal';
+import {
+  WorkOrderHeader, WorkOrderFacts, BlockStatusBanner, SectionContext,
+  OperationalGaps, ActionBar, statusTone,
+} from '../../components/ground/WorkOrder';
+import { minToHhmm } from '../../utils/time';
+import { bandOf, bandTone } from '../../utils/risk';
 
+const ACTION_STATUS = {
+  in_progress: 'In Progress',
+  completed: 'Completed',
+  pause: 'Paused',
+  issue: 'Issue Reported',
+  handoff: 'Completed',
+};
+
+const ISSUE_STATUSES = new Set(['Issue Reported', 'Paused', 'Rejected by Field Crew']);
+
+/**
+ * Ground landing — "Today's Tasks".
+ *
+ * One question, answered above the fold: what am I doing next, where, when, and
+ * is the block ready. Everything else is secondary. No network analytics, no
+ * optimizer internals.
+ */
 export const MaintDashboard = ({ onNavigate }) => {
+  const { tasksInventory, updateTaskStatus, completedWork } = usePlan();
   const { selectedDept } = useAuth();
-  const { tasksInventory, completedWork } = usePlan();
+  const [action, setAction] = useState(null);
 
-  // Filter tasks for the selected department
-  const deptTasks = tasksInventory.filter((t) => t.department === selectedDept);
-  const pendingTasks = deptTasks.filter((t) => t.status === 'Pending');
-  const criticalTasks = deptTasks.filter((t) => t.risk_score >= 80);
-  // Inventory records carry both the work-order fields and the scheduling facts,
-  // so the cards below need no fallbacks.
-  const scheduledDeptTasks = deptTasks.filter((t) => t.status !== 'Pending' && t.scheduled_date);
-  const completedDeptWork = completedWork.filter((j) => j.department === selectedDept);
-  // Crews actually assigned to this department's scheduled possessions.
-  const activeCrews = new Set(scheduledDeptTasks.flatMap((t) => t.assigned_teams || []));
+  const deptTasks = useMemo(
+    () => tasksInventory.filter((t) => t.department === selectedDept),
+    [tasksInventory, selectedDept],
+  );
+
+  const scheduled = useMemo(
+    () => deptTasks
+      .filter((t) => t.scheduled_date && (t.block_ids || []).length)
+      .sort((a, b) =>
+        a.scheduled_date.localeCompare(b.scheduled_date) || (a.start_minute ?? 0) - (b.start_minute ?? 0)),
+    [deptTasks],
+  );
+
+  // In-progress work is what you are doing; otherwise the earliest possession.
+  const next = useMemo(
+    () => scheduled.find((t) => t.status === 'In Progress') || scheduled[0] || null,
+    [scheduled],
+  );
+
+  const later = useMemo(
+    () => scheduled.filter((t) => t.task_id !== next?.task_id).slice(0, 5),
+    [scheduled, next],
+  );
+
+  const counts = useMemo(() => ({
+    assigned: deptTasks.length,
+    scheduled: scheduled.length,
+    active: deptTasks.filter((t) => t.status === 'In Progress').length,
+    issues: deptTasks.filter((t) => t.status && ISSUE_STATUSES.has(t.status)).length,
+    completed: completedWork.filter((j) => j.department === selectedDept).length,
+  }), [deptTasks, scheduled, completedWork, selectedDept]);
+
+  const handleSubmit = (taskId, actionType, reason, proposedDate) => {
+    updateTaskStatus(taskId, ACTION_STATUS[actionType] || 'Accepted', reason, proposedDate);
+    setAction(null);
+  };
+
+  const today = next?.scheduled_date;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-4">
+      {/* today line */}
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2 text-xs font-mono font-bold text-blue-600 uppercase tracking-wider">
-            <Wrench size={14} className="text-blue-500" />
-            <span>Field Engineering Management</span>
+          <div className="t-label">Today</div>
+          <div className="text-[17px] font-semibold text-rail-900 mt-0.5">
+            {today || 'No possession scheduled'}
           </div>
-          <h2 className="text-xl font-bold tracking-tight text-slate-900 mt-0.5">
-            Maintenance Dashboard — {selectedDept}
-          </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Manage field work orders, inspect Neev asset failure predictions, and confirm crew readiness.
-          </p>
+          <div className="text-xs text-rail-500 mt-0.5">{selectedDept}</div>
         </div>
-
-        <div className="text-xs text-slate-500 font-mono">
-          Department: <strong>{selectedDept}</strong>
-        </div>
-      </div>
-
-      {/* 5 Summary KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5">
-        <MetricCard
-          title="Pending Work Orders"
-          value={pendingTasks.length}
-          subtext="Awaiting block allocation"
-          icon={Clock}
-          color="amber"
-          onClick={() => onNavigate('my-tasks')}
-        />
-        <MetricCard
-          title="Critical Assets"
-          value={criticalTasks.length}
-          subtext="Neev risk &ge; 80"
-          icon={AlertTriangle}
-          color="red"
-          onClick={() => onNavigate('asset-health')}
-        />
-        <MetricCard
-          title="Scheduled Work"
-          value={scheduledDeptTasks.length}
-          subtext="Active in block plan"
-          icon={Calendar}
-          color="blue"
-          onClick={() => onNavigate('my-tasks')}
-        />
-        <MetricCard
-          title="Assigned Crews"
-          value={activeCrews.size}
-          subtext="Distinct crews in block plan"
-          icon={Users}
-          color="purple"
-          onClick={() => onNavigate('teams')}
-        />
-        <MetricCard
-          title="Completed Work"
-          value={completedDeptWork.length}
-          subtext="Possessions handed back"
-          icon={CheckCircle2}
-          color="green"
-          onClick={() => onNavigate('completed')}
-        />
-      </div>
-
-      {/* Main Scheduled Work Cards */}
-      <Card
-        title="Prioritized Scheduled Work for Your Department"
-        subtitle="Review assigned possession windows, asset failure risks, and crew dispatch"
-        action={
-          <button
-            onClick={() => onNavigate('my-tasks')}
-            className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1"
-          >
-            <span>Go to My Tasks</span>
-            <ArrowRight size={13} />
-          </button>
-        }
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {scheduledDeptTasks.map((t) => (
-            <div
-              key={t.task_id}
-              className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white hover:border-blue-300 hover:shadow-xs transition-all space-y-3"
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1.5 bg-status-info-tint border border-status-info text-[10px] font-semibold text-status-info tracking-wide">
+            {counts.scheduled} SCHEDULED
+          </span>
+          {counts.issues > 0 && (
+            <button
+              onClick={() => onNavigate && onNavigate('issues')}
+              className="px-2.5 py-1.5 bg-status-warn-tint border border-status-warn text-[10px] font-semibold text-status-warn tracking-wide"
             >
-              <div className="flex items-start justify-between">
-                <div>
-                  <span className="font-mono font-bold text-slate-900 text-sm">{t.task_id}</span>
-                  <h4 className="text-xs font-bold text-slate-800 mt-0.5">{t.maintenance_type || '\u2014'}</h4>
-                  <p className="text-[11px] text-slate-500">{t.section_id} • Asset {t.asset_id}</p>
-                </div>
-                <Badge variant={t.risk_score >= 80 ? 'CRITICAL' : 'primary'} size="sm">
-                  {t.risk_score ? `${t.risk_score.toFixed(1)}%` : 'Critical'}
-                </Badge>
-              </div>
-
-              <div className="bg-white p-2.5 rounded-lg border border-slate-200/80 text-xs space-y-1 font-mono">
-                <div className="flex justify-between text-slate-700">
-                  <span className="text-slate-400 font-sans">Window:</span>
-                  <span className="font-bold">
-                    {t.scheduled_date} | {minToHhmm(t.start_minute)} – {minToHhmm(t.end_minute)}
-                  </span>
-                </div>
-                <div className="flex justify-between text-slate-700">
-                  <span className="text-slate-400 font-sans">Assigned Team:</span>
-                  <span className="font-bold">
-                    {Array.isArray(t.assigned_teams) ? t.assigned_teams.join(', ') : t.assigned_teams}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between pt-1">
-                <span className="text-[11px] text-slate-500">Duration: {t.required_duration_minutes}m</span>
-                <button
-                  onClick={() => onNavigate('my-tasks')}
-                  className="px-2.5 py-1 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded text-xs font-semibold transition-colors"
-                >
-                  Manage Task &rarr;
-                </button>
-              </div>
-            </div>
-          ))}
+              {counts.issues} ISSUE{counts.issues === 1 ? '' : 'S'}
+            </button>
+          )}
         </div>
-      </Card>
+      </div>
+
+      {/* NEXT TASK — the dominant element */}
+      {!next ? (
+        <Panel>
+          <PanelHeader title="Next task" scope={selectedDept} />
+          <EmptyState title="No possession is assigned to your department.">
+            Work appears here once the optimizer places a task from your department into a block
+            possession.
+          </EmptyState>
+        </Panel>
+      ) : (
+        <Panel className="border-l-4 border-l-status-info overflow-hidden">
+          <div className="px-4 pt-3">
+            <StatusBadge tone={next.status === 'In Progress' ? 'info' : 'ok'} size="sm">
+              {next.status === 'In Progress' ? 'IN PROGRESS' : 'NEXT TASK'}
+            </StatusBadge>
+          </div>
+          <WorkOrderHeader task={next} status={next.status} />
+          <WorkOrderFacts task={next} />
+          <BlockStatusBanner task={next} status={next.status} />
+          <ActionBar status={next.status} onAction={(a) => setAction(a)} />
+        </Panel>
+      )}
+
+      {/* status row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          ['Assigned work', counts.assigned, 'my-tasks', 'idle'],
+          ['Active now', counts.active, 'active-block', counts.active ? 'info' : 'idle'],
+          ['Issues', counts.issues, 'issues', counts.issues ? 'warn' : 'idle'],
+          ['Completed', counts.completed, 'completed', 'ok'],
+        ].map(([label, value, go, tone]) => (
+          <button
+            key={label}
+            onClick={() => onNavigate && onNavigate(go)}
+            className="bg-surface-panel border border-line rounded-lg px-3 py-3 text-left hover:border-line-strong hover:bg-surface-sunken transition-colors min-h-touch"
+          >
+            <div className="t-label">{label}</div>
+            <div className={`font-mono text-2xl font-semibold mt-1 ${
+              tone === 'warn' ? 'text-status-warn' : tone === 'info' ? 'text-status-info'
+                : tone === 'ok' ? 'text-status-ok' : 'text-rail-900'
+            }`}>
+              {value}
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {next && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <SectionContext task={next} />
+          <OperationalGaps />
+        </div>
+      )}
+
+      {/* later today */}
+      <Panel>
+        <PanelHeader title="Later" scope={`${later.length} further possession${later.length === 1 ? '' : 's'}`} />
+        {later.length === 0 ? (
+          <EmptyState title="Nothing else scheduled for your department." />
+        ) : (
+          <div className="divide-y divide-line">
+            {later.map((t) => {
+              const band = bandOf(t);
+              return (
+                <button
+                  key={t.task_id}
+                  onClick={() => onNavigate && onNavigate('my-tasks')}
+                  className="w-full text-left px-3 py-3 flex flex-wrap items-center justify-between gap-3 hover:bg-surface-sunken transition-colors min-h-touch"
+                >
+                  <span className="min-w-0">
+                    <span className="font-mono text-[13px] font-semibold text-rail-900">{t.task_id}</span>
+                    <span className="block text-[11px] text-rail-500 mt-0.5">
+                      {t.maintenance_type} · {t.section_id}
+                    </span>
+                  </span>
+                  <span className="flex items-center gap-3 shrink-0">
+                    <span className="font-mono text-[12px] text-rail-900">
+                      {t.start_minute != null ? `${minToHhmm(t.start_minute)} → ${minToHhmm(t.end_minute)}` : '—'}
+                    </span>
+                    {band && <StatusBadge tone={bandTone(band)} size="sm">{band} {t.risk_score?.toFixed?.(1)}</StatusBadge>}
+                    {t.status && <StatusBadge tone={statusTone(t.status)} size="sm">{t.status}</StatusBadge>}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </Panel>
+
+      <Alert tone="idle" title="Session state only">
+        Status changes are held in the browser for this session. Nothing is written to an external
+        register and no notification is sent.
+        <Button size="sm" variant="ghost" className="ml-2" onClick={() => onNavigate && onNavigate('my-tasks')}>
+          View all assigned work
+        </Button>
+      </Alert>
+
+      <TaskActionModal
+        isOpen={Boolean(action)}
+        onClose={() => setAction(null)}
+        task={next}
+        actionType={action}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 };

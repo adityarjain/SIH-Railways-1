@@ -429,7 +429,56 @@ cannot be derived; no score is invented for it.
 
 ---
 
-## 16. Claims this project does not make
+## 16. Train projection for the planning timeline
+
+`frontend/src/data/section_trains.json` — reproduce with:
+
+```bash
+PYTHONPATH=. python scripts/generate_section_trains.py
+```
+
+The Authority timeline draws maintenance possessions against the train movements
+they have to fit around. That requires per-train timings, which the frontend
+previously did not have: `section_traffic.json` carries only aggregate counts.
+This artifact is a **projection of `trains.csv`, not a model**.
+
+| Metric | Value |
+| :--- | ---: |
+| Source rows (`trains.csv`) | 12,000 |
+| Rows within plan scope | 176 |
+| Rows dropped for missing timing | 0 |
+| Records emitted | 176 |
+| Sections covered | 43 |
+
+**Projection rule.** Restricted to the `(section_id, date)` pairs present in
+`optimized_block_plan.json`, plus the sections referenced by the replanning
+scenarios on every plan date (so a conflict scenario always has train context,
+including the 2026-09-08 replanned window). Ordered by
+`(section_id, date, arrival_minute, departure_minute, train_id)`.
+
+**What is and is not done to the data.** `arrival_minute` and `departure_minute`
+are copied verbatim from the source row. Nothing is sampled, smoothed, or
+generated. A row missing either timing field is dropped rather than imputed, and
+the dropped count is recorded in the artifact's own `provenance` block. Where a
+selected section/date has no projected record, the timeline says so rather than
+drawing a placeholder bar.
+
+Corroboration: the earliest projected train on SEC-0004 for 2026-09-07 arrives at
+minute 338, which matches the figure §12 derives independently from `trains.csv`
+when explaining why the 00:00–03:20 night window carries zero adjacent services.
+
+**Conflicts are never inferred from this artifact.** The timeline's conflict lane
+is drawn only where an artifact already establishes a conflict
+(`decision_trace.json → train_impact.conflicting`, or a replanning scenario's
+`conflict.overlap_window`). Overlap arithmetic is not performed in the UI.
+
+Asserted by `tests/test_section_trains.py`: source fidelity, verbatim timings,
+scope correctness, deterministic ordering, byte-identical regeneration, and
+internally consistent provenance counts.
+
+---
+
+## 17. Claims this project does not make
 
 - No live or real-time railway data. All operational events are simulated and
   read from `ritvik_demo_events.json`.

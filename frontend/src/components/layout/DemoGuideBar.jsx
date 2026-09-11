@@ -1,21 +1,26 @@
 import React from 'react';
 import { useDemoGuide, DEMO_STEPS } from '../../context/DemoGuideContext';
 import { usePlan } from '../../context/PlanContext';
-import { ChevronLeft, ChevronRight, X, Info } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 export const DemoGuideBar = ({ onNavigate }) => {
   const { isGuideActive, toggleGuide, currentStepIndex, currentStep, setStep, totalSteps } = useDemoGuide();
   const { toggleReplan } = usePlan();
 
-  // When the guide opens, land the user on step 1's page/role rather than
-  // showing "Step 1/14" over whatever screen they happened to be on. This
-  // component unmounts when the guide closes, so the effect runs once per open.
+  // Land on the current step's page/role rather than showing "Step n/14" over
+  // whatever screen happened to be mounted.
+  //
+  // This navigates to the CURRENT step, never to step 0. The bar is rendered by
+  // whichever role shell is active, so switching role unmounts and remounts it
+  // — a reset here would send the demo back to step 1 exactly at the Ground
+  // handoff. Restarting on open is handled by toggleGuide instead. Re-running
+  // this on remount is idempotent: it re-asserts the page we are already on.
   React.useEffect(() => {
     if (!isGuideActive) return;
-    const first = DEMO_STEPS[0];
-    setStep(0);
-    if (typeof first.replanned === 'boolean') toggleReplan(first.replanned);
-    if (onNavigate) onNavigate(first.page, first.role);
+    const target = DEMO_STEPS[currentStepIndex];
+    if (!target) return;
+    if (typeof target.replanned === 'boolean') toggleReplan(target.replanned);
+    if (onNavigate) onNavigate(target.page, target.role);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isGuideActive]);
 
@@ -43,45 +48,44 @@ export const DemoGuideBar = ({ onNavigate }) => {
   const handlePrev = () => goToStep(currentStepIndex - 1);
 
   return (
-    <div className="bg-slate-900 text-white px-6 py-2.5 flex items-center justify-between border-b border-slate-800 shadow-md sticky top-14 z-25">
-      <div className="flex items-center gap-3 max-w-4xl">
-        <span className="bg-blue-600 text-white text-[11px] font-bold px-2 py-0.5 rounded tracking-wide font-mono">
+    <div className="bg-rail-800 text-white px-5 py-2 flex items-center justify-between gap-4 border-b border-rail-700 sticky top-0 z-guide">
+      <div className="flex items-center gap-3 min-w-0">
+        <span className="bg-status-info text-white text-[10px] font-bold px-2 py-0.5 tracking-wide font-mono shrink-0">
           STEP {currentStepIndex + 1} / {totalSteps}
         </span>
-        <div>
-          <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
-            <span>{currentStep.title}</span>
-            <span className="text-[11px] font-normal text-slate-400">({currentStep.role})</span>
+        <div className="min-w-0">
+          <h4 className="text-[11px] font-semibold text-white flex items-center gap-1.5">
+            <span className="truncate">{currentStep.title}</span>
+            <span className="text-[10px] font-normal text-rail-400 shrink-0">({currentStep.role})</span>
           </h4>
-          <p className="text-[11px] text-slate-300 mt-0.5 line-clamp-1">{currentStep.description}</p>
+          <p className="text-[10px] text-rail-300 mt-0.5 truncate">{currentStep.description}</p>
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5 shrink-0">
         <button
           onClick={handlePrev}
           disabled={currentStepIndex === 0}
-          className="p-1 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 transition-colors"
-          title="Previous Step"
+          className="p-1 bg-rail-900 border border-rail-700 hover:bg-rail-700 disabled:opacity-30 disabled:cursor-not-allowed text-rail-300 transition-colors"
+          title="Previous step"
         >
-          <ChevronLeft size={16} />
+          <ChevronLeft size={15} />
         </button>
         <button
           onClick={handleNext}
           disabled={currentStepIndex === totalSteps - 1}
-          className="flex items-center gap-1 px-3 py-1 rounded bg-blue-600 hover:bg-blue-500 disabled:opacity-30 disabled:cursor-not-allowed text-xs font-semibold text-white transition-colors"
-          title="Next Step"
+          className="flex items-center gap-1 px-2.5 py-1 bg-status-info hover:bg-blue-700 disabled:opacity-30 disabled:cursor-not-allowed text-[11px] font-semibold text-white transition-colors"
+          title="Next step"
         >
-          <span>Next Step</span>
-          <ChevronRight size={14} />
+          <span>Next</span>
+          <ChevronRight size={13} />
         </button>
-        <div className="h-4 w-px bg-slate-700 mx-1" />
         <button
           onClick={toggleGuide}
-          className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-          title="Exit Guide"
+          className="p-1 text-rail-400 hover:text-white transition-colors"
+          title="Exit guide"
         >
-          <X size={16} />
+          <X size={15} />
         </button>
       </div>
     </div>

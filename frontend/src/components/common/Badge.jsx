@@ -1,41 +1,51 @@
 import React from 'react';
+import { StatusBadge } from '../ui';
+
+/**
+ * The previous Badge carried 18 ad-hoc variants. They now collapse onto the
+ * five semantic tones (plus bundling, which is genuinely its own meaning), so
+ * the same state reads identically on every screen. The `variant` prop keeps
+ * its original vocabulary so existing call sites don't have to change.
+ */
+const VARIANT_TONE = {
+  // risk bands
+  CRITICAL: 'critical',
+  HIGH: 'warn',
+  MODERATE: 'info',
+  LOW: 'ok',
+
+  // generic
+  danger: 'critical',
+  warning: 'warn',
+  success: 'ok',
+  info: 'info',
+  neutral: 'idle',
+  default: 'idle',
+  bundle: 'bundle',
+
+  // operational statuses
+  Scheduled: 'info',
+  Pending: 'warn',
+  'Pending Optimization': 'warn',
+  Completed: 'ok',
+  Accepted: 'ok',
+  'In Progress': 'info',
+  Replanned: 'warn',
+  Deferred: 'idle',
+  Verified: 'ok',
+  Rejected: 'critical',
+  'Rejected by Field Crew': 'critical',
+};
 
 export const Badge = ({ children, variant = 'default', size = 'md', className = '' }) => {
-  const sizeClasses = {
-    sm: 'text-[11px] px-1.5 py-0.5 font-medium',
-    md: 'text-xs px-2 py-0.5 font-semibold',
-    lg: 'text-xs px-2.5 py-1 font-semibold',
-  };
-
-  const variantClasses = {
-    default: 'bg-slate-100 text-slate-700 border border-slate-300',
-    primary: 'bg-blue-50 text-blue-700 border border-blue-200',
-    success: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-    warning: 'bg-amber-50 text-amber-700 border border-amber-200',
-    danger: 'bg-red-50 text-red-700 border border-red-200',
-    purple: 'bg-purple-50 text-purple-700 border border-purple-200',
-    orange: 'bg-orange-50 text-orange-700 border border-orange-200',
-    
-    // Risk badges
-    CRITICAL: 'bg-red-600 text-white font-bold tracking-wide shadow-sm',
-    HIGH: 'bg-orange-500 text-white font-semibold',
-    MODERATE: 'bg-amber-500 text-white font-semibold',
-    LOW: 'bg-emerald-600 text-white font-semibold',
-    
-    // Status badges
-    Scheduled: 'bg-blue-50 text-blue-700 border border-blue-300',
-    Replanned: 'bg-orange-50 text-orange-700 border border-orange-300 font-semibold',
-    Completed: 'bg-emerald-50 text-emerald-700 border border-emerald-300',
-    Pending: 'bg-slate-100 text-slate-600 border border-slate-300',
-    'In Progress': 'bg-indigo-50 text-indigo-700 border border-indigo-300 animate-pulse',
-    'False Closure': 'bg-red-50 text-red-700 border border-red-300 font-semibold',
-  };
-
-  const badgeStyle = variantClasses[variant] || variantClasses.default;
-
+  let t = VARIANT_TONE[variant];
+  if (!t && typeof variant === 'string') {
+    if (variant.startsWith('Reschedule')) t = 'warn';
+    else if (variant.startsWith('Rejected')) t = 'critical';
+  }
   return (
-    <span className={`inline-flex items-center rounded-full ${sizeClasses[size]} ${badgeStyle} ${className}`}>
+    <StatusBadge tone={t || 'idle'} size={size} className={className}>
       {children}
-    </span>
+    </StatusBadge>
   );
 };

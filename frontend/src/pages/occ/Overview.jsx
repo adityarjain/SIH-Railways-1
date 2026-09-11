@@ -1,264 +1,312 @@
-import React, { useState } from 'react';
-import { MetricCard } from '../../components/common/MetricCard';
-import { Card } from '../../components/common/Card';
-import { Badge } from '../../components/common/Badge';
+import React, { useMemo, useState } from 'react';
 import { usePlan } from '../../context/PlanContext';
+import {
+  Panel, PanelHeader, PanelBody, MetricRow, StatusBadge, Button,
+  EmptyState, ProvenanceNote, ScopeCaption, Select,
+} from '../../components/ui';
+import { BlockTrainGantt } from '../../components/timeline/BlockTrainGantt';
+import { minToHhmm } from '../../utils/time';
+import { bandOf } from '../../utils/risk';
 import corridorsSectionsData from '../../data/corridors_sections.json';
 import networkStats from '../../data/network_stats.json';
 import teamsData from '../../data/teams.json';
-import {
-  AlertTriangle,
-  Clock,
-  CheckCircle2,
-  Users,
-  ShieldCheck,
-  Calendar,
-  TrainTrack,
-  ArrowRight,
-  GitBranch,
-  Layers,
-  MapPin,
-  ExternalLink,
-} from 'lucide-react';
+import decisionTrace from '../../data/decision_trace.json';
 
+/**
+ * Authority Overview.
+ *
+ * Not a KPI wall: a status strip (in the header), a hero timeline, a ranked
+ * attention queue, then summary panels. Overview reports the FULL RUN; the
+ * planning screen reports the demo scenario. Every figure carries the scope it
+ * came from, because conflating the two is what previously produced a false
+ * headline.
+ */
 export const Overview = ({ onNavigate }) => {
-  // These KPIs report the full 30,000-task optimizer run, not the scenario
-  // rendered on the planning screen. The row is captioned accordingly so the
-  // two are never read as one number.
-  const { baselineMetrics: metrics, scheduledTasks, activeEvent } = usePlan();
-  const [selectedCorridorId, setSelectedCorridorId] = useState('COR-001');
-  const teamsTotal = teamsData.length;
+  const {
+    baselineMetrics: metrics, metrics: scenario, scheduledTasks, activeEvent,
+    isReplanned, replanRequest, replanScenario,
+  } = usePlan();
 
-  const corridors = corridorsSectionsData.corridors;
-  const sections = corridorsSectionsData.sections;
+  const risk = metrics.risk_breakdown || {};
+  const op = metrics.operational_metrics || {};
+  const reasons = metrics.deferral_reasons || {};
+  const prov = metrics.provenance || {};
 
-  const currentCorridor = corridors.find((c) => c.corridor_id === selectedCorridorId) || corridors[0];
-  const corridorSections = sections.filter((s) => s.corridor_id === selectedCorridorId);
+  // Default the hero timeline to the busiest plan date and corridor, so first
+  // paint is dense rather than empty.
+  const dateOptions = useMemo(() => {
+    const counts = {};
+    scheduledTasks.forEach((t) => { counts[t.date] = (counts[t.date] || 0) + 1; });
+    return Object.entries(counts).map(([date, count]) => ({ date, count })).sort((a, b) => a.date.localeCompare(b.date));
+  }, [scheduledTasks]);
 
-  // Derive upcoming possessions (top 5)
-  const upcomingTasks = scheduledTasks.slice(0, 5);
+  const busiestDate = useMemo(
+    () => dateOptions.reduce((best, o) => (!best || o.count > best.count ? o : best), null)?.date,
+    [dateOptions],
+  );
+  const [selectedDate, setSelectedDate] = useState(busiestDate);
+  const activeDate = selectedDate || busiestDate;
 
-  const minToHhmm = (m) => {
-    const hh = String(Math.floor(m / 60) % 24).padStart(2, '0');
-    const mm = String(m % 60).padStart(2, '0');
-    return `${hh}:${mm}`;
-  };
+  const busiestCorridor = useMemo(() => {
+    const counts = {};
+    scheduledTasks.forEach((t) => { if (t.date === activeDate) counts[t.corridor_id] = (counts[t.corridor_id] || 0) + 1; });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0];
+  }, [scheduledTasks, activeDate]);
+
+  const sections = useMemo(() => {
+    const ids = new Set(
+      scheduledTasks
+        .filter((t) => t.date === activeDate && (!busiestCorridor || t.corridor_id === busiestCorridor))
+        .map((t) => t.section_id),
+    );
+    return corridorsSectionsData.sections
+      .filter((s) => ids.has(s.section_id))
+      .sort((a, b) => a.section_id.localeCompare(b.section_id));
+  }, [scheduledTasks, activeDate, busiestCorridor]);
+
+  const corridorLabel = useMemo(() => {
+    const c = corridorsSectionsData.corridors.find((x) => x.corridor_id === busiestCorridor);
+    return c ? `${c.corridor_id} ${c.corridor_name}` : busiestCorridor || 'All corridors';
+  }, [busiestCorridor]);
+
+  /** Ranked by operational severity, merged from what the artifacts record. */
+  const attention = useMemo(() => {
+    const items = [];
+
+    if (activeEvent) {
+      const cf = replanScenario?.conflict;
+      items.push({
+        tone: 'critical',
+        kind: 'Train conflict',
+        title: activeEvent.name,
+        meta: cf?.details || `${activeEvent.sectionId || ''} · simulated event`,
+        go: 'live-ops',
+      });
+    }
+
+    if (isReplanned || replanRequest?.action_required) {
+      items.push({
+        tone: 'warn',
+        kind: 'Replan',
+        title: isReplanned ? 'Possession re-optimized' : 'Possession requires re-optimization',
+        meta: `${(replanRequest?.rejected_route_candidates || []).length} bypass routes rejected · no hold possible`,
+        go: 'replanning',
+      });
+    }
+
+    if (risk.critical_risk_deferred) {
+      items.push({
+        tone: 'critical',
+        kind: 'Critical deferred',
+        title: `${risk.critical_risk_deferred.toLocaleString()} critical-risk tasks deferred`,
+        meta: 'full run · deadline reached outside the daily batch',
+        go: 'demand',
+      });
+    }
+
+    if (reasons.team_capacity_exhausted) {
+      items.push({
+        tone: 'warn',
+        kind: 'Capacity',
+        title: `${reasons.team_capacity_exhausted.toLocaleString()} deferrals: crew capacity exhausted`,
+        meta: `${op.teams_utilized ?? 0} of ${teamsData.length} crews utilized`,
+        go: 'teams',
+      });
+    }
+
+    if (reasons.no_qualifying_team_shift) {
+      items.push({
+        tone: 'idle',
+        kind: 'No crew shift',
+        title: `${reasons.no_qualifying_team_shift.toLocaleString()} tasks had no qualifying crew shift`,
+        meta: 'department or shift window did not cover the task',
+        go: 'teams',
+      });
+    }
+
+    return items;
+    // risk/reasons/op are stable slices of the static metrics import.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeEvent, isReplanned, replanRequest, replanScenario]);
+
+  const upcoming = useMemo(
+    () => scheduledTasks
+      .filter((t) => t.date === activeDate)
+      .sort((a, b) => a.start_minute - b.start_minute)
+      .slice(0, 6),
+    [scheduledTasks, activeDate],
+  );
+
+  const impact = decisionTrace.train_impact || {};
 
   return (
-    <div className="space-y-6">
-      {/* Top Banner / Hero Info */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-6 rounded-2xl shadow-lg border border-slate-800 flex items-center justify-between">
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2 text-blue-400 text-xs font-mono font-semibold uppercase tracking-wider">
-            <TrainTrack size={16} />
-            <span>Indian Railways • Central Control Office</span>
-          </div>
-          <h2 className="text-xl font-bold tracking-tight text-white mt-1">
-            Operations Control Center (OCC)
-          </h2>
-          <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
-            AI-Powered Automatic Block Planning Engine. Continuously balancing predictive asset failure risks (Neev) against train movements, crew shifts, and corridor throughput headroom.
+          <h2 className="t-section-title">Operations Overview</h2>
+          <p className="text-xs text-rail-500 mt-0.5 max-w-3xl leading-relaxed">
+            Network state, maintenance risk, and the possessions planned against them.
           </p>
         </div>
-
-        <div className="text-right hidden sm:block bg-white/10 p-3.5 rounded-xl border border-white/15 backdrop-blur-xs">
-          <div className="text-[11px] text-blue-200">Current Simulation Date</div>
-          <div className="text-lg font-bold font-mono text-white">07 Sep 2026</div>
-          <div className="text-[11px] text-emerald-400 flex items-center gap-1 justify-end mt-0.5">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
-            <span>7-Day Rolling Horizon Active</span>
-          </div>
-        </div>
+        <Select label="Timeline date" value={activeDate || ''} onChange={(e) => setSelectedDate(e.target.value)}>
+          {dateOptions.map((o) => (
+            <option key={o.date} value={o.date}>{o.date} — {o.count} tasks</option>
+          ))}
+        </Select>
       </div>
 
-      {/* 6 Core KPIs — full-dataset optimizer baseline */}
-      <div className="flex items-center justify-between flex-wrap gap-1">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600">
-          Optimizer Baseline — Full Dataset
-        </h3>
-        <p className="text-[11px] text-slate-500">
-          30,000 tasks · 14-day horizon · CP-SAT run recorded in{' '}
-          <code className="font-mono text-slate-600">benchmarks/full_run_metrics.json</code>
-        </p>
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
-        <MetricCard
-          title="Critical Maintenance"
-          value={metrics.risk_breakdown.critical_risk_scheduled}
-          subtext="High-risk tasks scheduled"
-          icon={AlertTriangle}
-          color="red"
-          onClick={() => onNavigate('demand')}
+      {/* hero row: timeline + attention queue */}
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-4 items-start">
+        <BlockTrainGantt
+          sections={sections}
+          scheduledTasks={scheduledTasks}
+          selectedDate={activeDate}
+          corridorLabel={corridorLabel}
+          onSelectTask={() => onNavigate && onNavigate('block-planning')}
+          scope="Demo scenario"
+          compact
         />
-        <MetricCard
-          title="Pending Demand"
-          value={metrics.summary.total_deferred.toLocaleString()}
-          subtext="Not scheduled in this horizon"
-          icon={Clock}
-          color="amber"
-          onClick={() => onNavigate('demand')}
-        />
-        <MetricCard
-          title="Planned Blocks"
-          value={metrics.operational_metrics.unique_blocks_utilized}
-          subtext="Conflict-free possessions"
-          icon={CheckCircle2}
-          color="blue"
-          onClick={() => onNavigate('block-planning')}
-        />
-        <MetricCard
-          title="Active Conflicts"
-          value={activeEvent ? 1 : 0}
-          subtext={activeEvent ? 'Ritvik conflict active' : 'Zero train collisions'}
-          icon={AlertTriangle}
-          color={activeEvent ? 'orange' : 'green'}
-          onClick={() => onNavigate(activeEvent ? 'live-ops' : 'block-planning')}
-        />
-        <MetricCard
-          title="Teams Utilized"
-          value={`${metrics.operational_metrics.teams_utilized}/${teamsTotal}`}
-          subtext="Specialist maintenance crews"
-          icon={Users}
-          color="purple"
-        />
-        <MetricCard
-          title="Track Availability"
-          value={`${networkStats.track_availability_percent}%`}
-          subtext={`${networkStats.track_available_block_windows.toLocaleString()} of ${networkStats.total_block_windows.toLocaleString()} block windows`}
-          icon={ShieldCheck}
-          color="green"
-        />
-      </div>
 
-      {/* Main Row: Corridor Section Map + Upcoming Windows */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left 2 Cols: Railway Section Map */}
-        <div className="lg:col-span-2 space-y-4">
-          <Card
-            title="Railway Network & Corridor Sections Overview"
-            subtitle="Track possession availability, electrification and active maintenance, from the synthetic network dataset"
-            action={
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-500 font-medium">Corridor:</span>
-                <select
-                  value={selectedCorridorId}
-                  onChange={(e) => setSelectedCorridorId(e.target.value)}
-                  className="text-xs bg-slate-50 border border-slate-200 rounded px-2 py-1 font-semibold text-slate-800"
-                >
-                  {corridors.slice(0, 5).map((c) => (
-                    <option key={c.corridor_id} value={c.corridor_id}>
-                      {c.corridor_id} — {c.corridor_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            }
-          >
-            <div className="space-y-3">
-              {/* Corridor specs bar */}
-              <div className="flex items-center justify-between text-xs bg-slate-50 p-3 rounded-lg border border-slate-100">
-                <div className="flex items-center gap-3">
-                  <span className="font-bold text-slate-900">{currentCorridor.corridor_name}</span>
-                  <span className="text-slate-400">•</span>
-                  <span className="text-slate-600">Region: {currentCorridor.region}</span>
-                  <span className="text-slate-400">•</span>
-                  <span className="text-slate-600">{corridorSections.length} Sections</span>
-                </div>
+        <Panel>
+          <PanelHeader title="Critical attention" scope="Ranked by operational severity" />
+          {attention.length === 0 ? (
+            <EmptyState title="Nothing requires attention.">
+              No active conflict, no pending replan, and no critical-risk deferral recorded.
+            </EmptyState>
+          ) : (
+            <div className="divide-y divide-line">
+              {attention.map((a, i) => (
                 <button
-                  onClick={() => onNavigate('block-planning')}
-                  className="text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1"
+                  key={`${a.kind}-${i}`}
+                  onClick={() => onNavigate && onNavigate(a.go)}
+                  className="w-full text-left px-3 py-2.5 flex gap-2.5 hover:bg-surface-sunken transition-colors"
                 >
-                  <span>Open in Block Planner</span>
-                  <ArrowRight size={13} />
+                  <span className={`w-[3px] shrink-0 ${
+                    a.tone === 'critical' ? 'bg-status-critical' : a.tone === 'warn' ? 'bg-status-warn' : 'bg-status-idle'
+                  }`} />
+                  <span className="min-w-0">
+                    <StatusBadge tone={a.tone} size="sm">{a.kind}</StatusBadge>
+                    <span className="block text-xs font-medium text-rail-900 mt-1">{a.title}</span>
+                    <span className="block font-mono text-[9px] text-rail-400 mt-0.5">{a.meta}</span>
+                  </span>
                 </button>
-              </div>
-
-              {/* Sections Interactive Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1">
-                {corridorSections.slice(0, 9).map((sec) => {
-                  const hasMaintenance = scheduledTasks.some((t) => t.section_id === sec.section_id);
-                  const isTask5 = sec.section_id === 'SEC-0004';
-
-                  return (
-                    <div
-                      key={sec.section_id}
-                      onClick={() => onNavigate('block-planning')}
-                      className={`p-3 rounded-lg border text-left cursor-pointer transition-all hover:scale-[1.02] hover:shadow-xs ${
-                        isTask5
-                          ? 'bg-red-50/70 border-red-300 ring-1 ring-red-200'
-                          : hasMaintenance
-                          ? 'bg-blue-50/60 border-blue-200'
-                          : 'bg-slate-50/80 border-slate-200'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono font-bold text-xs text-slate-800">{sec.section_id}</span>
-                        {isTask5 ? (
-                          <Badge variant="CRITICAL" size="sm">CRITICAL WORK</Badge>
-                        ) : hasMaintenance ? (
-                          <Badge variant="primary" size="sm">SCHEDULED</Badge>
-                        ) : (
-                          <Badge variant="LOW" size="sm">CLEAR</Badge>
-                        )}
-                      </div>
-                      <p className="text-[11px] font-medium text-slate-600 mt-1 truncate">{sec.section_name}</p>
-                      <div className="mt-2 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[10px] text-slate-500 font-mono">
-                        <span>{sec.track_type}</span>
-                        <span>{sec.maximum_speed_kmph} km/h</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Right Col: Upcoming Maintenance Windows */}
-        <div className="space-y-4">
-          <Card
-            title="Upcoming Maintenance Windows"
-            subtitle="Prioritized possessions across network"
-            action={
-              <button
-                onClick={() => onNavigate('block-planning')}
-                className="text-xs text-blue-600 hover:text-blue-800 font-semibold"
-              >
-                View All ({scheduledTasks.length})
-              </button>
-            }
-          >
-            <div className="space-y-3">
-              {upcomingTasks.map((task) => (
-                <div
-                  key={task.task_id}
-                  onClick={() => onNavigate('block-planning')}
-                  className="p-3 rounded-lg border border-slate-100 bg-slate-50/60 hover:bg-blue-50/60 hover:border-blue-200 transition-all cursor-pointer space-y-1.5"
-                >
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-mono font-bold text-slate-800">{task.task_id}</span>
-                    <Badge
-                      variant={task.risk_score >= 80 ? 'CRITICAL' : task.is_bundled ? 'purple' : 'primary'}
-                      size="sm"
-                    >
-                      {task.risk_score >= 80 ? 'CRITICAL' : task.is_bundled ? 'BUNDLED' : 'SCHEDULED'}
-                    </Badge>
-                  </div>
-                  <div className="text-xs font-semibold text-slate-700 truncate">
-                    {task.department} • {task.section_id}
-                  </div>
-                  <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono pt-1">
-                    <span className="flex items-center gap-1">
-                      <Clock size={11} />
-                      {minToHhmm(task.start_minute)} – {minToHhmm(task.end_minute)}
-                    </span>
-                    <span>{task.duration_minutes} min</span>
-                  </div>
-                </div>
               ))}
             </div>
-          </Card>
-        </div>
+          )}
+        </Panel>
+      </div>
+
+      {/* summary panels — each captioned with its own scope */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+        <Panel>
+          <PanelHeader title="Maintenance risk" scope={`Full run · ${metrics.summary.total_tasks_considered.toLocaleString()} tasks`} />
+          <MetricRow label="Critical scheduled" value={(risk.critical_risk_scheduled ?? 0).toLocaleString()} tone="ok" />
+          <MetricRow label="Critical deferred" value={(risk.critical_risk_deferred ?? 0).toLocaleString()} tone="critical" />
+          <MetricRow label="High-risk scheduled" value={(risk.high_risk_scheduled ?? 0).toLocaleString()} />
+          {/* Reported by the run artifact rather than recomputed here, so the
+              screen cannot drift from the recorded figure. */}
+          <MetricRow
+            label="Critical scheduled rate"
+            value={risk.critical_scheduled_rate != null ? `${risk.critical_scheduled_rate}%` : '—'}
+            tone="warn"
+          />
+        </Panel>
+
+        <Panel>
+          <PanelHeader title="Block status" scope="Full run · 14-day horizon" />
+          <MetricRow label="Possessions used" value={(op.unique_blocks_utilized ?? 0).toLocaleString()} onClick={() => onNavigate && onNavigate('maintenance-blocks')} />
+          <MetricRow label="Night-window tasks" value={(op.night_maintenance_tasks ?? 0).toLocaleString()} />
+          <MetricRow label="Crews utilized" value={`${op.teams_utilized ?? 0} / ${teamsData.length}`} tone="warn" onClick={() => onNavigate && onNavigate('teams')} />
+          <MetricRow
+            label="Track availability"
+            value={`${networkStats.track_availability_percent}%`}
+            tone="ok"
+            sub={`${networkStats.track_available_block_windows.toLocaleString()} of ${networkStats.total_block_windows.toLocaleString()} windows`}
+          />
+        </Panel>
+
+        <Panel>
+          <PanelHeader title="Train impact" scope={`${decisionTrace.request?.task_id || ''} · decision trace`} />
+          <MetricRow label="Conflicting services" value={(impact.conflicting || []).length} tone={(impact.conflicting || []).length ? 'critical' : 'ok'} sub="must be zero (C002)" />
+          <MetricRow label="Adjacent services" value={(impact.adjacent || []).length} tone="ok" sub={`±${impact.adjacency_buffer_minutes ?? 60} min C008 buffer`} />
+          <MetricRow label="Estimated delay" value="0 min" tone="ok" />
+          <MetricRow label="Downstream impact" value="Not implemented" tone="idle" sub="no onward itinerary in the dataset" onClick={() => onNavigate && onNavigate('train-impact')} />
+        </Panel>
+
+        <Panel>
+          <PanelHeader title="Optimization" scope="Full run · CP-SAT" />
+          <MetricRow label="Solver status" value={metrics.summary.solver_status} tone={metrics.summary.solver_status === 'OPTIMAL' ? 'ok' : 'warn'} />
+          <MetricRow label="Runtime" value={`${metrics.summary.runtime_seconds} s`} sub="machine-dependent" />
+          <MetricRow label="Scheduled" value={`${metrics.summary.total_scheduled.toLocaleString()} (${metrics.summary.scheduled_percentage}%)`} onClick={() => onNavigate && onNavigate('performance')} />
+          <MetricRow label="Post-solve validation" value={prov.post_solve_validation || 'not recorded'} tone="ok" onClick={() => onNavigate && onNavigate('system-verification')} />
+        </Panel>
+      </div>
+
+      {/* decision + upcoming */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-4 items-start">
+        <Panel>
+          <PanelHeader
+            title="Optimization recommendation"
+            scope={`${decisionTrace.request?.task_id} · ${decisionTrace.request?.section_id} · ${decisionTrace.candidate_summary?.date_evaluated}`}
+            action={<Button size="sm" variant="secondary" onClick={() => onNavigate && onNavigate('decision-trace')}>Open decision trace</Button>}
+          />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-line">
+            {[
+              ['Windows considered', decisionTrace.candidate_summary?.block_windows_considered, undefined],
+              ['Rejected by constraint', decisionTrace.candidate_summary?.rejected, 'text-status-critical'],
+              ['Feasible', decisionTrace.candidate_summary?.feasible, 'text-status-ok'],
+              ['Selected window', decisionTrace.selected?.window, undefined],
+            ].map(([label, value, cls]) => (
+              <div key={label} className="bg-surface-panel px-3 py-2.5">
+                <div className="t-label">{label}</div>
+                <div className={`font-mono text-sm font-semibold mt-0.5 ${cls || 'text-rail-900'}`}>{value ?? '—'}</div>
+              </div>
+            ))}
+          </div>
+          {decisionTrace.explanation && (
+            <PanelBody className="border-t border-line">
+              <p className="text-[11px] text-rail-600 leading-relaxed">{decisionTrace.explanation}</p>
+            </PanelBody>
+          )}
+        </Panel>
+
+        <Panel>
+          <PanelHeader title="Upcoming possessions" scope={`${activeDate} · demo scenario`} />
+          {upcoming.length === 0 ? (
+            <EmptyState title="No possession scheduled on this date." />
+          ) : (
+            <div className="divide-y divide-line">
+              {upcoming.map((t) => (
+                <button
+                  key={t.task_id}
+                  onClick={() => onNavigate && onNavigate('block-planning')}
+                  className="w-full text-left px-3 py-2 flex items-center justify-between gap-3 hover:bg-surface-sunken transition-colors"
+                >
+                  <span className="min-w-0">
+                    <span className="t-mono-id block">{t.task_id}</span>
+                    <span className="block text-[10px] text-rail-400 truncate">
+                      {t.maintenance_type} · {t.section_id}
+                    </span>
+                  </span>
+                  <span className="text-right shrink-0">
+                    <span className="font-mono text-[11px] text-rail-900 block">
+                      {minToHhmm(t.start_minute)}–{minToHhmm(t.end_minute)}
+                    </span>
+                    {bandOf(t) === 'CRITICAL' && <StatusBadge tone="critical" size="sm">critical</StatusBadge>}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </Panel>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <ScopeCaption>
+          Headline figures: full run, {metrics.summary.total_tasks_considered.toLocaleString()} tasks.
+          Timeline: demo scenario, {scenario.summary.total_tasks_considered} tasks.
+        </ScopeCaption>
+        <ProvenanceNote generatedBy={prov.scope} command={prov.command} dataset={prov.dataset} />
       </div>
     </div>
   );

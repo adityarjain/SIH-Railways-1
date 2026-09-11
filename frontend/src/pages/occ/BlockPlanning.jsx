@@ -1,27 +1,17 @@
 import React, { useState } from 'react';
-import { GanttTimeline } from '../../components/timeline/GanttTimeline';
+import { BlockTrainGantt } from '../../components/timeline/BlockTrainGantt';
+import { MetricCard } from '../../components/common/MetricCard';
+import { ScopeCaption, FilterBar, Select } from '../../components/ui';
+import teamsData from '../../data/teams.json';
 import { BlockDrawer } from '../../components/timeline/BlockDrawer';
-import { WhyArnavModal } from '../../components/timeline/WhyArnavModal';
+import { DecisionTraceModal } from '../../components/timeline/DecisionTraceModal';
 import { BundlingView } from '../../components/timeline/BundlingView';
 import { TrafficContext } from '../../components/timeline/TrafficContext';
 import { WeeklyView } from '../../components/planning/WeeklyView';
 import { MonthlyHeatmap } from '../../components/planning/MonthlyHeatmap';
-import { MetricCard } from '../../components/common/MetricCard';
 import { RecommendationActions } from '../../components/occ/RecommendationActions';
 import { usePlan } from '../../context/PlanContext';
 import corridorsSectionsData from '../../data/corridors_sections.json';
-import {
-  Calendar,
-  Sparkles,
-  Filter,
-  Layers,
-  AlertTriangle,
-  Clock,
-  Users,
-  CheckCircle2,
-  CalendarDays,
-  Grid,
-} from 'lucide-react';
 
 // Both selectors are derived from the plan the optimizer actually produced, so
 // every option renders a populated timeline. Previously the date and corridor
@@ -52,7 +42,7 @@ const buildCorridorOptions = (tasks) => {
 };
 
 export const BlockPlanning = () => {
-  const { scheduledTasks, metrics, isReplanned, activeEvent } = usePlan();
+  const { scheduledTasks, metrics, activeEvent } = usePlan();
 
   const dateOptions = React.useMemo(() => buildDateOptions(scheduledTasks), [scheduledTasks]);
   const corridorOptions = React.useMemo(() => buildCorridorOptions(scheduledTasks), [scheduledTasks]);
@@ -75,8 +65,8 @@ export const BlockPlanning = () => {
   const [viewMode, setViewMode] = useState('timeline'); // 'timeline', 'weekly', 'monthly'
 
   const [drawerTask, setDrawerTask] = useState(null);
-  const [whyArnavOpen, setWhyArnavOpen] = useState(false);
-  const [whyArnavTask, setWhyArnavTask] = useState(null);
+  const [decisionTraceOpen, setDecisionTraceOpen] = useState(false);
+  const [decisionTraceTask, setDecisionTraceTask] = useState(null);
 
   // Only show sections that carry a scheduled possession on the selected date,
   // optionally narrowed to one corridor. This keeps the timeline dense instead
@@ -95,6 +85,13 @@ export const BlockPlanning = () => {
     .filter((s) => activeSectionIds.has(s.section_id))
     .sort((a, b) => a.section_id.localeCompare(b.section_id));
 
+  // Human-readable corridor for the timeline header.
+  const corridorLabel = React.useMemo(() => {
+    if (selectedCorridor === 'ALL') return 'All corridors';
+    const c = corridorsSectionsData.corridors.find((x) => x.corridor_id === selectedCorridor);
+    return c ? `${c.corridor_id} ${c.corridor_name}` : selectedCorridor;
+  }, [selectedCorridor]);
+
   // Show traffic for the section the operator is looking at: the selected
   // possession's section, else the first section in the corridor.
   const trafficSectionId = drawerTask?.section_id || sections[0]?.section_id || 'SEC-0004';
@@ -103,197 +100,104 @@ export const BlockPlanning = () => {
     setDrawerTask(task);
   };
 
-  const handleOpenWhyArnav = (task) => {
-    setWhyArnavTask(task);
-    setWhyArnavOpen(true);
+  const handleOpenDecisionTrace = (task) => {
+    setDecisionTraceTask(task);
+    setDecisionTraceOpen(true);
   };
 
   return (
     <div className="space-y-6">
-      {/* Page Title Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      {/* Page header */}
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2 text-xs font-mono font-bold text-blue-600 uppercase tracking-wider">
-            <Sparkles size={14} className="text-blue-500" />
-            <span>Google OR-Tools CP-SAT Scheduling Engine</span>
-          </div>
-          <h2 className="text-xl font-bold tracking-tight text-slate-900 mt-0.5">
-            Automatic Block Planning
-          </h2>
-          <p className="text-xs text-slate-500 mt-0.5 max-w-2xl">
-            AI-assisted maintenance scheduling based on asset risk, railway blocks, train operations and team availability.
+          <h2 className="t-section-title">Block Planning</h2>
+          <p className="text-xs text-rail-500 mt-0.5 max-w-3xl leading-relaxed">
+            Maintenance scheduling constrained by asset risk, block availability, train operations
+            and crew shifts. Solved by OR-Tools CP-SAT.
           </p>
         </div>
-
-        {/* Plan provenance. The solver is Python and is not run from the browser,
-            so this states where the rendered plan came from instead of offering a
-            button that only claims to have solved it. */}
+        {/* The solver is Python and is not run from the browser, so this states
+            where the rendered plan came from rather than implying it solved here. */}
         <div className="text-right shrink-0">
-          <div className="flex items-center gap-1.5 justify-end text-xs font-semibold text-slate-700">
-            <Sparkles size={14} className="text-blue-600" />
-            <span>Plan generated offline by CP-SAT</span>
-          </div>
-          <p className="text-[11px] text-slate-500 mt-0.5">
-            <code className="font-mono">python demo.py</code> &middot; controller actions below
-          </p>
+          <ScopeCaption>Plan generated offline by CP-SAT</ScopeCaption>
+          <p className="font-mono text-[10px] text-rail-400 mt-0.5">$ python demo.py</p>
         </div>
       </div>
 
-      {/* Top Filter Bar & View Toggles */}
-      <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-3">
-          {/* View Mode Switcher */}
-          <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200">
-            <button
-              onClick={() => setViewMode('timeline')}
-              className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
-                viewMode === 'timeline'
-                  ? 'bg-white text-blue-700 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Gantt Timeline
-            </button>
-            <button
-              onClick={() => setViewMode('weekly')}
-              className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
-                viewMode === 'weekly'
-                  ? 'bg-white text-blue-700 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Weekly Planning
-            </button>
-            <button
-              onClick={() => setViewMode('monthly')}
-              className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
-                viewMode === 'monthly'
-                  ? 'bg-white text-blue-700 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Monthly Heatmap
-            </button>
+      {/* Filter bar & view toggles */}
+      <FilterBar className="justify-between">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex items-stretch border border-line">
+            {[['timeline', 'Timeline'], ['weekly', 'Weekly'], ['monthly', 'Monthly']].map(([id, label]) => (
+              <button
+                key={id}
+                onClick={() => setViewMode(id)}
+                className={`px-2.5 py-1 text-[10px] font-semibold transition-colors ${
+                  viewMode === id ? 'bg-rail-900 text-white' : 'text-rail-500 hover:bg-surface-sunken'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
 
-          <div className="h-4 w-px bg-slate-200" />
+          <Select label="Date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)}>
+            {dateOptions.map((o) => (
+              <option key={o.date} value={o.date}>
+                {o.date} · {o.count} {o.count === 1 ? 'task' : 'tasks'}
+              </option>
+            ))}
+          </Select>
 
-          {/* Date Selector — options and counts come from the plan */}
-          <div className="flex items-center gap-1.5 text-xs text-slate-700">
-            <Calendar size={14} className="text-slate-400" />
-            <span className="font-semibold">Planning Date:</span>
-            <select
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="bg-slate-50 border border-slate-200 rounded px-2 py-1 font-mono font-bold text-slate-800"
-            >
-              {dateOptions.map((o) => (
-                <option key={o.date} value={o.date}>
-                  {o.date} ({o.count} {o.count === 1 ? 'task' : 'tasks'})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Corridor Selector — options and counts come from the plan */}
-          <div className="flex items-center gap-1.5 text-xs text-slate-700">
-            <span className="font-semibold">Corridor:</span>
-            <select
-              value={selectedCorridor}
-              onChange={(e) => setSelectedCorridor(e.target.value)}
-              className="bg-slate-50 border border-slate-200 rounded px-2 py-1 font-medium text-slate-800"
-            >
-              <option value="ALL">All corridors ({scheduledTasks.length})</option>
-              {corridorOptions.map((o) => (
-                <option key={o.id} value={o.id}>
-                  {o.id} — {o.name} ({o.count})
-                </option>
-              ))}
-            </select>
-          </div>
+          <Select label="Corridor" value={selectedCorridor} onChange={(e) => setSelectedCorridor(e.target.value)}>
+            <option value="ALL">All corridors · {scheduledTasks.length}</option>
+            {corridorOptions.map((o) => (
+              <option key={o.id} value={o.id}>
+                {o.id} — {o.name} · {o.count}
+              </option>
+            ))}
+          </Select>
         </div>
 
-        {/* Status Callout — the span the demo plan actually covers */}
-        <div className="text-xs text-slate-500 font-mono">
-          {dateOptions.length > 0 && (
-            <>Plan span: <strong>{dateOptions[0].date} – {dateOptions[dateOptions.length - 1].date}</strong></>
-          )}
-        </div>
-      </div>
+        {dateOptions.length > 0 && (
+          <ScopeCaption>
+            Plan span {dateOptions[0].date} – {dateOptions[dateOptions.length - 1].date}
+          </ScopeCaption>
+        )}
+      </FilterBar>
 
-      {/* Planning Summary Cards — scoped to the scenario rendered below */}
-      <div className="flex items-center justify-between flex-wrap gap-1">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600">
-          Demo Scenario — Solved Subset
-        </h3>
-        <p className="text-[11px] text-slate-500">
-          Reproduce with <code className="font-mono text-slate-600">python demo.py</code> · full-dataset
-          baseline shown on the Overview screen
-        </p>
+      {/* Scenario summary — scoped to the subset rendered below */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="t-label">Demo scenario — solved subset</h3>
+        <ScopeCaption>
+          Full-dataset baseline is on the Overview screen · reproduce with python demo.py
+        </ScopeCaption>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-        <div className="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-xs">
-          <span className="text-[10px] uppercase font-bold text-red-600 tracking-wider block">Critical Tasks</span>
-          <span className="text-xl font-bold font-mono text-red-600 mt-1 block">
-            {metrics.risk_breakdown.critical_risk_scheduled}
-          </span>
-          <span className="text-[10px] text-slate-400">Neev score &ge; 80</span>
-        </div>
-        <div className="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-xs">
-          <span className="text-[10px] uppercase font-bold text-orange-600 tracking-wider block">High Risk Tasks</span>
-          <span className="text-xl font-bold font-mono text-orange-600 mt-1 block">
-            {metrics.risk_breakdown.high_risk_scheduled}
-          </span>
-          <span className="text-[10px] text-slate-400">Neev score 60-79</span>
-        </div>
-        <div className="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-xs">
-          <span className="text-[10px] uppercase font-bold text-slate-600 tracking-wider block">Tasks Considered</span>
-          <span className="text-xl font-bold font-mono text-slate-800 mt-1 block">
-            {metrics.summary.total_tasks_considered}
-          </span>
-          <span className="text-[10px] text-slate-400">Scenario subset</span>
-        </div>
-        <div className="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-xs">
-          <span className="text-[10px] uppercase font-bold text-blue-600 tracking-wider block">Planned Blocks</span>
-          <span className="text-xl font-bold font-mono text-blue-600 mt-1 block">
-            {metrics.operational_metrics.unique_blocks_utilized}
-          </span>
-          <span className="text-[10px] text-slate-400">Conflict-free</span>
-        </div>
-        <div className="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-xs">
-          <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block">Deferred Tasks</span>
-          <span className="text-xl font-bold font-mono text-slate-700 mt-1 block">
-            {metrics.summary.total_deferred.toLocaleString()}
-          </span>
-          <span className="text-[10px] text-slate-400">Not placed in scenario</span>
-        </div>
-        <div className="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-xs">
-          <span className="text-[10px] uppercase font-bold text-purple-600 tracking-wider block">Teams Utilized</span>
-          <span className="text-xl font-bold font-mono text-purple-600 mt-1 block">
-            {metrics.operational_metrics.teams_utilized}/39
-          </span>
-          <span className="text-[10px] text-slate-400">Specialist crews</span>
-        </div>
-        <div className="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-xs">
-          <span className="text-[10px] uppercase font-bold text-emerald-600 tracking-wider block">Train Conflicts</span>
-          <span className="text-xl font-bold font-mono text-emerald-600 mt-1 block">
-            {activeEvent ? 1 : 0}
-          </span>
-          <span className="text-[10px] text-slate-400">
-            {activeEvent ? 'Simulated alert' : '100% Resolved'}
-          </span>
-        </div>
+        {[
+          ['Critical tasks', metrics.risk_breakdown.critical_risk_scheduled, 'Risk score \u2265 80', 'red'],
+          ['High-risk tasks', metrics.risk_breakdown.high_risk_scheduled, 'Risk score 60\u201379', 'amber'],
+          ['Tasks considered', metrics.summary.total_tasks_considered, 'Scenario subset', 'slate'],
+          ['Planned blocks', metrics.operational_metrics.unique_blocks_utilized, 'Block windows used', 'blue'],
+          ['Deferred', metrics.summary.total_deferred.toLocaleString(), 'Not placed in scenario', 'slate'],
+          ['Crews utilized', `${metrics.operational_metrics.teams_utilized}/${teamsData.length}`, 'Of the full roster', 'purple'],
+          ['Train conflicts', activeEvent ? 1 : 0, activeEvent ? 'Simulated event active' : 'None recorded', activeEvent ? 'amber' : 'green'],
+        ].map(([title, value, subtext, color]) => (
+          <MetricCard key={title} title={title} value={value} subtext={subtext} color={color} />
+        ))}
       </div>
 
       {/* Main Centerpiece Area: Gantt Timeline / Weekly / Monthly */}
       <RecommendationActions taskId="TASK-000005" />
 
       {viewMode === 'timeline' && (
-        <GanttTimeline
+        <BlockTrainGantt
           sections={sections}
           scheduledTasks={scheduledTasks}
           selectedDate={selectedDate}
+          corridorLabel={corridorLabel}
           onSelectTask={handleSelectTask}
+          scope="Demo scenario"
         />
       )}
 
@@ -327,13 +231,13 @@ export const BlockPlanning = () => {
         task={drawerTask}
         isOpen={Boolean(drawerTask)}
         onClose={() => setDrawerTask(null)}
-        onOpenWhyArnav={handleOpenWhyArnav}
+        onOpenDecisionTrace={handleOpenDecisionTrace}
       />
 
-      <WhyArnavModal
-        task={whyArnavTask}
-        isOpen={whyArnavOpen}
-        onClose={() => setWhyArnavOpen(false)}
+      <DecisionTraceModal
+        task={decisionTraceTask}
+        isOpen={decisionTraceOpen}
+        onClose={() => setDecisionTraceOpen(false)}
       />
     </div>
   );

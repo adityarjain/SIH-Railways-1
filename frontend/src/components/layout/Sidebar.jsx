@@ -1,146 +1,144 @@
 import React from 'react';
 import { useAuth, ROLES } from '../../context/AuthContext';
-import {
-  LayoutDashboard,
-  ClipboardList,
-  CalendarDays,
-  Radio,
-  RefreshCw,
-  GitFork,
-  BarChart3,
-  PlayCircle,
-  Wrench,
-  CheckCircle2,
-  HeartPulse,
-  Users,
-  TrainTrack,
-  LogOut,
-  Layers,
-} from 'lucide-react';
 
-// Single source of truth for which tabs each role can reach. App.jsx uses this
-// to keep the mounted page and the sidebar from drifting apart when the role
-// changes (header switcher, demo guide, or login all land here).
-export const NAV_ITEMS_BY_ROLE = {
-  [ROLES.OCC]: [
-    { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-    { id: 'demand', label: 'Maintenance Demand', icon: ClipboardList },
-    { id: 'block-planning', label: 'Automatic Block Planning', icon: CalendarDays, highlight: true },
-    { id: 'live-ops', label: 'Live Operations', icon: Radio },
-    { id: 'replanning', label: 'Replanning', icon: RefreshCw },
-    { id: 'network', label: 'Network', icon: GitFork },
-    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-    { id: 'simulator', label: 'Event Simulator', icon: PlayCircle },
+/**
+ * Single source of truth for which tabs each role can reach. App.jsx derives
+ * the landing tab and the reachability guard from this, so the mounted page and
+ * the navigation can never drift apart when the role changes.
+ *
+ * Tab ids are load-bearing: they are keys in PAGES, in roleCanReach, and in
+ * DEMO_STEPS[].page simultaneously. Labels are free to change; ids are not.
+ */
+export const NAV_SECTIONS_BY_ROLE = {
+  [ROLES.AUTHORITY]: [
+    {
+      group: 'OPERATIONS',
+      items: [
+        { id: 'overview', label: 'Overview' },
+        { id: 'live-ops', label: 'Live Operations' },
+        { id: 'train-impact', label: 'Train Impact' },
+        { id: 'replanning', label: 'Replanning' },
+      ],
+    },
+    {
+      group: 'MAINTENANCE',
+      items: [
+        { id: 'demand', label: 'Risk & Tasks' },
+        { id: 'block-planning', label: 'Block Planning', highlight: true },
+        { id: 'maintenance-blocks', label: 'Maintenance Blocks' },
+        { id: 'teams', label: 'Resources' },
+      ],
+    },
+    {
+      group: 'ANALYTICS',
+      items: [
+        { id: 'analytics', label: 'Risk Analytics' },
+        { id: 'performance', label: 'Performance' },
+        { id: 'evaluation', label: 'Evaluation' },
+      ],
+    },
+    {
+      group: 'VERIFICATION',
+      items: [
+        { id: 'decision-trace', label: 'Decision Trace' },
+        { id: 'general-verify', label: 'Work Verification' },
+        { id: 'system-verification', label: 'System Verification' },
+      ],
+    },
+    {
+      group: 'DEMO',
+      items: [{ id: 'simulator', label: 'Guided Demo' }],
+    },
   ],
-  [ROLES.MAINTENANCE]: [
-    { id: 'maint-dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'my-tasks', label: 'My Tasks', icon: Wrench, highlight: true },
-    { id: 'asset-health', label: 'Asset Health (Neev)', icon: HeartPulse },
-    { id: 'teams', label: 'Team Availability', icon: Users },
-    { id: 'completed', label: 'Completed Work', icon: CheckCircle2 },
-  ],
-  [ROLES.GENERAL]: [
-    { id: 'general-verify', label: 'Completed Work', icon: CheckCircle2, highlight: true },
+
+  [ROLES.GROUND]: [
+    {
+      group: 'MY WORK',
+      items: [
+        { id: 'maint-dashboard', label: "Today's Tasks" },
+        { id: 'my-tasks', label: 'Assigned Work', highlight: true },
+        { id: 'active-block', label: 'Active Block' },
+      ],
+    },
+    {
+      group: 'OPERATIONS',
+      items: [
+        { id: 'block-status', label: 'Block Status' },
+        { id: 'section-info', label: 'Section Information' },
+      ],
+    },
+    {
+      group: 'REPORTING',
+      items: [
+        { id: 'issues', label: 'Issues' },
+        { id: 'completed', label: 'Completion / Handoff' },
+      ],
+    },
   ],
 };
 
-export const Sidebar = ({ activeTab, onTabChange }) => {
-  const { currentUser, selectedDept, setSelectedDept, DEPARTMENTS, logout } = useAuth();
-  const role = currentUser?.role || ROLES.OCC;
+/** Flattened view, for landing-tab and reachability checks. */
+export const NAV_ITEMS_BY_ROLE = Object.fromEntries(
+  Object.entries(NAV_SECTIONS_BY_ROLE).map(([role, sections]) => [
+    role,
+    sections.flatMap((s) => s.items),
+  ]),
+);
 
-  const navItems = NAV_ITEMS_BY_ROLE[role] || NAV_ITEMS_BY_ROLE[ROLES.OCC];
+/**
+ * Authority navigation rail. Ground does not use this component at all — it has
+ * its own top tab strip, because a field work tool is not a filtered version of
+ * a planning console.
+ */
+export const Sidebar = ({ activeTab, onTabChange }) => {
+  const { currentUser, logout } = useAuth();
+  const role = currentUser?.role || ROLES.AUTHORITY;
+  const sections = NAV_SECTIONS_BY_ROLE[role] || NAV_SECTIONS_BY_ROLE[ROLES.AUTHORITY];
 
   return (
-    <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col h-screen sticky top-0 shrink-0 select-none border-r border-slate-800">
-      {/* Brand Header */}
-      <div className="p-4 border-b border-slate-800/80">
-        <div className="flex items-center gap-2.5">
-          <div className="h-9 w-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-md shadow-blue-900/30">
-            <TrainTrack size={20} />
+    <aside className="w-56 bg-rail-950 flex flex-col h-screen sticky top-0 shrink-0 select-none border-r border-rail-800">
+      <nav className="flex-1 py-3 overflow-y-auto custom-scrollbar">
+        {sections.map((section) => (
+          <div key={section.group}>
+            <div className="px-4 pt-3.5 pb-1.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-rail-500">
+              {section.group}
+            </div>
+            {section.items.map((item) => {
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => onTabChange(item.id)}
+                  className={`w-full flex items-center gap-2 px-4 py-[7px] text-[11px] transition-colors border-l-2 ${
+                    isActive
+                      ? 'bg-rail-800 text-white font-semibold border-status-info'
+                      : 'text-rail-300 hover:bg-rail-900 hover:text-white font-normal border-transparent'
+                  }`}
+                >
+                  <span className="flex-1 text-left truncate">{item.label}</span>
+                  {item.highlight && !isActive && (
+                    <span className="h-1 w-1 rounded-full bg-status-info shrink-0" />
+                  )}
+                </button>
+              );
+            })}
           </div>
-          <div>
-            <h1 className="text-xs font-bold text-white tracking-tight uppercase">Indian Railways</h1>
-            <p className="text-[11px] text-blue-400 font-semibold tracking-wider">Maintenance OR Control</p>
-          </div>
-        </div>
-
-        {/* Role Tag */}
-        <div className="mt-3 px-2.5 py-1 rounded bg-slate-800/80 border border-slate-700/60 flex items-center justify-between">
-          <span className="text-[11px] text-slate-400 font-medium">Logged Role:</span>
-          <span className="text-[11px] font-bold text-blue-300 truncate max-w-[130px]">{role}</span>
-        </div>
-      </div>
-
-      {/* Maintenance Department Selector (Only when in Maintenance role) */}
-      {role === ROLES.MAINTENANCE && (
-        <div className="p-3 bg-slate-800/40 border-b border-slate-800">
-          <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1">
-            Department Context
-          </label>
-          <select
-            value={selectedDept}
-            onChange={(e) => setSelectedDept(e.target.value)}
-            className="w-full text-xs bg-slate-800 border border-slate-700 text-slate-200 rounded px-2 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-blue-500 font-medium"
-          >
-            {DEPARTMENTS.map((d) => (
-              <option key={d} value={d}>
-                {d}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-
-      {/* Navigation List */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto custom-scrollbar">
-        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-3 pb-1">
-          {role === ROLES.OCC ? 'Operations Modules' : role === ROLES.MAINTENANCE ? 'Field Portal' : 'Public Verification'}
-        </div>
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeTab === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => onTabChange(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                isActive
-                  ? 'bg-blue-600 text-white font-semibold shadow-xs'
-                  : item.highlight
-                  ? 'text-blue-300 hover:bg-slate-800/80 hover:text-white'
-                  : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-              }`}
-            >
-              <Icon size={16} className={isActive ? 'text-white' : item.highlight ? 'text-blue-400' : 'text-slate-400'} />
-              <span className="flex-1 text-left truncate">{item.label}</span>
-              {item.highlight && !isActive && (
-                <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
-              )}
-            </button>
-          );
-        })}
+        ))}
       </nav>
 
-      {/* Footer Info & Disclaimer */}
-      <div className="p-3 border-t border-slate-800 bg-slate-950/60 text-slate-500 text-[10px] space-y-2">
-        <div className="flex items-center gap-1.5 text-slate-400">
-          <Layers size={12} className="text-blue-400" />
-          <span className="font-semibold text-slate-300">Neev → Arnav → Ritvik</span>
-        </div>
-        <p className="leading-tight text-slate-500">
-          AI-Powered Automatic Block Planning. Demo environment for Smart India Hackathon.
+      <div className="px-4 py-3 border-t border-rail-800 bg-rail-950 space-y-2">
+        <p className="text-[10px] leading-snug text-rail-500">
+          Automatic block planning. Demonstration environment, synthetic dataset.
         </p>
-        <div className="pt-1 flex items-center justify-between">
-          <span className="bg-slate-800 text-slate-400 text-[9px] px-1.5 py-0.5 rounded font-mono">
-            Demo / Synthetic Data
+        <div className="flex items-center justify-between">
+          <span className="bg-rail-800 text-rail-400 text-[9px] px-1.5 py-0.5 font-mono border border-rail-700">
+            SYNTHETIC
           </span>
           <button
             onClick={logout}
-            className="text-slate-400 hover:text-red-400 flex items-center gap-1 text-[11px] transition-colors"
-            title="Sign Out"
+            className="text-rail-400 hover:text-status-critical text-[10px] transition-colors"
           >
-            <LogOut size={12} />
-            <span>Sign out</span>
+            Sign out
           </button>
         </div>
       </div>

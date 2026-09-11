@@ -8,12 +8,12 @@ import decisionTrace from '../../data/decision_trace.json';
 import { Award } from 'lucide-react';
 
 const STATUS_STYLES = {
-  SELECTED: { row: 'bg-emerald-50/70 font-semibold text-emerald-900', label: 'text-emerald-700' },
-  FEASIBLE: { row: 'text-slate-600', label: 'text-blue-600' },
-  REJECTED: { row: 'text-slate-600', label: 'text-red-600' },
+  SELECTED: { row: 'bg-status-ok-tint font-semibold text-status-ok', label: 'text-status-ok' },
+  FEASIBLE: { row: 'text-rail-600', label: 'text-status-info' },
+  REJECTED: { row: 'text-rail-600', label: 'text-status-critical' },
 };
 
-export const WhyArnavModal = ({ isOpen, onClose, task }) => {
+export const DecisionTraceModal = ({ isOpen, onClose, task }) => {
   const trace = decisionTrace;
   const {
     request, risk_signal: risk, candidate_summary: summary, candidates, selected,
@@ -32,33 +32,33 @@ export const WhyArnavModal = ({ isOpen, onClose, task }) => {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Why Did Arnav Select This Block?"
+      title="Why This Block Was Selected"
       subtitle="Constraint Programming (Google OR-Tools CP-SAT) decision trace, recomputed from the dataset"
       maxWidth="max-w-3xl"
     >
       <div className="space-y-6">
         {/* Banner */}
-        <div className="bg-slate-900 text-slate-100 p-4 rounded-xl border border-slate-800 flex items-center justify-between gap-4">
+        <div className="bg-rail-950 text-white p-4 rounded-lg border border-rail-800 flex items-center justify-between gap-4">
           <div>
-            <span className="text-[11px] font-mono font-bold text-blue-400 uppercase tracking-wider block">
+            <span className="text-[11px] font-mono font-bold text-rail-300 uppercase tracking-wider block">
               Automated Reasoning Trace
             </span>
             <h4 className="text-sm font-bold text-white mt-0.5">
               Assignment trace for {request.task_id} on {request.section_id}
             </h4>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-rail-400 mt-1">
               {summary.block_windows_considered} block windows on {summary.date_evaluated} evaluated
               against hard constraints{ruleCounts ? ` — ${ruleCounts}` : ''}.
             </p>
           </div>
           <div className="text-right shrink-0">
-            <span className="text-[10px] text-slate-400 block">Outcome</span>
-            <span className="text-xs font-bold text-emerald-400 font-mono">FEASIBLE ASSIGNMENT</span>
+            <span className="text-[10px] text-rail-400 block">Outcome</span>
+            <span className="text-xs font-bold text-status-ok font-mono">FEASIBLE ASSIGNMENT</span>
           </div>
         </div>
 
         {!isTracedTask && (
-          <div className="text-[11px] text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+          <div className="text-[11px] text-status-warn bg-status-warn-tint border border-status-warn rounded-lg px-3 py-2">
             A full candidate trace is published for <strong>{request.task_id}</strong>, the worked
             example in this demo. You opened <strong>{task.task_id}</strong> — the trace below is for{' '}
             {request.task_id}. Regenerate for another task with{' '}
@@ -68,89 +68,90 @@ export const WhyArnavModal = ({ isOpen, onClose, task }) => {
 
         <div className="space-y-4">
           {/* STEP 1 — REQUEST */}
-          <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
+          <div className="p-4 rounded-lg border border-line bg-surface-panel space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="h-6 w-6 rounded-full bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center">1</span>
-                <h5 className="text-xs font-bold text-slate-900 uppercase tracking-wide">Step 1 — Maintenance Request</h5>
+                <span className="h-6 w-6 rounded-full bg-status-info-tint text-status-info font-bold text-xs flex items-center justify-center">1</span>
+                <h5 className="text-xs font-bold text-rail-900 uppercase tracking-wide">Step 1 — Maintenance Request</h5>
               </div>
               <Badge variant="primary" size="sm">{request.required_duration_minutes} MIN</Badge>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs bg-slate-50 p-3 rounded-lg border border-slate-100">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs bg-surface-sunken p-3 rounded-lg border border-line-subtle">
               <div>
-                <span className="text-slate-500 block text-[11px]">Type</span>
-                <span className="font-semibold text-slate-800">{request.maintenance_type}</span>
+                <span className="text-rail-500 block text-[11px]">Type</span>
+                <span className="font-semibold text-rail-800">{request.maintenance_type}</span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[11px]">Duration</span>
-                <span className="font-semibold text-slate-800">
+                <span className="text-rail-500 block text-[11px]">Duration</span>
+                <span className="font-semibold text-rail-800">
                   {request.required_duration_minutes} min ({request.blocks_required} blocks)
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[11px]">Crew required</span>
-                <span className="font-semibold text-slate-800">
+                <span className="text-rail-500 block text-[11px]">Crew required</span>
+                <span className="font-semibold text-rail-800">
                   {request.required_team_size} · {request.department}
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[11px]">Deadline</span>
-                <span className="font-semibold text-slate-800 font-mono">{request.deadline}</span>
+                <span className="text-rail-500 block text-[11px]">Deadline</span>
+                <span className="font-semibold text-rail-800 font-mono">{request.deadline}</span>
               </div>
             </div>
           </div>
 
           {/* STEP 2 — RISK SIGNAL */}
-          <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
+          <div className="p-4 rounded-lg border border-line bg-surface-panel space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="h-6 w-6 rounded-full bg-red-100 text-red-700 font-bold text-xs flex items-center justify-center">2</span>
-                <h5 className="text-xs font-bold text-slate-900 uppercase tracking-wide">Step 2 — Neev Failure Risk Signal</h5>
+                <span className="h-6 w-6 rounded-full bg-status-critical-tint text-status-critical font-bold text-xs flex items-center justify-center">2</span>
+                <h5 className="text-xs font-bold text-rail-900 uppercase tracking-wide">Step 2 — Failure Risk Signal</h5>
               </div>
               <Badge variant="CRITICAL" size="sm">{risk.risk_level} RISK</Badge>
             </div>
-            <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-3 rounded-lg border border-slate-100">
+            <div className="grid grid-cols-2 gap-2 text-xs bg-surface-sunken p-3 rounded-lg border border-line-subtle">
               <div>
-                <span className="text-slate-500 block text-[11px]">Asset failure risk</span>
-                <span className="font-bold text-red-600 font-mono text-sm">
+                <span className="text-rail-500 block text-[11px]">Asset failure risk</span>
+                <span className="font-bold text-status-critical font-mono text-sm">
                   {risk.risk_score.toFixed(1)} / 100 ({risk.risk_level})
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[11px]">30-day failure probability</span>
-                <span className="font-bold text-slate-800 font-mono text-sm">
+                <span className="text-rail-500 block text-[11px]">30-day failure probability</span>
+                <span className="font-bold text-rail-800 font-mono text-sm">
                   {(risk.failure_probability_30d * 100).toFixed(1)}%
                 </span>
               </div>
-              <div className="col-span-2 text-slate-600 text-[11px] pt-1">
+              <div className="col-span-2 text-rail-600 text-[11px] pt-1">
                 Weighted into a composite priority score of{' '}
                 <strong>{risk.priority_score.toLocaleString()}</strong>, which is how the objective
-                ranks this task against competing demand. Source: {risk.source}.
+                ranks this task against competing demand. Source:{' '}
+                {risk.source?.match(/\(([^)]+)\)/)?.[1] || 'neev_predictions_for_optimizer.csv'}.
               </div>
             </div>
           </div>
 
           {/* STEP 3 — CANDIDATES & FILTERS */}
-          <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-3">
+          <div className="p-4 rounded-lg border border-line bg-surface-panel space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="h-6 w-6 rounded-full bg-purple-100 text-purple-700 font-bold text-xs flex items-center justify-center">3</span>
-                <h5 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
+                <span className="h-6 w-6 rounded-full bg-bundle-tint text-bundle font-bold text-xs flex items-center justify-center">3</span>
+                <h5 className="text-xs font-bold text-rail-900 uppercase tracking-wide">
                   Step 3 — Candidate Evaluation &amp; Feasibility Filters
                 </h5>
               </div>
-              <span className="text-xs text-slate-500 font-mono">
+              <span className="text-xs text-rail-500 font-mono">
                 {summary.block_windows_considered} evaluated · {summary.rejected} pruned
               </span>
             </div>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-rail-500">
               Each window is a contiguous block chain covering {request.required_duration_minutes} min.
               Hard constraints are applied before the objective chooses among what survives.
             </p>
 
-            <div className="border border-slate-200 rounded-lg overflow-x-auto text-xs">
+            <div className="border border-line rounded-lg overflow-x-auto text-xs">
               <table className="w-full text-left min-w-[560px]">
-                <thead className="bg-slate-100 text-[11px] text-slate-600 font-mono border-b border-slate-200">
+                <thead className="bg-surface-sunken text-[11px] text-rail-600 font-mono border-b border-line">
                   <tr>
                     <th className="py-1.5 px-3">Block Window</th>
                     <th className="py-1.5 px-3">Time</th>
@@ -167,8 +168,8 @@ export const WhyArnavModal = ({ isOpen, onClose, task }) => {
                         <td className="py-2 px-3 whitespace-nowrap">{c.block_ids.join(' + ')}</td>
                         <td className="py-2 px-3 whitespace-nowrap">{c.window}</td>
                         <td className={`py-2 px-3 font-semibold ${style.label}`}>{c.status}</td>
-                        <td className="py-2 px-3 text-slate-500">{c.rule}</td>
-                        <td className="py-2 px-3 font-sans text-slate-600 font-normal">{c.reason}</td>
+                        <td className="py-2 px-3 text-rail-500">{c.rule}</td>
+                        <td className="py-2 px-3 font-sans text-rail-600 font-normal">{c.reason}</td>
                       </tr>
                     );
                   })}
@@ -178,24 +179,24 @@ export const WhyArnavModal = ({ isOpen, onClose, task }) => {
           </div>
 
           {/* STEP 4 — SELECTED TEAM */}
-          <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
+          <div className="p-4 rounded-lg border border-line bg-surface-panel space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="h-6 w-6 rounded-full bg-emerald-100 text-emerald-700 font-bold text-xs flex items-center justify-center">4</span>
-                <h5 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
+                <span className="h-6 w-6 rounded-full bg-status-ok-tint text-status-ok font-bold text-xs flex items-center justify-center">4</span>
+                <h5 className="text-xs font-bold text-rail-900 uppercase tracking-wide">
                   Step 4 — Team Feasibility (S005 / S006)
                 </h5>
               </div>
               <Badge variant="success" size="sm">CREW QUALIFIED</Badge>
             </div>
-            <div className="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100 space-y-1">
+            <div className="text-xs text-rail-600 bg-surface-sunken p-3 rounded-lg border border-line-subtle space-y-1">
               {selected.teams.map((t) => (
                 <div key={t.team_id}>
                   • <strong>{t.team_id}</strong> ({t.department}, shift {t.shift}) — crew{' '}
                   {t.team_size} ≥ {t.required_team_size} required
                 </div>
               ))}
-              <div className="text-slate-500 pt-1">
+              <div className="text-rail-500 pt-1">
                 Global non-overlap (S007) is enforced across the network by the solver, so an assigned
                 crew cannot hold two possessions at once.
               </div>
@@ -203,11 +204,11 @@ export const WhyArnavModal = ({ isOpen, onClose, task }) => {
           </div>
 
           {/* STEP 4b — TRAIN IMPACT */}
-          <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
+          <div className="p-4 rounded-lg border border-line bg-surface-panel space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="h-6 w-6 rounded-full bg-sky-100 text-sky-700 font-bold text-xs flex items-center justify-center">5</span>
-                <h5 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
+                <h5 className="text-xs font-bold text-rail-900 uppercase tracking-wide">
                   Step 5 — Affected Train Services
                 </h5>
               </div>
@@ -216,22 +217,22 @@ export const WhyArnavModal = ({ isOpen, onClose, task }) => {
               </Badge>
             </div>
 
-            <div className="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100 space-y-2">
+            <div className="text-xs text-rail-600 bg-surface-sunken p-3 rounded-lg border border-line-subtle space-y-2">
               <div>
-                <span className="font-semibold text-slate-700">Conflicting movements (C002):</span>{' '}
+                <span className="font-semibold text-rail-700">Conflicting movements (C002):</span>{' '}
                 {trainImpact?.conflicting?.length ? (
-                  <span className="font-mono text-red-700">
+                  <span className="font-mono text-status-critical">
                     {trainImpact.conflicting.map((t) => t.train_id).join(', ')}
                   </span>
                 ) : (
-                  <span className="text-emerald-700 font-semibold">
+                  <span className="text-status-ok font-semibold">
                     none — no train movement overlaps this possession
                   </span>
                 )}
               </div>
 
               <div>
-                <span className="font-semibold text-slate-700">
+                <span className="font-semibold text-rail-700">
                   Adjacent services (±{trainImpact?.adjacency_buffer_minutes ?? 60} min, C008):
                 </span>{' '}
                 {trainImpact?.adjacent?.length ? (
@@ -241,20 +242,20 @@ export const WhyArnavModal = ({ isOpen, onClose, task }) => {
                       .join(' · ')}
                   </span>
                 ) : (
-                  <span className="text-emerald-700 font-semibold">
+                  <span className="text-status-ok font-semibold">
                     none — the nearest passenger service is outside the buffer
                   </span>
                 )}
               </div>
 
-              <p className="text-[11px] text-slate-500 leading-snug pt-0.5">
+              <p className="text-[11px] text-rail-500 leading-snug pt-0.5">
                 {trainImpact?.note}
               </p>
 
               {/* No estimated delay is shown here: this possession displaces no
                   train, so there is no delay to report. Reroute delay appears on
                   the Live Operations screen when a train is actually diverted. */}
-              <p className="text-[11px] text-slate-500 leading-snug">
+              <p className="text-[11px] text-rail-500 leading-snug">
                 <span className="font-semibold">Estimated train delay:</span>{' '}
                 {trainImpact?.conflicting?.length
                   ? 'see Live Operations for the computed reroute or hold delay'
@@ -264,31 +265,31 @@ export const WhyArnavModal = ({ isOpen, onClose, task }) => {
           </div>
 
           {/* STEP 6 — DECISION */}
-          <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/50 space-y-2">
+          <div className="p-4 rounded-lg border border-status-ok bg-status-ok-tint space-y-2">
             <div className="flex items-center gap-2">
-              <Award size={18} className="text-emerald-700" />
-              <h5 className="text-xs font-bold text-emerald-900 uppercase tracking-wide">
+              <Award size={18} className="text-status-ok" />
+              <h5 className="text-xs font-bold text-status-ok uppercase tracking-wide">
                 Step 6 — Selected Assignment
               </h5>
             </div>
-            <div className="text-xs text-emerald-950 font-mono bg-white/70 border border-emerald-200 rounded-lg px-3 py-2">
+            <div className="text-xs text-status-ok font-mono bg-surface-panel border border-status-ok rounded-lg px-3 py-2">
               {selected.block_ids.join(' + ')} · {selected.date} · {selected.window} ·{' '}
               {selected.teams.map((t) => t.team_id).join(', ')}
             </div>
-            <p className="text-xs text-emerald-950 leading-relaxed">{trace.explanation}</p>
+            <p className="text-xs text-status-ok leading-relaxed">{trace.explanation}</p>
           </div>
         </div>
 
         {/* Footer */}
         <div className="pt-2 flex items-center justify-between gap-3">
-          <p className="text-[10px] text-slate-400 leading-tight">
+          <p className="text-[10px] text-rail-400 leading-tight">
             Recomputed by{' '}
             <code className="font-mono">scripts/generate_decision_trace.py</code> from{' '}
             {trace.provenance?.dataset}. Synthetic demonstration data.
           </p>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-semibold transition-colors shrink-0"
+            className="px-4 py-2 bg-rail-900 hover:bg-rail-700 text-white rounded-lg text-xs font-semibold transition-colors shrink-0"
           >
             Close
           </button>

@@ -1,18 +1,22 @@
 import React from 'react';
 
-export const Card = ({ children, title, subtitle, action, className = '', headerClassName = '', bodyClassName = '' }) => {
-  return (
-    <div className={`bg-white rounded-xl border border-slate-200/90 shadow-sm overflow-hidden ${className}`}>
-      {(title || subtitle || action) && (
-        <div className={`px-5 py-4 border-b border-slate-100 flex items-center justify-between ${headerClassName}`}>
-          <div>
-            {title && <h3 className="font-semibold text-slate-800 text-sm tracking-tight">{title}</h3>}
-            {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
-          </div>
-          {action && <div>{action}</div>}
+/**
+ * Panel with an optional header. Kept on its original prop signature so the
+ * existing screens keep working; the visual language is the new one.
+ */
+export const Card = ({
+  children, title, subtitle, action, className = '', headerClassName = '', bodyClassName = '',
+}) => (
+  <div className={`bg-surface-panel border border-line rounded-lg ${className}`}>
+    {(title || action) && (
+      <div className={`px-3 py-2.5 border-b border-line bg-surface-sunken flex items-start justify-between gap-3 rounded-t-lg ${headerClassName}`}>
+        <div className="min-w-0">
+          {title && <div className="t-label">{title}</div>}
+          {subtitle && <div className="t-scope mt-0.5 normal-case tracking-normal">{subtitle}</div>}
         </div>
-      )}
-      <div className={`p-5 ${bodyClassName}`}>{children}</div>
-    </div>
-  );
-};
+        {action && <div className="shrink-0">{action}</div>}
+      </div>
+    )}
+    <div className={`p-3 ${bodyClassName}`}>{children}</div>
+  </div>
+);

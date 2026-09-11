@@ -1,0 +1,2305 @@
+{
+  "_description": "Per-section train occupancy projected verbatim from Arnav_Optimizer_Clean_Dataset/trains.csv. Arrival and departure minutes are source values; no timing is synthesized. Rows lacking either timing field are dropped rather than imputed.",
+  "provenance": {
+    "scope": "GANTT_TRAIN_PROJECTION",
+    "source": "Arnav_Optimizer_Clean_Dataset/trains.csv",
+    "generator": "scripts/generate_section_trains.py",
+    "command": "PYTHONPATH=. python scripts/generate_section_trains.py",
+    "filter": "(section_id, date) pairs present in optimized_block_plan.json, plus the sections referenced by the replanning scenarios on every plan date",
+    "source_rows": 12000,
+    "rows_in_scope": 176,
+    "rows_dropped_missing_timing": 0,
+    "records_emitted": 176,
+    "sections": 43
+  },
+  "sections": {
+    "SEC-0004": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-02148",
+          "section_id": "SEC-0004",
+          "date": "2026-09-03",
+          "arrival_minute": 174,
+          "departure_minute": 186,
+          "train_type": "Freight",
+          "corridor_id": "COR-001",
+          "priority_class": 1,
+          "passenger_load_percent": 53.5,
+          "scheduled_speed_kmph": 110.0
+        }
+      ],
+      "2026-09-07": [
+        {
+          "train_id": "TRN-08879",
+          "section_id": "SEC-0004",
+          "date": "2026-09-07",
+          "arrival_minute": 338,
+          "departure_minute": 348,
+          "train_type": "EMU",
+          "corridor_id": "COR-001",
+          "priority_class": 2,
+          "passenger_load_percent": 55.4,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-05554",
+          "section_id": "SEC-0004",
+          "date": "2026-09-07",
+          "arrival_minute": 526,
+          "departure_minute": 541,
+          "train_type": "Superfast",
+          "corridor_id": "COR-001",
+          "priority_class": 3,
+          "passenger_load_percent": 52.0,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-05265",
+          "section_id": "SEC-0004",
+          "date": "2026-09-07",
+          "arrival_minute": 810,
+          "departure_minute": 822,
+          "train_type": "EMU",
+          "corridor_id": "COR-001",
+          "priority_class": 2,
+          "passenger_load_percent": 79.8,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-08173",
+          "section_id": "SEC-0004",
+          "date": "2026-09-07",
+          "arrival_minute": 851,
+          "departure_minute": 863,
+          "train_type": "EMU",
+          "corridor_id": "COR-001",
+          "priority_class": 2,
+          "passenger_load_percent": 92.2,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-01469",
+          "section_id": "SEC-0004",
+          "date": "2026-09-07",
+          "arrival_minute": 939,
+          "departure_minute": 951,
+          "train_type": "Passenger",
+          "corridor_id": "COR-001",
+          "priority_class": 2,
+          "passenger_load_percent": 74.6,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-05959",
+          "section_id": "SEC-0004",
+          "date": "2026-09-07",
+          "arrival_minute": 1221,
+          "departure_minute": 1228,
+          "train_type": "Passenger",
+          "corridor_id": "COR-001",
+          "priority_class": 2,
+          "passenger_load_percent": 80.2,
+          "scheduled_speed_kmph": 120.0
+        }
+      ],
+      "2026-09-08": [
+        {
+          "train_id": "TRN-11012",
+          "section_id": "SEC-0004",
+          "date": "2026-09-08",
+          "arrival_minute": 69,
+          "departure_minute": 84,
+          "train_type": "Superfast",
+          "corridor_id": "COR-001",
+          "priority_class": 3,
+          "passenger_load_percent": 99.0,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-04609",
+          "section_id": "SEC-0004",
+          "date": "2026-09-08",
+          "arrival_minute": 175,
+          "departure_minute": 182,
+          "train_type": "Superfast",
+          "corridor_id": "COR-001",
+          "priority_class": 3,
+          "passenger_load_percent": 52.7,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-08068",
+          "section_id": "SEC-0004",
+          "date": "2026-09-08",
+          "arrival_minute": 904,
+          "departure_minute": 911,
+          "train_type": "Superfast",
+          "corridor_id": "COR-001",
+          "priority_class": 3,
+          "passenger_load_percent": 86.5,
+          "scheduled_speed_kmph": 110.0
+        }
+      ]
+    },
+    "SEC-0007": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-00520",
+          "section_id": "SEC-0007",
+          "date": "2026-09-03",
+          "arrival_minute": 2,
+          "departure_minute": 12,
+          "train_type": "Express",
+          "corridor_id": "COR-001",
+          "priority_class": 3,
+          "passenger_load_percent": 78.6,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-10310",
+          "section_id": "SEC-0007",
+          "date": "2026-09-03",
+          "arrival_minute": 92,
+          "departure_minute": 104,
+          "train_type": "Freight",
+          "corridor_id": "COR-001",
+          "priority_class": 1,
+          "passenger_load_percent": 32.8,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-05656",
+          "section_id": "SEC-0007",
+          "date": "2026-09-03",
+          "arrival_minute": 222,
+          "departure_minute": 229,
+          "train_type": "Passenger",
+          "corridor_id": "COR-001",
+          "priority_class": 2,
+          "passenger_load_percent": 71.3,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-11018",
+          "section_id": "SEC-0007",
+          "date": "2026-09-03",
+          "arrival_minute": 555,
+          "departure_minute": 570,
+          "train_type": "Passenger",
+          "corridor_id": "COR-001",
+          "priority_class": 2,
+          "passenger_load_percent": 76.9,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-03614",
+          "section_id": "SEC-0007",
+          "date": "2026-09-03",
+          "arrival_minute": 777,
+          "departure_minute": 789,
+          "train_type": "Passenger",
+          "corridor_id": "COR-001",
+          "priority_class": 2,
+          "passenger_load_percent": 65.7,
+          "scheduled_speed_kmph": 110.0
+        }
+      ]
+    },
+    "SEC-0012": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-10278",
+          "section_id": "SEC-0012",
+          "date": "2026-09-03",
+          "arrival_minute": 141,
+          "departure_minute": 151,
+          "train_type": "EMU",
+          "corridor_id": "COR-002",
+          "priority_class": 2,
+          "passenger_load_percent": 77.7,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-07238",
+          "section_id": "SEC-0012",
+          "date": "2026-09-03",
+          "arrival_minute": 262,
+          "departure_minute": 274,
+          "train_type": "EMU",
+          "corridor_id": "COR-002",
+          "priority_class": 2,
+          "passenger_load_percent": 35.1,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-06391",
+          "section_id": "SEC-0012",
+          "date": "2026-09-03",
+          "arrival_minute": 360,
+          "departure_minute": 370,
+          "train_type": "Passenger",
+          "corridor_id": "COR-002",
+          "priority_class": 2,
+          "passenger_load_percent": 73.7,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-10446",
+          "section_id": "SEC-0012",
+          "date": "2026-09-03",
+          "arrival_minute": 906,
+          "departure_minute": 913,
+          "train_type": "Passenger",
+          "corridor_id": "COR-002",
+          "priority_class": 2,
+          "passenger_load_percent": 55.6,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-05418",
+          "section_id": "SEC-0012",
+          "date": "2026-09-03",
+          "arrival_minute": 971,
+          "departure_minute": 981,
+          "train_type": "Superfast",
+          "corridor_id": "COR-002",
+          "priority_class": 3,
+          "passenger_load_percent": 79.5,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-00213",
+          "section_id": "SEC-0012",
+          "date": "2026-09-03",
+          "arrival_minute": 1238,
+          "departure_minute": 1248,
+          "train_type": "Freight",
+          "corridor_id": "COR-002",
+          "priority_class": 1,
+          "passenger_load_percent": 25.5,
+          "scheduled_speed_kmph": 100.0
+        }
+      ]
+    },
+    "SEC-0014": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-06921",
+          "section_id": "SEC-0014",
+          "date": "2026-09-03",
+          "arrival_minute": 89,
+          "departure_minute": 96,
+          "train_type": "Superfast",
+          "corridor_id": "COR-002",
+          "priority_class": 3,
+          "passenger_load_percent": 66.3,
+          "scheduled_speed_kmph": 130.0
+        },
+        {
+          "train_id": "TRN-06332",
+          "section_id": "SEC-0014",
+          "date": "2026-09-03",
+          "arrival_minute": 223,
+          "departure_minute": 233,
+          "train_type": "EMU",
+          "corridor_id": "COR-002",
+          "priority_class": 2,
+          "passenger_load_percent": 88.4,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-03832",
+          "section_id": "SEC-0014",
+          "date": "2026-09-03",
+          "arrival_minute": 877,
+          "departure_minute": 887,
+          "train_type": "Passenger",
+          "corridor_id": "COR-002",
+          "priority_class": 2,
+          "passenger_load_percent": 54.2,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-10657",
+          "section_id": "SEC-0014",
+          "date": "2026-09-03",
+          "arrival_minute": 1211,
+          "departure_minute": 1216,
+          "train_type": "Superfast",
+          "corridor_id": "COR-002",
+          "priority_class": 3,
+          "passenger_load_percent": 49.9,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-03612",
+          "section_id": "SEC-0014",
+          "date": "2026-09-03",
+          "arrival_minute": 1354,
+          "departure_minute": 1361,
+          "train_type": "Passenger",
+          "corridor_id": "COR-002",
+          "priority_class": 2,
+          "passenger_load_percent": 82.4,
+          "scheduled_speed_kmph": 100.0
+        }
+      ]
+    },
+    "SEC-0018": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-05283",
+          "section_id": "SEC-0018",
+          "date": "2026-09-03",
+          "arrival_minute": 461,
+          "departure_minute": 473,
+          "train_type": "Superfast",
+          "corridor_id": "COR-002",
+          "priority_class": 3,
+          "passenger_load_percent": 80.2,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-07779",
+          "section_id": "SEC-0018",
+          "date": "2026-09-03",
+          "arrival_minute": 519,
+          "departure_minute": 531,
+          "train_type": "Express",
+          "corridor_id": "COR-002",
+          "priority_class": 3,
+          "passenger_load_percent": 92.9,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-04901",
+          "section_id": "SEC-0018",
+          "date": "2026-09-03",
+          "arrival_minute": 706,
+          "departure_minute": 721,
+          "train_type": "Express",
+          "corridor_id": "COR-002",
+          "priority_class": 3,
+          "passenger_load_percent": 57.5,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-06585",
+          "section_id": "SEC-0018",
+          "date": "2026-09-03",
+          "arrival_minute": 1046,
+          "departure_minute": 1066,
+          "train_type": "EMU",
+          "corridor_id": "COR-002",
+          "priority_class": 2,
+          "passenger_load_percent": 50.4,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-04281",
+          "section_id": "SEC-0018",
+          "date": "2026-09-03",
+          "arrival_minute": 1387,
+          "departure_minute": 1394,
+          "train_type": "Passenger",
+          "corridor_id": "COR-002",
+          "priority_class": 2,
+          "passenger_load_percent": 55.7,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-04140",
+          "section_id": "SEC-0018",
+          "date": "2026-09-03",
+          "arrival_minute": 1417,
+          "departure_minute": 1424,
+          "train_type": "Passenger",
+          "corridor_id": "COR-002",
+          "priority_class": 2,
+          "passenger_load_percent": 60.2,
+          "scheduled_speed_kmph": 110.0
+        }
+      ]
+    },
+    "SEC-0019": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-01984",
+          "section_id": "SEC-0019",
+          "date": "2026-09-03",
+          "arrival_minute": 590,
+          "departure_minute": 602,
+          "train_type": "Superfast",
+          "corridor_id": "COR-002",
+          "priority_class": 3,
+          "passenger_load_percent": 94.1,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-08094",
+          "section_id": "SEC-0019",
+          "date": "2026-09-03",
+          "arrival_minute": 785,
+          "departure_minute": 795,
+          "train_type": "Superfast",
+          "corridor_id": "COR-002",
+          "priority_class": 3,
+          "passenger_load_percent": 59.1,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-11978",
+          "section_id": "SEC-0019",
+          "date": "2026-09-03",
+          "arrival_minute": 1037,
+          "departure_minute": 1047,
+          "train_type": "EMU",
+          "corridor_id": "COR-002",
+          "priority_class": 2,
+          "passenger_load_percent": 99.0,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-02514",
+          "section_id": "SEC-0019",
+          "date": "2026-09-03",
+          "arrival_minute": 1052,
+          "departure_minute": 1057,
+          "train_type": "EMU",
+          "corridor_id": "COR-002",
+          "priority_class": 2,
+          "passenger_load_percent": 51.7,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-10339",
+          "section_id": "SEC-0019",
+          "date": "2026-09-03",
+          "arrival_minute": 1184,
+          "departure_minute": 1191,
+          "train_type": "Freight",
+          "corridor_id": "COR-002",
+          "priority_class": 1,
+          "passenger_load_percent": 29.4,
+          "scheduled_speed_kmph": 120.0
+        }
+      ]
+    },
+    "SEC-0022": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-08050",
+          "section_id": "SEC-0022",
+          "date": "2026-09-03",
+          "arrival_minute": 582,
+          "departure_minute": 589,
+          "train_type": "Freight",
+          "corridor_id": "COR-003",
+          "priority_class": 1,
+          "passenger_load_percent": 17.3,
+          "scheduled_speed_kmph": 110.0
+        }
+      ]
+    },
+    "SEC-0024": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-01320",
+          "section_id": "SEC-0024",
+          "date": "2026-09-03",
+          "arrival_minute": 143,
+          "departure_minute": 150,
+          "train_type": "Superfast",
+          "corridor_id": "COR-003",
+          "priority_class": 3,
+          "passenger_load_percent": 86.3,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-10444",
+          "section_id": "SEC-0024",
+          "date": "2026-09-03",
+          "arrival_minute": 313,
+          "departure_minute": 318,
+          "train_type": "Passenger",
+          "corridor_id": "COR-003",
+          "priority_class": 2,
+          "passenger_load_percent": 78.4,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-04863",
+          "section_id": "SEC-0024",
+          "date": "2026-09-03",
+          "arrival_minute": 1086,
+          "departure_minute": 1093,
+          "train_type": "Superfast",
+          "corridor_id": "COR-003",
+          "priority_class": 3,
+          "passenger_load_percent": 54.3,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-08584",
+          "section_id": "SEC-0024",
+          "date": "2026-09-03",
+          "arrival_minute": 1174,
+          "departure_minute": 1179,
+          "train_type": "Express",
+          "corridor_id": "COR-003",
+          "priority_class": 3,
+          "passenger_load_percent": 58.3,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-10187",
+          "section_id": "SEC-0024",
+          "date": "2026-09-03",
+          "arrival_minute": 1238,
+          "departure_minute": 1250,
+          "train_type": "Passenger",
+          "corridor_id": "COR-003",
+          "priority_class": 2,
+          "passenger_load_percent": 59.4,
+          "scheduled_speed_kmph": 80.0
+        }
+      ]
+    },
+    "SEC-0025": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-11383",
+          "section_id": "SEC-0025",
+          "date": "2026-09-03",
+          "arrival_minute": 147,
+          "departure_minute": 152,
+          "train_type": "Freight",
+          "corridor_id": "COR-003",
+          "priority_class": 1,
+          "passenger_load_percent": 35.1,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-07080",
+          "section_id": "SEC-0025",
+          "date": "2026-09-03",
+          "arrival_minute": 191,
+          "departure_minute": 201,
+          "train_type": "Freight",
+          "corridor_id": "COR-003",
+          "priority_class": 1,
+          "passenger_load_percent": 23.7,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-05923",
+          "section_id": "SEC-0025",
+          "date": "2026-09-03",
+          "arrival_minute": 1040,
+          "departure_minute": 1052,
+          "train_type": "Passenger",
+          "corridor_id": "COR-003",
+          "priority_class": 2,
+          "passenger_load_percent": 84.0,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-10182",
+          "section_id": "SEC-0025",
+          "date": "2026-09-03",
+          "arrival_minute": 1074,
+          "departure_minute": 1084,
+          "train_type": "Passenger",
+          "corridor_id": "COR-003",
+          "priority_class": 2,
+          "passenger_load_percent": 62.6,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-11902",
+          "section_id": "SEC-0025",
+          "date": "2026-09-03",
+          "arrival_minute": 1289,
+          "departure_minute": 1296,
+          "train_type": "Express",
+          "corridor_id": "COR-003",
+          "priority_class": 3,
+          "passenger_load_percent": 72.5,
+          "scheduled_speed_kmph": 110.0
+        }
+      ]
+    },
+    "SEC-0028": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-10759",
+          "section_id": "SEC-0028",
+          "date": "2026-09-03",
+          "arrival_minute": 203,
+          "departure_minute": 213,
+          "train_type": "Passenger",
+          "corridor_id": "COR-003",
+          "priority_class": 2,
+          "passenger_load_percent": 73.9,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-10093",
+          "section_id": "SEC-0028",
+          "date": "2026-09-03",
+          "arrival_minute": 501,
+          "departure_minute": 511,
+          "train_type": "Superfast",
+          "corridor_id": "COR-003",
+          "priority_class": 3,
+          "passenger_load_percent": 52.4,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-04416",
+          "section_id": "SEC-0028",
+          "date": "2026-09-03",
+          "arrival_minute": 880,
+          "departure_minute": 892,
+          "train_type": "Passenger",
+          "corridor_id": "COR-003",
+          "priority_class": 2,
+          "passenger_load_percent": 86.5,
+          "scheduled_speed_kmph": 120.0
+        }
+      ]
+    },
+    "SEC-0036": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-05818",
+          "section_id": "SEC-0036",
+          "date": "2026-09-03",
+          "arrival_minute": 324,
+          "departure_minute": 334,
+          "train_type": "Superfast",
+          "corridor_id": "COR-004",
+          "priority_class": 3,
+          "passenger_load_percent": 52.0,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-01604",
+          "section_id": "SEC-0036",
+          "date": "2026-09-03",
+          "arrival_minute": 1193,
+          "departure_minute": 1198,
+          "train_type": "Express",
+          "corridor_id": "COR-004",
+          "priority_class": 3,
+          "passenger_load_percent": 64.9,
+          "scheduled_speed_kmph": 120.0
+        }
+      ]
+    },
+    "SEC-0037": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-02132",
+          "section_id": "SEC-0037",
+          "date": "2026-09-03",
+          "arrival_minute": 253,
+          "departure_minute": 260,
+          "train_type": "EMU",
+          "corridor_id": "COR-004",
+          "priority_class": 2,
+          "passenger_load_percent": 77.1,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-11553",
+          "section_id": "SEC-0037",
+          "date": "2026-09-03",
+          "arrival_minute": 1269,
+          "departure_minute": 1281,
+          "train_type": "Express",
+          "corridor_id": "COR-004",
+          "priority_class": 3,
+          "passenger_load_percent": 50.1,
+          "scheduled_speed_kmph": 130.0
+        }
+      ]
+    },
+    "SEC-0038": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-04492",
+          "section_id": "SEC-0038",
+          "date": "2026-09-03",
+          "arrival_minute": 45,
+          "departure_minute": 55,
+          "train_type": "EMU",
+          "corridor_id": "COR-004",
+          "priority_class": 2,
+          "passenger_load_percent": 87.9,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-00119",
+          "section_id": "SEC-0038",
+          "date": "2026-09-03",
+          "arrival_minute": 151,
+          "departure_minute": 158,
+          "train_type": "Passenger",
+          "corridor_id": "COR-004",
+          "priority_class": 2,
+          "passenger_load_percent": 99.0,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-04913",
+          "section_id": "SEC-0038",
+          "date": "2026-09-03",
+          "arrival_minute": 277,
+          "departure_minute": 284,
+          "train_type": "Passenger",
+          "corridor_id": "COR-004",
+          "priority_class": 2,
+          "passenger_load_percent": 69.1,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-06813",
+          "section_id": "SEC-0038",
+          "date": "2026-09-03",
+          "arrival_minute": 614,
+          "departure_minute": 626,
+          "train_type": "Freight",
+          "corridor_id": "COR-004",
+          "priority_class": 1,
+          "passenger_load_percent": 32.2,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-00316",
+          "section_id": "SEC-0038",
+          "date": "2026-09-03",
+          "arrival_minute": 1417,
+          "departure_minute": 1429,
+          "train_type": "EMU",
+          "corridor_id": "COR-004",
+          "priority_class": 2,
+          "passenger_load_percent": 58.8,
+          "scheduled_speed_kmph": 100.0
+        }
+      ]
+    },
+    "SEC-0042": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-10447",
+          "section_id": "SEC-0042",
+          "date": "2026-09-03",
+          "arrival_minute": 78,
+          "departure_minute": 88,
+          "train_type": "Superfast",
+          "corridor_id": "COR-005",
+          "priority_class": 3,
+          "passenger_load_percent": 57.9,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-05658",
+          "section_id": "SEC-0042",
+          "date": "2026-09-03",
+          "arrival_minute": 827,
+          "departure_minute": 834,
+          "train_type": "Passenger",
+          "corridor_id": "COR-005",
+          "priority_class": 2,
+          "passenger_load_percent": 77.6,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-09021",
+          "section_id": "SEC-0042",
+          "date": "2026-09-03",
+          "arrival_minute": 1177,
+          "departure_minute": 1197,
+          "train_type": "Freight",
+          "corridor_id": "COR-005",
+          "priority_class": 1,
+          "passenger_load_percent": 44.7,
+          "scheduled_speed_kmph": 100.0
+        }
+      ]
+    },
+    "SEC-0044": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-11943",
+          "section_id": "SEC-0044",
+          "date": "2026-09-03",
+          "arrival_minute": 212,
+          "departure_minute": 232,
+          "train_type": "Passenger",
+          "corridor_id": "COR-005",
+          "priority_class": 2,
+          "passenger_load_percent": 61.7,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-01403",
+          "section_id": "SEC-0044",
+          "date": "2026-09-03",
+          "arrival_minute": 393,
+          "departure_minute": 408,
+          "train_type": "Express",
+          "corridor_id": "COR-005",
+          "priority_class": 3,
+          "passenger_load_percent": 81.9,
+          "scheduled_speed_kmph": 130.0
+        },
+        {
+          "train_id": "TRN-03060",
+          "section_id": "SEC-0044",
+          "date": "2026-09-03",
+          "arrival_minute": 628,
+          "departure_minute": 638,
+          "train_type": "EMU",
+          "corridor_id": "COR-005",
+          "priority_class": 2,
+          "passenger_load_percent": 99.0,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-06607",
+          "section_id": "SEC-0044",
+          "date": "2026-09-03",
+          "arrival_minute": 1043,
+          "departure_minute": 1050,
+          "train_type": "Superfast",
+          "corridor_id": "COR-005",
+          "priority_class": 3,
+          "passenger_load_percent": 46.0,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-04509",
+          "section_id": "SEC-0044",
+          "date": "2026-09-03",
+          "arrival_minute": 1428,
+          "departure_minute": 1435,
+          "train_type": "Passenger",
+          "corridor_id": "COR-005",
+          "priority_class": 2,
+          "passenger_load_percent": 70.7,
+          "scheduled_speed_kmph": 120.0
+        }
+      ]
+    },
+    "SEC-0045": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-08105",
+          "section_id": "SEC-0045",
+          "date": "2026-09-03",
+          "arrival_minute": 44,
+          "departure_minute": 64,
+          "train_type": "Superfast",
+          "corridor_id": "COR-005",
+          "priority_class": 3,
+          "passenger_load_percent": 99.0,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-01958",
+          "section_id": "SEC-0045",
+          "date": "2026-09-03",
+          "arrival_minute": 1014,
+          "departure_minute": 1026,
+          "train_type": "Freight",
+          "corridor_id": "COR-005",
+          "priority_class": 1,
+          "passenger_load_percent": 52.1,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-08954",
+          "section_id": "SEC-0045",
+          "date": "2026-09-03",
+          "arrival_minute": 1162,
+          "departure_minute": 1174,
+          "train_type": "EMU",
+          "corridor_id": "COR-005",
+          "priority_class": 2,
+          "passenger_load_percent": 83.2,
+          "scheduled_speed_kmph": 110.0
+        }
+      ]
+    },
+    "SEC-0052": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-04438",
+          "section_id": "SEC-0052",
+          "date": "2026-09-03",
+          "arrival_minute": 218,
+          "departure_minute": 223,
+          "train_type": "Express",
+          "corridor_id": "COR-006",
+          "priority_class": 3,
+          "passenger_load_percent": 49.2,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-03497",
+          "section_id": "SEC-0052",
+          "date": "2026-09-03",
+          "arrival_minute": 411,
+          "departure_minute": 418,
+          "train_type": "Passenger",
+          "corridor_id": "COR-006",
+          "priority_class": 2,
+          "passenger_load_percent": 46.3,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-06146",
+          "section_id": "SEC-0052",
+          "date": "2026-09-03",
+          "arrival_minute": 556,
+          "departure_minute": 576,
+          "train_type": "EMU",
+          "corridor_id": "COR-006",
+          "priority_class": 2,
+          "passenger_load_percent": 46.3,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-10786",
+          "section_id": "SEC-0052",
+          "date": "2026-09-03",
+          "arrival_minute": 774,
+          "departure_minute": 794,
+          "train_type": "Passenger",
+          "corridor_id": "COR-006",
+          "priority_class": 2,
+          "passenger_load_percent": 78.8,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-07017",
+          "section_id": "SEC-0052",
+          "date": "2026-09-03",
+          "arrival_minute": 1054,
+          "departure_minute": 1059,
+          "train_type": "Freight",
+          "corridor_id": "COR-006",
+          "priority_class": 1,
+          "passenger_load_percent": 21.1,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-01314",
+          "section_id": "SEC-0052",
+          "date": "2026-09-03",
+          "arrival_minute": 1429,
+          "departure_minute": 1439,
+          "train_type": "Passenger",
+          "corridor_id": "COR-006",
+          "priority_class": 2,
+          "passenger_load_percent": 52.5,
+          "scheduled_speed_kmph": 120.0
+        }
+      ]
+    },
+    "SEC-0054": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-07586",
+          "section_id": "SEC-0054",
+          "date": "2026-09-03",
+          "arrival_minute": 161,
+          "departure_minute": 173,
+          "train_type": "Freight",
+          "corridor_id": "COR-006",
+          "priority_class": 1,
+          "passenger_load_percent": 41.1,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-10495",
+          "section_id": "SEC-0054",
+          "date": "2026-09-03",
+          "arrival_minute": 478,
+          "departure_minute": 488,
+          "train_type": "Express",
+          "corridor_id": "COR-006",
+          "priority_class": 3,
+          "passenger_load_percent": 80.3,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-05654",
+          "section_id": "SEC-0054",
+          "date": "2026-09-03",
+          "arrival_minute": 1082,
+          "departure_minute": 1089,
+          "train_type": "Superfast",
+          "corridor_id": "COR-006",
+          "priority_class": 3,
+          "passenger_load_percent": 65.4,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-05284",
+          "section_id": "SEC-0054",
+          "date": "2026-09-03",
+          "arrival_minute": 1092,
+          "departure_minute": 1097,
+          "train_type": "Passenger",
+          "corridor_id": "COR-006",
+          "priority_class": 2,
+          "passenger_load_percent": 66.2,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-03824",
+          "section_id": "SEC-0054",
+          "date": "2026-09-03",
+          "arrival_minute": 1144,
+          "departure_minute": 1154,
+          "train_type": "Passenger",
+          "corridor_id": "COR-006",
+          "priority_class": 2,
+          "passenger_load_percent": 70.8,
+          "scheduled_speed_kmph": 130.0
+        },
+        {
+          "train_id": "TRN-00438",
+          "section_id": "SEC-0054",
+          "date": "2026-09-03",
+          "arrival_minute": 1344,
+          "departure_minute": 1351,
+          "train_type": "Express",
+          "corridor_id": "COR-006",
+          "priority_class": 3,
+          "passenger_load_percent": 82.2,
+          "scheduled_speed_kmph": 80.0
+        }
+      ]
+    },
+    "SEC-0067": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-10881",
+          "section_id": "SEC-0067",
+          "date": "2026-09-03",
+          "arrival_minute": 170,
+          "departure_minute": 190,
+          "train_type": "Passenger",
+          "corridor_id": "COR-007",
+          "priority_class": 2,
+          "passenger_load_percent": 91.9,
+          "scheduled_speed_kmph": 130.0
+        },
+        {
+          "train_id": "TRN-06712",
+          "section_id": "SEC-0067",
+          "date": "2026-09-03",
+          "arrival_minute": 321,
+          "departure_minute": 341,
+          "train_type": "Passenger",
+          "corridor_id": "COR-007",
+          "priority_class": 2,
+          "passenger_load_percent": 64.2,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-11362",
+          "section_id": "SEC-0067",
+          "date": "2026-09-03",
+          "arrival_minute": 558,
+          "departure_minute": 568,
+          "train_type": "Express",
+          "corridor_id": "COR-007",
+          "priority_class": 3,
+          "passenger_load_percent": 57.2,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-01422",
+          "section_id": "SEC-0067",
+          "date": "2026-09-03",
+          "arrival_minute": 1372,
+          "departure_minute": 1392,
+          "train_type": "Express",
+          "corridor_id": "COR-007",
+          "priority_class": 3,
+          "passenger_load_percent": 57.0,
+          "scheduled_speed_kmph": 80.0
+        }
+      ]
+    },
+    "SEC-0069": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-02144",
+          "section_id": "SEC-0069",
+          "date": "2026-09-03",
+          "arrival_minute": 200,
+          "departure_minute": 207,
+          "train_type": "Freight",
+          "corridor_id": "COR-007",
+          "priority_class": 1,
+          "passenger_load_percent": 53.7,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-03789",
+          "section_id": "SEC-0069",
+          "date": "2026-09-03",
+          "arrival_minute": 325,
+          "departure_minute": 335,
+          "train_type": "EMU",
+          "corridor_id": "COR-007",
+          "priority_class": 2,
+          "passenger_load_percent": 80.9,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-04060",
+          "section_id": "SEC-0069",
+          "date": "2026-09-03",
+          "arrival_minute": 358,
+          "departure_minute": 365,
+          "train_type": "Freight",
+          "corridor_id": "COR-007",
+          "priority_class": 1,
+          "passenger_load_percent": 43.7,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-04752",
+          "section_id": "SEC-0069",
+          "date": "2026-09-03",
+          "arrival_minute": 781,
+          "departure_minute": 786,
+          "train_type": "Express",
+          "corridor_id": "COR-007",
+          "priority_class": 3,
+          "passenger_load_percent": 66.2,
+          "scheduled_speed_kmph": 130.0
+        },
+        {
+          "train_id": "TRN-06303",
+          "section_id": "SEC-0069",
+          "date": "2026-09-03",
+          "arrival_minute": 1354,
+          "departure_minute": 1361,
+          "train_type": "Freight",
+          "corridor_id": "COR-007",
+          "priority_class": 1,
+          "passenger_load_percent": 25.8,
+          "scheduled_speed_kmph": 100.0
+        }
+      ]
+    },
+    "SEC-0072": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-11694",
+          "section_id": "SEC-0072",
+          "date": "2026-09-03",
+          "arrival_minute": 50,
+          "departure_minute": 55,
+          "train_type": "EMU",
+          "corridor_id": "COR-008",
+          "priority_class": 2,
+          "passenger_load_percent": 89.6,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-11008",
+          "section_id": "SEC-0072",
+          "date": "2026-09-03",
+          "arrival_minute": 211,
+          "departure_minute": 221,
+          "train_type": "Passenger",
+          "corridor_id": "COR-008",
+          "priority_class": 2,
+          "passenger_load_percent": 66.3,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-08403",
+          "section_id": "SEC-0072",
+          "date": "2026-09-03",
+          "arrival_minute": 629,
+          "departure_minute": 649,
+          "train_type": "Passenger",
+          "corridor_id": "COR-008",
+          "priority_class": 2,
+          "passenger_load_percent": 88.0,
+          "scheduled_speed_kmph": 80.0
+        }
+      ]
+    },
+    "SEC-0073": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-03926",
+          "section_id": "SEC-0073",
+          "date": "2026-09-03",
+          "arrival_minute": 218,
+          "departure_minute": 230,
+          "train_type": "Express",
+          "corridor_id": "COR-008",
+          "priority_class": 3,
+          "passenger_load_percent": 59.5,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-05804",
+          "section_id": "SEC-0073",
+          "date": "2026-09-03",
+          "arrival_minute": 866,
+          "departure_minute": 873,
+          "train_type": "Passenger",
+          "corridor_id": "COR-008",
+          "priority_class": 2,
+          "passenger_load_percent": 85.4,
+          "scheduled_speed_kmph": 120.0
+        }
+      ]
+    },
+    "SEC-0088": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-07652",
+          "section_id": "SEC-0088",
+          "date": "2026-09-03",
+          "arrival_minute": 480,
+          "departure_minute": 485,
+          "train_type": "Passenger",
+          "corridor_id": "COR-009",
+          "priority_class": 2,
+          "passenger_load_percent": 76.9,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-00894",
+          "section_id": "SEC-0088",
+          "date": "2026-09-03",
+          "arrival_minute": 874,
+          "departure_minute": 879,
+          "train_type": "Freight",
+          "corridor_id": "COR-009",
+          "priority_class": 1,
+          "passenger_load_percent": 26.8,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-05514",
+          "section_id": "SEC-0088",
+          "date": "2026-09-03",
+          "arrival_minute": 992,
+          "departure_minute": 1002,
+          "train_type": "EMU",
+          "corridor_id": "COR-009",
+          "priority_class": 2,
+          "passenger_load_percent": 59.0,
+          "scheduled_speed_kmph": 120.0
+        }
+      ]
+    },
+    "SEC-0092": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-11885",
+          "section_id": "SEC-0092",
+          "date": "2026-09-03",
+          "arrival_minute": 244,
+          "departure_minute": 249,
+          "train_type": "Express",
+          "corridor_id": "COR-010",
+          "priority_class": 3,
+          "passenger_load_percent": 52.5,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-08406",
+          "section_id": "SEC-0092",
+          "date": "2026-09-03",
+          "arrival_minute": 529,
+          "departure_minute": 541,
+          "train_type": "Freight",
+          "corridor_id": "COR-010",
+          "priority_class": 1,
+          "passenger_load_percent": 28.9,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-09329",
+          "section_id": "SEC-0092",
+          "date": "2026-09-03",
+          "arrival_minute": 1129,
+          "departure_minute": 1139,
+          "train_type": "Passenger",
+          "corridor_id": "COR-010",
+          "priority_class": 2,
+          "passenger_load_percent": 80.1,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-09095",
+          "section_id": "SEC-0092",
+          "date": "2026-09-03",
+          "arrival_minute": 1229,
+          "departure_minute": 1236,
+          "train_type": "Freight",
+          "corridor_id": "COR-010",
+          "priority_class": 1,
+          "passenger_load_percent": 18.3,
+          "scheduled_speed_kmph": 130.0
+        }
+      ]
+    },
+    "SEC-0098": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-09469",
+          "section_id": "SEC-0098",
+          "date": "2026-09-03",
+          "arrival_minute": 40,
+          "departure_minute": 52,
+          "train_type": "Freight",
+          "corridor_id": "COR-010",
+          "priority_class": 1,
+          "passenger_load_percent": 64.3,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-11573",
+          "section_id": "SEC-0098",
+          "date": "2026-09-03",
+          "arrival_minute": 155,
+          "departure_minute": 175,
+          "train_type": "EMU",
+          "corridor_id": "COR-010",
+          "priority_class": 2,
+          "passenger_load_percent": 73.9,
+          "scheduled_speed_kmph": 130.0
+        },
+        {
+          "train_id": "TRN-09137",
+          "section_id": "SEC-0098",
+          "date": "2026-09-03",
+          "arrival_minute": 890,
+          "departure_minute": 902,
+          "train_type": "Express",
+          "corridor_id": "COR-010",
+          "priority_class": 3,
+          "passenger_load_percent": 92.0,
+          "scheduled_speed_kmph": 130.0
+        }
+      ]
+    },
+    "SEC-0100": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-07148",
+          "section_id": "SEC-0100",
+          "date": "2026-09-03",
+          "arrival_minute": 158,
+          "departure_minute": 163,
+          "train_type": "Express",
+          "corridor_id": "COR-010",
+          "priority_class": 3,
+          "passenger_load_percent": 96.4,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-02693",
+          "section_id": "SEC-0100",
+          "date": "2026-09-03",
+          "arrival_minute": 1348,
+          "departure_minute": 1353,
+          "train_type": "Superfast",
+          "corridor_id": "COR-010",
+          "priority_class": 3,
+          "passenger_load_percent": 81.6,
+          "scheduled_speed_kmph": 110.0
+        }
+      ]
+    },
+    "SEC-0102": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-05408",
+          "section_id": "SEC-0102",
+          "date": "2026-09-03",
+          "arrival_minute": 2,
+          "departure_minute": 9,
+          "train_type": "Express",
+          "corridor_id": "COR-011",
+          "priority_class": 3,
+          "passenger_load_percent": 75.2,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-10089",
+          "section_id": "SEC-0102",
+          "date": "2026-09-03",
+          "arrival_minute": 139,
+          "departure_minute": 146,
+          "train_type": "Freight",
+          "corridor_id": "COR-011",
+          "priority_class": 1,
+          "passenger_load_percent": 67.1,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-04508",
+          "section_id": "SEC-0102",
+          "date": "2026-09-03",
+          "arrival_minute": 294,
+          "departure_minute": 306,
+          "train_type": "Freight",
+          "corridor_id": "COR-011",
+          "priority_class": 1,
+          "passenger_load_percent": 43.1,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-07823",
+          "section_id": "SEC-0102",
+          "date": "2026-09-03",
+          "arrival_minute": 1005,
+          "departure_minute": 1015,
+          "train_type": "Express",
+          "corridor_id": "COR-011",
+          "priority_class": 3,
+          "passenger_load_percent": 54.5,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-04172",
+          "section_id": "SEC-0102",
+          "date": "2026-09-03",
+          "arrival_minute": 1108,
+          "departure_minute": 1113,
+          "train_type": "Freight",
+          "corridor_id": "COR-011",
+          "priority_class": 1,
+          "passenger_load_percent": 34.9,
+          "scheduled_speed_kmph": 100.0
+        }
+      ]
+    },
+    "SEC-0108": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-09995",
+          "section_id": "SEC-0108",
+          "date": "2026-09-03",
+          "arrival_minute": 90,
+          "departure_minute": 97,
+          "train_type": "Superfast",
+          "corridor_id": "COR-011",
+          "priority_class": 3,
+          "passenger_load_percent": 99.0,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-10930",
+          "section_id": "SEC-0108",
+          "date": "2026-09-03",
+          "arrival_minute": 348,
+          "departure_minute": 363,
+          "train_type": "Freight",
+          "corridor_id": "COR-011",
+          "priority_class": 1,
+          "passenger_load_percent": 37.3,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-10797",
+          "section_id": "SEC-0108",
+          "date": "2026-09-03",
+          "arrival_minute": 675,
+          "departure_minute": 685,
+          "train_type": "Freight",
+          "corridor_id": "COR-011",
+          "priority_class": 1,
+          "passenger_load_percent": 61.9,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-10899",
+          "section_id": "SEC-0108",
+          "date": "2026-09-03",
+          "arrival_minute": 1094,
+          "departure_minute": 1099,
+          "train_type": "Passenger",
+          "corridor_id": "COR-011",
+          "priority_class": 2,
+          "passenger_load_percent": 76.6,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-10428",
+          "section_id": "SEC-0108",
+          "date": "2026-09-03",
+          "arrival_minute": 1419,
+          "departure_minute": 1429,
+          "train_type": "Freight",
+          "corridor_id": "COR-011",
+          "priority_class": 1,
+          "passenger_load_percent": 42.8,
+          "scheduled_speed_kmph": 130.0
+        }
+      ]
+    },
+    "SEC-0117": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-03597",
+          "section_id": "SEC-0117",
+          "date": "2026-09-03",
+          "arrival_minute": 155,
+          "departure_minute": 162,
+          "train_type": "Freight",
+          "corridor_id": "COR-012",
+          "priority_class": 1,
+          "passenger_load_percent": 55.7,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-11866",
+          "section_id": "SEC-0117",
+          "date": "2026-09-03",
+          "arrival_minute": 316,
+          "departure_minute": 328,
+          "train_type": "Superfast",
+          "corridor_id": "COR-012",
+          "priority_class": 3,
+          "passenger_load_percent": 66.9,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-02445",
+          "section_id": "SEC-0117",
+          "date": "2026-09-03",
+          "arrival_minute": 744,
+          "departure_minute": 754,
+          "train_type": "Passenger",
+          "corridor_id": "COR-012",
+          "priority_class": 2,
+          "passenger_load_percent": 99.0,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-06144",
+          "section_id": "SEC-0117",
+          "date": "2026-09-03",
+          "arrival_minute": 847,
+          "departure_minute": 859,
+          "train_type": "Superfast",
+          "corridor_id": "COR-012",
+          "priority_class": 3,
+          "passenger_load_percent": 54.8,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-05411",
+          "section_id": "SEC-0117",
+          "date": "2026-09-03",
+          "arrival_minute": 1254,
+          "departure_minute": 1259,
+          "train_type": "Superfast",
+          "corridor_id": "COR-012",
+          "priority_class": 3,
+          "passenger_load_percent": 69.0,
+          "scheduled_speed_kmph": 80.0
+        }
+      ]
+    },
+    "SEC-0120": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-08625",
+          "section_id": "SEC-0120",
+          "date": "2026-09-03",
+          "arrival_minute": 144,
+          "departure_minute": 164,
+          "train_type": "EMU",
+          "corridor_id": "COR-012",
+          "priority_class": 2,
+          "passenger_load_percent": 27.3,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-09939",
+          "section_id": "SEC-0120",
+          "date": "2026-09-03",
+          "arrival_minute": 1075,
+          "departure_minute": 1090,
+          "train_type": "EMU",
+          "corridor_id": "COR-012",
+          "priority_class": 2,
+          "passenger_load_percent": 42.9,
+          "scheduled_speed_kmph": 100.0
+        }
+      ]
+    },
+    "SEC-0127": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-01766",
+          "section_id": "SEC-0127",
+          "date": "2026-09-03",
+          "arrival_minute": 26,
+          "departure_minute": 33,
+          "train_type": "Express",
+          "corridor_id": "COR-013",
+          "priority_class": 3,
+          "passenger_load_percent": 74.5,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-04352",
+          "section_id": "SEC-0127",
+          "date": "2026-09-03",
+          "arrival_minute": 532,
+          "departure_minute": 552,
+          "train_type": "Superfast",
+          "corridor_id": "COR-013",
+          "priority_class": 3,
+          "passenger_load_percent": 68.6,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-07781",
+          "section_id": "SEC-0127",
+          "date": "2026-09-03",
+          "arrival_minute": 566,
+          "departure_minute": 578,
+          "train_type": "EMU",
+          "corridor_id": "COR-013",
+          "priority_class": 2,
+          "passenger_load_percent": 51.5,
+          "scheduled_speed_kmph": 80.0
+        }
+      ]
+    },
+    "SEC-0130": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-04364",
+          "section_id": "SEC-0130",
+          "date": "2026-09-03",
+          "arrival_minute": 608,
+          "departure_minute": 615,
+          "train_type": "Freight",
+          "corridor_id": "COR-013",
+          "priority_class": 1,
+          "passenger_load_percent": 14.5,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-04746",
+          "section_id": "SEC-0130",
+          "date": "2026-09-03",
+          "arrival_minute": 1309,
+          "departure_minute": 1321,
+          "train_type": "Superfast",
+          "corridor_id": "COR-013",
+          "priority_class": 3,
+          "passenger_load_percent": 57.8,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-11917",
+          "section_id": "SEC-0130",
+          "date": "2026-09-03",
+          "arrival_minute": 1405,
+          "departure_minute": 1415,
+          "train_type": "Freight",
+          "corridor_id": "COR-013",
+          "priority_class": 1,
+          "passenger_load_percent": 39.1,
+          "scheduled_speed_kmph": 120.0
+        }
+      ]
+    },
+    "SEC-0135": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-03620",
+          "section_id": "SEC-0135",
+          "date": "2026-09-03",
+          "arrival_minute": 2,
+          "departure_minute": 12,
+          "train_type": "EMU",
+          "corridor_id": "COR-014",
+          "priority_class": 2,
+          "passenger_load_percent": 66.8,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-03260",
+          "section_id": "SEC-0135",
+          "date": "2026-09-03",
+          "arrival_minute": 274,
+          "departure_minute": 281,
+          "train_type": "EMU",
+          "corridor_id": "COR-014",
+          "priority_class": 2,
+          "passenger_load_percent": 70.3,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-08972",
+          "section_id": "SEC-0135",
+          "date": "2026-09-03",
+          "arrival_minute": 703,
+          "departure_minute": 723,
+          "train_type": "Freight",
+          "corridor_id": "COR-014",
+          "priority_class": 1,
+          "passenger_load_percent": 34.4,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-09787",
+          "section_id": "SEC-0135",
+          "date": "2026-09-03",
+          "arrival_minute": 1005,
+          "departure_minute": 1015,
+          "train_type": "Freight",
+          "corridor_id": "COR-014",
+          "priority_class": 1,
+          "passenger_load_percent": 15.6,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-07949",
+          "section_id": "SEC-0135",
+          "date": "2026-09-03",
+          "arrival_minute": 1007,
+          "departure_minute": 1022,
+          "train_type": "Passenger",
+          "corridor_id": "COR-014",
+          "priority_class": 2,
+          "passenger_load_percent": 58.5,
+          "scheduled_speed_kmph": 130.0
+        }
+      ]
+    },
+    "SEC-0141": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-10760",
+          "section_id": "SEC-0141",
+          "date": "2026-09-03",
+          "arrival_minute": 84,
+          "departure_minute": 91,
+          "train_type": "EMU",
+          "corridor_id": "COR-015",
+          "priority_class": 2,
+          "passenger_load_percent": 79.0,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-09036",
+          "section_id": "SEC-0141",
+          "date": "2026-09-03",
+          "arrival_minute": 733,
+          "departure_minute": 743,
+          "train_type": "EMU",
+          "corridor_id": "COR-015",
+          "priority_class": 2,
+          "passenger_load_percent": 71.2,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-00206",
+          "section_id": "SEC-0141",
+          "date": "2026-09-03",
+          "arrival_minute": 810,
+          "departure_minute": 822,
+          "train_type": "EMU",
+          "corridor_id": "COR-015",
+          "priority_class": 2,
+          "passenger_load_percent": 65.6,
+          "scheduled_speed_kmph": 130.0
+        }
+      ]
+    },
+    "SEC-0152": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-00672",
+          "section_id": "SEC-0152",
+          "date": "2026-09-03",
+          "arrival_minute": 169,
+          "departure_minute": 181,
+          "train_type": "Passenger",
+          "corridor_id": "COR-016",
+          "priority_class": 2,
+          "passenger_load_percent": 55.8,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-10392",
+          "section_id": "SEC-0152",
+          "date": "2026-09-03",
+          "arrival_minute": 601,
+          "departure_minute": 616,
+          "train_type": "Freight",
+          "corridor_id": "COR-016",
+          "priority_class": 1,
+          "passenger_load_percent": 12.9,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-06130",
+          "section_id": "SEC-0152",
+          "date": "2026-09-03",
+          "arrival_minute": 676,
+          "departure_minute": 686,
+          "train_type": "EMU",
+          "corridor_id": "COR-016",
+          "priority_class": 2,
+          "passenger_load_percent": 83.2,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-09188",
+          "section_id": "SEC-0152",
+          "date": "2026-09-03",
+          "arrival_minute": 1207,
+          "departure_minute": 1212,
+          "train_type": "Passenger",
+          "corridor_id": "COR-016",
+          "priority_class": 2,
+          "passenger_load_percent": 80.4,
+          "scheduled_speed_kmph": 120.0
+        }
+      ]
+    },
+    "SEC-0155": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-08186",
+          "section_id": "SEC-0155",
+          "date": "2026-09-03",
+          "arrival_minute": 29,
+          "departure_minute": 41,
+          "train_type": "Freight",
+          "corridor_id": "COR-016",
+          "priority_class": 1,
+          "passenger_load_percent": 34.5,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-10935",
+          "section_id": "SEC-0155",
+          "date": "2026-09-03",
+          "arrival_minute": 141,
+          "departure_minute": 148,
+          "train_type": "Express",
+          "corridor_id": "COR-016",
+          "priority_class": 3,
+          "passenger_load_percent": 77.9,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-03105",
+          "section_id": "SEC-0155",
+          "date": "2026-09-03",
+          "arrival_minute": 699,
+          "departure_minute": 706,
+          "train_type": "Freight",
+          "corridor_id": "COR-016",
+          "priority_class": 1,
+          "passenger_load_percent": 49.4,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-00177",
+          "section_id": "SEC-0155",
+          "date": "2026-09-03",
+          "arrival_minute": 770,
+          "departure_minute": 775,
+          "train_type": "Passenger",
+          "corridor_id": "COR-016",
+          "priority_class": 2,
+          "passenger_load_percent": 91.7,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-09947",
+          "section_id": "SEC-0155",
+          "date": "2026-09-03",
+          "arrival_minute": 870,
+          "departure_minute": 877,
+          "train_type": "Express",
+          "corridor_id": "COR-016",
+          "priority_class": 3,
+          "passenger_load_percent": 80.3,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-00223",
+          "section_id": "SEC-0155",
+          "date": "2026-09-03",
+          "arrival_minute": 943,
+          "departure_minute": 953,
+          "train_type": "EMU",
+          "corridor_id": "COR-016",
+          "priority_class": 2,
+          "passenger_load_percent": 70.5,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-02746",
+          "section_id": "SEC-0155",
+          "date": "2026-09-03",
+          "arrival_minute": 1019,
+          "departure_minute": 1026,
+          "train_type": "EMU",
+          "corridor_id": "COR-016",
+          "priority_class": 2,
+          "passenger_load_percent": 80.0,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-01759",
+          "section_id": "SEC-0155",
+          "date": "2026-09-03",
+          "arrival_minute": 1042,
+          "departure_minute": 1049,
+          "train_type": "Express",
+          "corridor_id": "COR-016",
+          "priority_class": 3,
+          "passenger_load_percent": 85.8,
+          "scheduled_speed_kmph": 120.0
+        }
+      ]
+    },
+    "SEC-0167": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-07954",
+          "section_id": "SEC-0167",
+          "date": "2026-09-03",
+          "arrival_minute": 300,
+          "departure_minute": 310,
+          "train_type": "Freight",
+          "corridor_id": "COR-017",
+          "priority_class": 1,
+          "passenger_load_percent": 45.2,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-01258",
+          "section_id": "SEC-0167",
+          "date": "2026-09-03",
+          "arrival_minute": 362,
+          "departure_minute": 382,
+          "train_type": "Passenger",
+          "corridor_id": "COR-017",
+          "priority_class": 2,
+          "passenger_load_percent": 97.1,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-09929",
+          "section_id": "SEC-0167",
+          "date": "2026-09-03",
+          "arrival_minute": 483,
+          "departure_minute": 488,
+          "train_type": "Passenger",
+          "corridor_id": "COR-017",
+          "priority_class": 2,
+          "passenger_load_percent": 64.4,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-00311",
+          "section_id": "SEC-0167",
+          "date": "2026-09-03",
+          "arrival_minute": 719,
+          "departure_minute": 739,
+          "train_type": "EMU",
+          "corridor_id": "COR-017",
+          "priority_class": 2,
+          "passenger_load_percent": 70.2,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-00868",
+          "section_id": "SEC-0167",
+          "date": "2026-09-03",
+          "arrival_minute": 1357,
+          "departure_minute": 1362,
+          "train_type": "EMU",
+          "corridor_id": "COR-017",
+          "priority_class": 2,
+          "passenger_load_percent": 84.4,
+          "scheduled_speed_kmph": 80.0
+        }
+      ]
+    },
+    "SEC-0179": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-00999",
+          "section_id": "SEC-0179",
+          "date": "2026-09-03",
+          "arrival_minute": 185,
+          "departure_minute": 192,
+          "train_type": "EMU",
+          "corridor_id": "COR-018",
+          "priority_class": 2,
+          "passenger_load_percent": 99.0,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-06358",
+          "section_id": "SEC-0179",
+          "date": "2026-09-03",
+          "arrival_minute": 823,
+          "departure_minute": 830,
+          "train_type": "EMU",
+          "corridor_id": "COR-018",
+          "priority_class": 2,
+          "passenger_load_percent": 87.5,
+          "scheduled_speed_kmph": 110.0
+        }
+      ]
+    },
+    "SEC-0182": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-05516",
+          "section_id": "SEC-0182",
+          "date": "2026-09-03",
+          "arrival_minute": 64,
+          "departure_minute": 74,
+          "train_type": "Superfast",
+          "corridor_id": "COR-019",
+          "priority_class": 3,
+          "passenger_load_percent": 95.3,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-01179",
+          "section_id": "SEC-0182",
+          "date": "2026-09-03",
+          "arrival_minute": 685,
+          "departure_minute": 695,
+          "train_type": "Freight",
+          "corridor_id": "COR-019",
+          "priority_class": 1,
+          "passenger_load_percent": 28.5,
+          "scheduled_speed_kmph": 120.0
+        }
+      ]
+    },
+    "SEC-0188": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-10632",
+          "section_id": "SEC-0188",
+          "date": "2026-09-03",
+          "arrival_minute": 243,
+          "departure_minute": 250,
+          "train_type": "Superfast",
+          "corridor_id": "COR-019",
+          "priority_class": 3,
+          "passenger_load_percent": 73.0,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-11234",
+          "section_id": "SEC-0188",
+          "date": "2026-09-03",
+          "arrival_minute": 535,
+          "departure_minute": 540,
+          "train_type": "Superfast",
+          "corridor_id": "COR-019",
+          "priority_class": 3,
+          "passenger_load_percent": 85.1,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-10398",
+          "section_id": "SEC-0188",
+          "date": "2026-09-03",
+          "arrival_minute": 605,
+          "departure_minute": 615,
+          "train_type": "Freight",
+          "corridor_id": "COR-019",
+          "priority_class": 1,
+          "passenger_load_percent": 25.1,
+          "scheduled_speed_kmph": 130.0
+        }
+      ]
+    },
+    "SEC-0189": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-02788",
+          "section_id": "SEC-0189",
+          "date": "2026-09-03",
+          "arrival_minute": 88,
+          "departure_minute": 100,
+          "train_type": "EMU",
+          "corridor_id": "COR-019",
+          "priority_class": 2,
+          "passenger_load_percent": 76.3,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-00669",
+          "section_id": "SEC-0189",
+          "date": "2026-09-03",
+          "arrival_minute": 412,
+          "departure_minute": 432,
+          "train_type": "Superfast",
+          "corridor_id": "COR-019",
+          "priority_class": 3,
+          "passenger_load_percent": 94.4,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-01507",
+          "section_id": "SEC-0189",
+          "date": "2026-09-03",
+          "arrival_minute": 965,
+          "departure_minute": 970,
+          "train_type": "Passenger",
+          "corridor_id": "COR-019",
+          "priority_class": 2,
+          "passenger_load_percent": 88.1,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-03623",
+          "section_id": "SEC-0189",
+          "date": "2026-09-03",
+          "arrival_minute": 975,
+          "departure_minute": 982,
+          "train_type": "Express",
+          "corridor_id": "COR-019",
+          "priority_class": 3,
+          "passenger_load_percent": 77.3,
+          "scheduled_speed_kmph": 110.0
+        }
+      ]
+    },
+    "SEC-0193": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-10776",
+          "section_id": "SEC-0193",
+          "date": "2026-09-03",
+          "arrival_minute": 396,
+          "departure_minute": 406,
+          "train_type": "Superfast",
+          "corridor_id": "COR-020",
+          "priority_class": 3,
+          "passenger_load_percent": 67.9,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-08818",
+          "section_id": "SEC-0193",
+          "date": "2026-09-03",
+          "arrival_minute": 443,
+          "departure_minute": 463,
+          "train_type": "Superfast",
+          "corridor_id": "COR-020",
+          "priority_class": 3,
+          "passenger_load_percent": 32.0,
+          "scheduled_speed_kmph": 100.0
+        },
+        {
+          "train_id": "TRN-04615",
+          "section_id": "SEC-0193",
+          "date": "2026-09-03",
+          "arrival_minute": 810,
+          "departure_minute": 817,
+          "train_type": "Freight",
+          "corridor_id": "COR-020",
+          "priority_class": 1,
+          "passenger_load_percent": 36.4,
+          "scheduled_speed_kmph": 130.0
+        }
+      ]
+    },
+    "SEC-0194": {
+      "2026-09-03": [
+        {
+          "train_id": "TRN-00431",
+          "section_id": "SEC-0194",
+          "date": "2026-09-03",
+          "arrival_minute": 497,
+          "departure_minute": 512,
+          "train_type": "Superfast",
+          "corridor_id": "COR-020",
+          "priority_class": 3,
+          "passenger_load_percent": 53.1,
+          "scheduled_speed_kmph": 110.0
+        },
+        {
+          "train_id": "TRN-04147",
+          "section_id": "SEC-0194",
+          "date": "2026-09-03",
+          "arrival_minute": 820,
+          "departure_minute": 825,
+          "train_type": "Superfast",
+          "corridor_id": "COR-020",
+          "priority_class": 3,
+          "passenger_load_percent": 68.5,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-07873",
+          "section_id": "SEC-0194",
+          "date": "2026-09-03",
+          "arrival_minute": 914,
+          "departure_minute": 919,
+          "train_type": "Superfast",
+          "corridor_id": "COR-020",
+          "priority_class": 3,
+          "passenger_load_percent": 72.9,
+          "scheduled_speed_kmph": 80.0
+        },
+        {
+          "train_id": "TRN-06440",
+          "section_id": "SEC-0194",
+          "date": "2026-09-03",
+          "arrival_minute": 964,
+          "departure_minute": 974,
+          "train_type": "Passenger",
+          "corridor_id": "COR-020",
+          "priority_class": 2,
+          "passenger_load_percent": 66.7,
+          "scheduled_speed_kmph": 120.0
+        },
+        {
+          "train_id": "TRN-10779",
+          "section_id": "SEC-0194",
+          "date": "2026-09-03",
+          "arrival_minute": 1281,
+          "departure_minute": 1293,
+          "train_type": "EMU",
+          "corridor_id": "COR-020",
+          "priority_class": 2,
+          "passenger_load_percent": 99.0,
+          "scheduled_speed_kmph": 100.0
+        }
+      ]
+    }
+  }
+}
