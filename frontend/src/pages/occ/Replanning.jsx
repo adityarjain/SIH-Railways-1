@@ -235,7 +235,7 @@ export const Replanning = ({ onNavigate }) => {
               <span className="flex-1 min-w-6 h-px bg-ws-rule" />
               <span className="font-mono text-[10px] text-ws-light">{t('replanning.retentionScope', { count: retention.tasks_in_plan ?? '—' })}</span>
             </div>
-            <div className="grid grid-cols-3 gap-x-3.5 border-t border-ws-rule pt-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-3.5 gap-y-2 border-t border-ws-rule pt-3">
               <div>
                 <div className="font-mono text-[22px] font-bold text-ws-warn leading-none">{retention.tasks_re_solved ?? '—'}</div>
                 <div className="font-ws text-xs text-ws-mid mt-[3px] leading-[1.35]">{t('replanning.reSolved')}</div>

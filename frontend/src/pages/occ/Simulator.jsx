@@ -153,7 +153,7 @@ export const Simulator = ({ onNavigate }) => {
             meta={simStep > 0 ? t('simulator.stepOf', { n: simStep }) : t('simulator.closedLoopScope')}
             isHindi={isHindi}
           />
-          <div className="grid grid-cols-7 gap-1.5 border-t border-ws-rule pt-3">
+          <div className="grid grid-cols-3 sm:grid-cols-7 gap-1.5 border-t border-ws-rule pt-3">
             {STEP_KEYS.map((nameKey, i) => {
               const num = i + 1;
               const done = simStep >= num;

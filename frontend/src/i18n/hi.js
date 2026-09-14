@@ -236,8 +236,6 @@ export const hi = {
     blockStatusScope: 'पूर्ण रन · 14-दिवसीय अवधि',
     possessionsUsed: 'प्रयुक्त ब्लॉक अवधियाँ',
     nightWindowTasks: 'रात्रि अवधि के कार्य',
-    crewsUtilized: 'प्रयुक्त दल',
-    trackAvailability: 'ट्रैक उपलब्धता',
     trackAvailabilitySub: '{total} में से {avail} अवधियाँ',
 
     trainImpact: 'ट्रेन प्रभाव',
@@ -268,7 +266,7 @@ export const hi = {
     upcoming: 'आगामी ब्लॉक अवधियाँ',
     upcomingScope: '{date} · प्रदर्शन परिदृश्य',
     noPossessionOnDate: 'इस तिथि हेतु कोई ब्लॉक अवधि निर्धारित नहीं।',
-    headlineScope: 'मुख्य आँकड़े: पूर्ण रन, {full} कार्य। समयरेखा: प्रदर्शन परिदृश्य, {demo} कार्य।',
+    headlineScope: 'मुख्य आँकड़े: पूर्ण रन, {full} कार्य, {scheduled} निर्धारित, {deferred} अति-गंभीर आस्थगित। समयरेखा: प्रदर्शन परिदृश्य, {demo} कार्य।',
 
     // Industrial worksheet (design 2A) — Authority Overview only.
     daySheet: 'दिन-पत्रक — ब्लॉक एवं गाड़ी संचलन',
@@ -284,8 +282,6 @@ export const hi = {
     crewSummary: '{team} · आवश्यक {required} में से {size} · पाली {shift}',
     trainsField: '{conflicting} टकराव (C002) · ±{min} मिनट में {adjacent} निकटवर्ती',
     decisionBasis: 'निर्णय आधार',
-    constraintCheck: 'प्रतिबंध जाँच',
-    constraintSummary: '{considered} अवधियाँ मूल्यांकित · {rejected} अस्वीकृत · {feasible} संभाव्य',
     decisionRecordedNote: 'निर्णय प्राधिकरण भूमिका द्वारा अभिलिखित; योजना स्वतः लागू नहीं होती।',
     goToBlockPlanning: 'ब्लॉक नियोजन पर जाएँ',
     requiresAttention: 'ध्यान आवश्यक',
@@ -297,7 +293,6 @@ export const hi = {
     corridorsNotListedGeneric: '{count} अन्य कॉरिडोर सूचीबद्ध नहीं हैं।',
     legendCriticalLower: 'गंभीर',
     otherPossessions: 'अन्य अधिकार',
-    possCritSecLegend: 'POSS · CRIT · SEC',
     planState: 'योजना स्थिति',
     runState: 'रन स्थिति',
     checksLabel: 'जाँच',
@@ -306,7 +301,6 @@ export const hi = {
     decisionBasis3: 'दर्ज C002 टकराव समूह में इस अवधि के भीतर कोई गाड़ी गतिविधि नहीं, और इसके किनारों के ±{buffer} मिनट के भीतर भी नहीं।',
     decisionBasis3Alt: '{count} दर्ज C002 गाड़ी गतिविधियाँ इस अवधि के भीतर आती हैं।',
     decisionBasis4: '{team} पूरी अवधि हेतु पाली पर है, आवश्यक {required} के विरुद्ध {available} योग्य कार्मिक उपलब्ध।',
-    tasksScheduledCaption: 'निर्धारित कार्य · सूची का {pct}%',
     daySheetWord: 'दिन-पत्रक',
   },
 

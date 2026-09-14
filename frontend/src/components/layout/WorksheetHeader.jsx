@@ -78,7 +78,7 @@ export const WorksheetHeader = ({ activeTab, onNavigate, subtitle }) => {
         </div>
         <span className="flex-1 min-w-3" />
         <div className="flex items-center gap-4 flex-wrap">
-          <div className="text-right">
+          <div className="text-right hidden sm:block">
             <div className={`font-display text-xs font-semibold ${uc} ${tr} text-ws-light`}>{t('overview.runState')}</div>
             <div className="font-mono text-[11px] text-ws-body mt-0.5">
               <span className="text-ws-warn font-bold">{metrics.summary.solver_status}</span> {metrics.summary.runtime_seconds}s

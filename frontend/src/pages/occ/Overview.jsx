@@ -5,29 +5,27 @@ import { useI18n } from '../../i18n';
 import { WorksheetHeader } from '../../components/layout/WorksheetHeader';
 import { NAV_ITEMS_BY_ROLE } from '../../components/layout/Sidebar';
 import { DaySheet } from '../../components/timeline/DaySheet';
+import { RegionHeader, wsCase } from '../../components/ui/worksheet';
 import { bandOf } from '../../utils/risk';
 import corridorsSectionsData from '../../data/corridors_sections.json';
-import networkStats from '../../data/network_stats.json';
 import teamsData from '../../data/teams.json';
 import decisionTrace from '../../data/decision_trace.json';
 
 /**
  * Authority Overview — "industrial worksheet" (design 2A).
  *
- * A single, self-contained operational worksheet rather than a KPI wall: it
- * owns its own provenance strip, masthead and navigation (regions 01-08 of
- * the approved design), because a day sheet, a recommendation dossier that
- * carries its own evidence, and a ranked attention ledger read as one surface,
- * not as widgets inside a dashboard shell. Every other Authority screen keeps
- * the existing sidebar shell; only this one page renders full-bleed (see
- * `AppLayout.jsx`).
+ * A lean at-a-glance surface, not a KPI wall and not a second copy of every
+ * other Authority screen. Regions that duplicated Decision Trace, Resources
+ * and Analytics almost verbatim were cut in the declutter pass; what remains
+ * is either unique to this page (the day sheet, the ranked attention ledger)
+ * or a genuine summary with a one-click path to the page that owns the detail.
  *
- * Reading order: PLAN (day sheet) -> DECISION (recommendation) -> EVIDENCE
- * (constraint check) -> OPERATIONAL CONTEXT (attention, corridors, plan state).
+ * Reading order: PLAN (day sheet) -> DECISION (recommendation) -> OPERATIONAL
+ * CONTEXT (attention, next out, corridor situation).
  *
- * Overview reports the FULL RUN (`baselineMetrics`); the day sheet and
- * dossier report the DEMO SCENARIO (`metrics` / `decision_trace.json`). Every
- * figure keeps the scope it came from.
+ * Overview reports the FULL RUN (`baselineMetrics`) in its footer; the day
+ * sheet and dossier report the DEMO SCENARIO (`metrics` / `decision_trace.json`).
+ * Every figure keeps the scope it came from.
  */
 
 const CORRIDOR_NAME = Object.fromEntries(
@@ -62,8 +60,7 @@ export const Overview = ({ onNavigate }) => {
   const reasons = metrics.deferral_reasons || {};
   const prov = metrics.provenance || {};
 
-  const uc = isHindi ? '' : 'uppercase';
-  const tr = isHindi ? '' : 'tracking-[0.1em]';
+  const { uc, tr } = wsCase(isHindi);
 
   // Task counts per date the plan actually schedules something on.
   const taskCounts = useMemo(() => {
@@ -195,12 +192,12 @@ export const Overview = ({ onNavigate }) => {
   }, [activeEvent, isReplanned, replanRequest, replanScenario, replannedRecord, t]);
 
   const nextOut = useMemo(
-    () => [...tasksOnDate].sort((a, b) => a.start_minute - b.start_minute).slice(0, 6),
+    () => [...tasksOnDate].sort((a, b) => a.start_minute - b.start_minute).slice(0, 4),
     [tasksOnDate],
   );
 
   // Corridor situation — every corridor touched on the active date, ranked by
-  // possession count. Only the top 12 are drawn; the rest are named in the
+  // possession count. Only the top 6 are drawn; the rest are named in the
   // footnote so the count is never silently dropped.
   const corridorStats = useMemo(() => {
     const map = new Map();
@@ -217,29 +214,21 @@ export const Overview = ({ onNavigate }) => {
   }, [tasksOnDate]);
 
   const maxPoss = Math.max(1, corridorStats[0]?.poss || 1);
-  const shownCorridors = corridorStats.slice(0, 12);
-  const hiddenCorridors = corridorStats.slice(12);
+  const shownCorridors = corridorStats.slice(0, 6);
+  const hiddenCorridors = corridorStats.slice(6);
   const allHiddenSingle = hiddenCorridors.length > 0 && hiddenCorridors.every((c) => c.poss === 1);
-  const colLeft = shownCorridors.slice(0, Math.ceil(shownCorridors.length / 2));
-  const colRight = shownCorridors.slice(Math.ceil(shownCorridors.length / 2));
 
   // Decision basis — four clauses, each derived from a real decision_trace.json
   // field rather than hand-written narrative. Never fabricated.
   const dReq = decisionTrace.request || {};
   const dRisk = decisionTrace.risk_signal || {};
   const dSel = decisionTrace.selected || {};
-  const dSum = decisionTrace.candidate_summary || {};
   const dImpact = decisionTrace.train_impact || {};
   const dCandidates = decisionTrace.candidates || [];
   const selectedCandidate = dCandidates.find((c) => c.status === 'SELECTED');
   const offeredMinutes = windowSpanMinutes(selectedCandidate?.window);
   const primaryCrew = (dSel.teams || [])[0];
   const conflictingCount = (dImpact.conflicting || []).length;
-  const byRule = dSum.rejected_by_rule || {};
-  const ruleMeta = Object.entries(byRule)
-    .sort((a, b) => b[1] - a[1])
-    .map(([rule, count]) => `${rule} ×${count}`)
-    .join(' · ');
 
   // Masthead subtitle date range — the shared WorksheetHeader computes its
   // own run-state line; this is only for the day-sheet-specific line below.
@@ -265,7 +254,7 @@ export const Overview = ({ onNavigate }) => {
     <div className="bg-ws-band min-h-full">
       <WorksheetHeader activeTab="overview" onNavigate={onNavigate} subtitle={overviewSubtitle} />
 
-      {/* 04 — horizon strip */}
+      {/* horizon strip */}
       <div className="bg-ws-band border-b border-ws-rule flex items-stretch">
         <div className="px-3.5 py-1.5 hidden lg:flex items-center border-r border-ws-rule shrink-0">
           <span className={`font-display text-xs font-semibold ${uc} tracking-[0.12em] text-ws-mid`}>
@@ -300,7 +289,7 @@ export const Overview = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* 05 — day sheet (region 01 of the design) */}
+      {/* day sheet (region 01 of the design, rendered by DaySheet itself) */}
       <DaySheet
         corridorOptions={corridorOptions}
         corridorId={activeCorridor}
@@ -312,17 +301,15 @@ export const Overview = ({ onNavigate }) => {
         onSelectTask={() => onNavigate && onNavigate('block-planning')}
       />
 
-      {/* 06 — recommendation dossier (64) + 07 — attention ledger (36) */}
+      {/* 02 — recommendation headline + 03 — attention ledger */}
       <div className="grid grid-cols-1 lg:grid-cols-[60fr_40fr] xl:grid-cols-[64fr_36fr] bg-ws-rule gap-px">
         <div className="bg-ws-dossier border-t-[3px] border-ws-ink px-3.5 md:px-4 xl:px-5 pt-[15px] pb-[18px] min-w-0">
-          <div className="flex items-center gap-2.5 pb-2 flex-wrap">
-            <span className="font-mono text-[11px] font-bold text-ws-light">02</span>
-            <span className={`font-display text-base font-semibold ${uc} ${tr} text-ws-ink`}>{t('overview.recommendation')}</span>
-            <span className="flex-1 min-w-6 h-px bg-ws-rule" />
-            <span className="font-mono text-[10px] text-ws-light">
-              {dReq.task_id} · {dReq.section_id} · {t('overview.pendingAuthorityDecision').toUpperCase()}
-            </span>
-          </div>
+          <RegionHeader
+            number="02"
+            title={t('overview.recommendation')}
+            isHindi={isHindi}
+            meta={`${dReq.task_id} · ${dReq.section_id} · ${t('overview.pendingAuthorityDecision').toUpperCase()}`}
+          />
 
           <div className="flex items-end gap-5 pt-0.5 pb-3 border-b border-ws-rule flex-wrap">
             <div>
@@ -381,36 +368,6 @@ export const Overview = ({ onNavigate }) => {
             </div>
           </div>
 
-          <div className="pt-3.5">
-            <div className="flex items-baseline gap-2.5 mb-1.5 flex-wrap">
-              <span className={`font-display text-sm font-semibold ${uc} ${tr} text-ws-ink`}>{t('overview.constraintCheck')}</span>
-              <span className="font-mono text-[11px] text-ws-mid">
-                {t('overview.constraintSummary', { considered: dSum.block_windows_considered, rejected: dSum.rejected, feasible: dSum.feasible })}
-              </span>
-              <span className="flex-1 min-w-2" />
-              <span className="font-mono text-[10px] text-ws-light">{ruleMeta}</span>
-            </div>
-            <div className="border-t border-ws-rule bg-ws-surface">
-              {dCandidates.map((c, i) => {
-                const verdictColor = c.status === 'SELECTED' ? 'text-ws-info' : c.status === 'FEASIBLE' ? 'text-ws-ok' : 'text-ws-critical';
-                const verdictText = c.status === 'SELECTED' ? t('decisionTrace.selected') : c.status === 'FEASIBLE' ? t('decisionTrace.feasible') : t('decisionTrace.rejected');
-                return (
-                  <div
-                    key={`${(c.block_ids || []).join('-')}-${c.window}-${i}`}
-                    className={`grid grid-cols-[86px_70px_72px_minmax(0,1fr)] items-center gap-2 px-2 py-1 border-b border-ws-hairline last:border-b-0 hover:bg-ws-surface ${
-                      c.status === 'SELECTED' ? 'bg-ws-selected' : ''
-                    }`}
-                  >
-                    <span className={`font-mono text-[11px] ${c.status === 'SELECTED' ? 'font-bold text-ws-ink' : 'font-medium text-ws-ink'}`}>{c.window}</span>
-                    <span className={`font-display text-xs font-bold ${uc} ${tr} ${verdictColor}`}>{verdictText}</span>
-                    <span className={`font-mono text-[10px] ${c.rule ? 'text-ws-critical' : 'text-ws-disabled'}`}>{c.rule || '—'}</span>
-                    <span className="font-mono text-[10px] text-ws-mid overflow-hidden text-ellipsis whitespace-nowrap">{c.reason}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
           <div className="flex items-center gap-2.5 pt-[15px] flex-wrap">
             <button
               onClick={() => onNavigate && onNavigate('decision-trace')}
@@ -429,16 +386,14 @@ export const Overview = ({ onNavigate }) => {
           </div>
         </div>
 
-        {/* 07 — attention ledger + next out */}
+        {/* 03 — attention ledger + 04 — next out */}
         <div className="bg-ws-surface border-t border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-[18px] min-w-0">
-          <div className="flex items-center gap-2.5 pb-2 flex-wrap">
-            <span className="font-mono text-[11px] font-bold text-ws-light">03</span>
-            <span className={`font-display text-base font-semibold ${uc} ${tr} text-ws-ink`}>{t('overview.requiresAttention')}</span>
-            <span className="flex-1 min-w-6 h-px bg-ws-rule" />
-            <span className="font-mono text-[10px] text-ws-light">
-              {t('overview.rankedBySeverity', { count: attention.length }).toUpperCase()}
-            </span>
-          </div>
+          <RegionHeader
+            number="03"
+            title={t('overview.requiresAttention')}
+            isHindi={isHindi}
+            meta={t('overview.rankedBySeverity', { count: attention.length }).toUpperCase()}
+          />
 
           {attention.length === 0 ? (
             <div className="py-6">
@@ -476,12 +431,12 @@ export const Overview = ({ onNavigate }) => {
           )}
 
           <div className="pt-[18px]">
-            <div className="flex items-center gap-2.5 pb-2 flex-wrap">
-              <span className="font-mono text-[11px] font-bold text-ws-light">04</span>
-              <span className={`font-display text-base font-semibold ${uc} ${tr} text-ws-ink`}>{t('overview.nextOut')}</span>
-              <span className="flex-1 min-w-6 h-px bg-ws-rule" />
-              <span className="font-mono text-[10px] text-ws-light">{activeDate} · {nextOut.length} / {tasksOnDate.length}</span>
-            </div>
+            <RegionHeader
+              number="04"
+              title={t('overview.nextOut')}
+              isHindi={isHindi}
+              meta={`${activeDate} · ${nextOut.length} / ${tasksOnDate.length}`}
+            />
             {nextOut.length === 0 ? (
               <div className="py-4 font-ws text-xs text-ws-mid">{t('overview.noPossessionOnDate')}</div>
             ) : (
@@ -516,99 +471,62 @@ export const Overview = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* 08 — corridor situation (1fr) + 09 — plan state (420px) */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_420px] bg-ws-rule gap-px border-t border-ws-rule">
-        <div className="bg-ws-surface px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4 min-w-0">
-          <div className="flex items-center gap-2.5 pb-2 flex-wrap">
-            <span className="font-mono text-[11px] font-bold text-ws-light">05</span>
-            <span className={`font-display text-base font-semibold ${uc} ${tr} text-ws-ink`}>{t('overview.corridorSituation')}</span>
-            <span className="flex-1 min-w-6 h-px bg-ws-rule" />
-            <span className="font-mono text-[10px] text-ws-light">
-              {activeDate} · {tasksOnDate.length} / {corridorStats.length}
-            </span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-            {[colLeft, colRight].map((col, ci) => (
-              <div key={ci} className="border-t border-ws-rule">
-                {col.map((c) => (
-                  <button
-                    key={c.id}
-                    onClick={() => setSelectedCorridor(c.id)}
-                    className={`grid grid-cols-[72px_minmax(0,1fr)_104px] items-center gap-2.5 w-full text-left px-1.5 py-1 border-b border-ws-hairline hover:bg-ws-paper ${
-                      c.id === activeCorridor ? 'bg-ws-selected' : ''
-                    }`}
-                  >
-                    <span className={`font-mono text-[11px] ${c.id === activeCorridor ? 'font-bold' : 'font-medium'} text-ws-ink`}>{c.id}</span>
-                    <span className="flex items-center gap-1.5 min-w-0">
-                      <span className="flex h-[9px] w-32 shrink-0 gap-px bg-ws-tick">
-                        <span className="bg-ws-critical" style={{ width: `${(c.crit / maxPoss) * 100}%` }} />
-                        <span className="bg-ws-body" style={{ width: `${((c.poss - c.crit) / maxPoss) * 100}%` }} />
-                      </span>
-                      <span className="font-ws text-xs text-ws-mid overflow-hidden text-ellipsis whitespace-nowrap">{c.name}</span>
-                    </span>
-                    <span className="font-mono text-[10px] text-ws-light text-right">{c.poss} · {c.crit} · {c.sec}</span>
-                  </button>
-                ))}
-              </div>
-            ))}
-          </div>
-          <div className="flex items-center gap-4 pt-[9px] flex-wrap">
-            {hiddenCorridors.length > 0 && (
-              <span className="font-ws text-xs text-ws-light">
-                {allHiddenSingle
-                  ? t('overview.corridorsNotListed', { count: hiddenCorridors.length })
-                  : t('overview.corridorsNotListedGeneric', { count: hiddenCorridors.length })}
+      {/* 05 — corridor situation */}
+      <div className="bg-ws-surface px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4 border-t border-ws-rule">
+        <RegionHeader
+          number="05"
+          title={t('overview.corridorSituation')}
+          isHindi={isHindi}
+          meta={`${activeDate} · ${tasksOnDate.length} / ${corridorStats.length}`}
+        />
+        <div className="border-t border-ws-rule max-w-2xl">
+          {shownCorridors.map((c) => (
+            <button
+              key={c.id}
+              onClick={() => setSelectedCorridor(c.id)}
+              className={`grid grid-cols-[52px_minmax(0,1fr)_58px] sm:grid-cols-[72px_minmax(0,1fr)_104px] items-center gap-2 sm:gap-2.5 w-full text-left px-1.5 py-1 border-b border-ws-hairline hover:bg-ws-paper ${
+                c.id === activeCorridor ? 'bg-ws-selected' : ''
+              }`}
+            >
+              <span className={`font-mono text-[11px] ${c.id === activeCorridor ? 'font-bold' : 'font-medium'} text-ws-ink`}>{c.id}</span>
+              <span className="flex items-center gap-1.5 min-w-0">
+                <span className="flex h-[9px] w-8 sm:w-32 shrink-0 gap-px bg-ws-tick">
+                  <span className="bg-ws-critical" style={{ width: `${(c.crit / maxPoss) * 100}%` }} />
+                  <span className="bg-ws-body" style={{ width: `${((c.poss - c.crit) / maxPoss) * 100}%` }} />
+                </span>
+                <span className="font-ws text-xs text-ws-mid overflow-hidden text-ellipsis whitespace-nowrap">{c.name}</span>
               </span>
-            )}
-            <span className="flex-1 min-w-2" />
-            <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
-              <span className="w-3.5 h-[9px] bg-ws-critical" />{t('overview.legendCriticalLower')}
-            </span>
-            <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
-              <span className="w-3.5 h-[9px] bg-ws-body" />{t('overview.otherPossessions')}
-            </span>
-            <span className="font-mono text-[10px] text-ws-light">{t('overview.possCritSecLegend')}</span>
-          </div>
+              <span className="font-mono text-[10px] text-ws-light text-right">{c.poss} · {c.crit} · {c.sec}</span>
+            </button>
+          ))}
         </div>
-
-        <div className="bg-ws-surface px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
-          <div className="flex items-center gap-2.5 pb-2 flex-wrap">
-            <span className="font-mono text-[11px] font-bold text-ws-light">06</span>
-            <span className={`font-display text-base font-semibold ${uc} ${tr} text-ws-ink`}>{t('overview.planState')}</span>
-            <span className="flex-1 min-w-6 h-px bg-ws-rule" />
-            <span className="font-mono text-[10px] text-ws-light">
-              {t('scope.fullRunTasks', { count: metrics.summary.total_tasks_considered.toLocaleString() }).toUpperCase()}
+        <div className="flex items-center gap-4 pt-[9px] flex-wrap">
+          {hiddenCorridors.length > 0 && (
+            <span className="font-ws text-xs text-ws-light">
+              {allHiddenSingle
+                ? t('overview.corridorsNotListed', { count: hiddenCorridors.length })
+                : t('overview.corridorsNotListedGeneric', { count: hiddenCorridors.length })}
             </span>
-          </div>
-          <div className="grid grid-cols-2 gap-x-5 gap-y-3.5 border-t border-ws-rule pt-3">
-            <div>
-              <div className="font-mono text-[22px] font-bold text-ws-ink leading-none">{metrics.summary.total_scheduled.toLocaleString()}</div>
-              <div className="font-ws text-xs text-ws-mid mt-[3px] leading-[1.35]">
-                {t('overview.tasksScheduledCaption', { pct: metrics.summary.scheduled_percentage })}
-              </div>
-            </div>
-            <div>
-              <div className="font-mono text-[22px] font-bold text-ws-critical leading-none">{(risk.critical_risk_deferred ?? 0).toLocaleString()}</div>
-              <div className="font-ws text-xs text-ws-mid mt-[3px] leading-[1.35]">{t('overview.criticalDeferred')}</div>
-            </div>
-            <div>
-              <div className="font-mono text-[22px] font-bold text-ws-warn leading-none">{op.teams_utilized ?? 0} / {teamsData.length}</div>
-              <div className="font-ws text-xs text-ws-mid mt-[3px] leading-[1.35]">{t('overview.crewsUtilized')}</div>
-            </div>
-            <div>
-              <div className="font-mono text-[22px] font-bold text-ws-ink leading-none">{networkStats.track_availability_percent}%</div>
-              <div className="font-ws text-xs text-ws-mid mt-[3px] leading-[1.35]">
-                {t('overview.trackAvailability')} · {networkStats.track_available_block_windows.toLocaleString()} / {networkStats.total_block_windows.toLocaleString()}
-              </div>
-            </div>
-          </div>
+          )}
+          <span className="flex-1 min-w-2" />
+          <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
+            <span className="w-3.5 h-[9px] bg-ws-critical" />{t('overview.legendCriticalLower')}
+          </span>
+          <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
+            <span className="w-3.5 h-[9px] bg-ws-body" />{t('overview.otherPossessions')}
+          </span>
         </div>
       </div>
 
-      {/* 10 — footer */}
+      {/* footer */}
       <div className="bg-ws-band border-t border-ws-rule px-3.5 md:px-4 xl:px-5 py-2 flex flex-wrap items-center gap-3.5">
         <span className="font-mono text-[10px] text-ws-mid">
-          {t('overview.headlineScope', { full: metrics.summary.total_tasks_considered.toLocaleString(), demo: scenario.summary.total_tasks_considered }).toUpperCase()}
+          {t('overview.headlineScope', {
+            full: metrics.summary.total_tasks_considered.toLocaleString(),
+            scheduled: metrics.summary.total_scheduled.toLocaleString(),
+            deferred: (risk.critical_risk_deferred ?? 0).toLocaleString(),
+            demo: scenario.summary.total_tasks_considered,
+          }).toUpperCase()}
         </span>
         <span className="flex-1 min-w-2" />
         <span className="font-mono text-[10px] text-ws-light break-all">

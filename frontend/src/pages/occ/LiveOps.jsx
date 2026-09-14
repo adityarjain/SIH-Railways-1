@@ -70,7 +70,7 @@ export const LiveOps = ({ onNavigate }) => {
               <Pill tone="critical">{t('liveOps.collisionConflict')}</Pill>
             </div>
 
-            <div className="grid grid-cols-3 gap-3 font-mono text-xs bg-ws-surface p-3 border border-ws-warn">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs bg-ws-surface p-3 border border-ws-warn">
               <div>
                 <span className="font-ws text-ws-mid block text-[11px]">{t('liveOps.affectedMaintenance')}</span>
                 <span className="font-bold text-ws-ink">{replanRequest.maintenance_task_id}</span>

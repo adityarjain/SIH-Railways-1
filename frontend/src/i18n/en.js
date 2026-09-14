@@ -231,8 +231,6 @@ export const en = {
     blockStatusScope: 'Full run · 14-day horizon',
     possessionsUsed: 'Possessions used',
     nightWindowTasks: 'Night-window tasks',
-    crewsUtilized: 'Crews utilized',
-    trackAvailability: 'Track availability',
     trackAvailabilitySub: '{avail} of {total} windows',
 
     trainImpact: 'Train impact',
@@ -263,7 +261,7 @@ export const en = {
     upcoming: 'Upcoming possessions',
     upcomingScope: '{date} · demo scenario',
     noPossessionOnDate: 'No possession scheduled on this date.',
-    headlineScope: 'Headline figures: full run, {full} tasks. Timeline: demo scenario, {demo} tasks.',
+    headlineScope: 'Headline figures: full run, {full} tasks, {scheduled} scheduled, {deferred} critical-risk deferred. Timeline: demo scenario, {demo} tasks.',
 
     // Industrial worksheet (design 2A) — Authority Overview only.
     daySheet: 'Day sheet — blocks and train movements',
@@ -279,8 +277,6 @@ export const en = {
     crewSummary: '{team} · {size} of {required} required · shift {shift}',
     trainsField: '{conflicting} conflicting (C002) · {adjacent} adjacent within ±{min} min',
     decisionBasis: 'Decision basis',
-    constraintCheck: 'Constraint check',
-    constraintSummary: '{considered} windows evaluated · {rejected} rejected · {feasible} feasible',
     decisionRecordedNote: 'Decision recorded by the authority role; the plan is not applied automatically.',
     goToBlockPlanning: 'Go to block planning',
     requiresAttention: 'Requires attention',
@@ -292,7 +288,6 @@ export const en = {
     corridorsNotListedGeneric: '{count} further corridors are not listed.',
     legendCriticalLower: 'critical',
     otherPossessions: 'other possessions',
-    possCritSecLegend: 'POSS · CRIT · SEC',
     planState: 'Plan state',
     runState: 'Run state',
     checksLabel: 'checks',
@@ -301,7 +296,6 @@ export const en = {
     decisionBasis3: 'No movement in the recorded C002 conflict set falls inside the window, and none within ±{buffer} min of its edges.',
     decisionBasis3Alt: '{count} recorded C002 movement(s) fall inside the window.',
     decisionBasis4: '{team} is on shift for the whole window with {available} qualified staff against {required} required.',
-    tasksScheduledCaption: 'Tasks scheduled · {pct}% of the inventory',
     daySheetWord: 'Day sheet',
   },
 

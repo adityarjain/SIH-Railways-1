@@ -223,7 +223,7 @@ export const Demand = ({ onNavigate }) => {
                 <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{t('demand.predictedRisk')}</span>
                 <Pill tone={PILL_TONE_MAP[bandTone(bandOf(selected))] || 'idle'}>{bandOf(selected) || '—'}</Pill>
               </div>
-              <div className="grid grid-cols-3 gap-px bg-ws-body border border-ws-body">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-ws-body border border-ws-body">
                 {[
                   [t('demand.colRiskScore'), selected.risk_score != null ? selected.risk_score.toFixed(1) : '—', t('demand.riskOf100')],
                   [t('demand.colFailure30'), selected.failure_probability_30d != null ? `${(selected.failure_probability_30d * 100).toFixed(2)}%` : '—', null],
