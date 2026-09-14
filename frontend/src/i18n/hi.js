@@ -613,7 +613,7 @@ export const hi = {
     availability: 'उपलब्धता',
     assignedPossessions: 'आवंटित ब्लॉक अवधियाँ',
     noneInPlan: 'इस योजना में कोई नहीं',
-    andMore: '+{count} और',
+    nextAssignment: '{count} नियुक्त · अगला {task} {date} {window}',
     noCrewMatch: 'वर्तमान फ़िल्टर से कोई दल मेल नहीं खाता।',
     replannedTitle: 'योजना पुनर्नियोजित स्थिति में है',
     replannedBody: 'दर्शाए गए आवंटन पुनः अनुकूलित कार्यक्रम के अनुरूप हैं। प्रभावित ब्लॉक अवधि हेतु दल आवंटन तदनुसार बदला गया है।',

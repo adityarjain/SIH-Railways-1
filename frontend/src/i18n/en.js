@@ -608,7 +608,7 @@ export const en = {
     availability: 'Availability',
     assignedPossessions: 'Assigned possessions',
     noneInPlan: 'None in this plan',
-    andMore: '+{count} more',
+    nextAssignment: '{count} assigned · next {task} {date} {window}',
     noCrewMatch: 'No crew matches the current filters.',
     replannedTitle: 'Plan is in its replanned state',
     replannedBody: 'Assignments shown follow the re-optimized schedule. Crew allocation for the affected possession has changed accordingly.',

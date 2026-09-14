@@ -129,15 +129,12 @@ export const TeamAvailability = ({ onNavigate }) => {
                   <td className="px-3.5 py-1.5 text-right whitespace-nowrap">
                     <Pill tone={tm.availability_percent >= 90 ? 'ok' : tm.availability_percent >= 75 ? 'warn' : 'critical'} size="sm">{tm.availability_percent}%</Pill>
                   </td>
-                  <td className="px-3.5 py-1.5">
+                  <td className="px-3.5 py-1.5 whitespace-nowrap">
                     {list.length === 0 ? (
                       <span className="font-ws text-[10px] text-ws-light">{t('resources.noneInPlan')}</span>
                     ) : (
-                      <span className="space-y-0.5 block">
-                        {list.slice(0, 3).map((a) => (
-                          <span key={a.task_id} className="block font-mono text-[10px] text-ws-body whitespace-nowrap">{a.task_id} · {a.date} · {minToHhmm(a.start_minute)}–{minToHhmm(a.end_minute)}</span>
-                        ))}
-                        {list.length > 3 && <span className="block font-ws text-[9px] text-ws-light">{t('resources.andMore', { count: list.length - 3 })}</span>}
+                      <span className="font-mono text-[10px] text-ws-body">
+                        {t('resources.nextAssignment', { count: list.length, task: list[0].task_id, date: list[0].date, window: `${minToHhmm(list[0].start_minute)}–${minToHhmm(list[0].end_minute)}` })}
                       </span>
                     )}
                   </td>
