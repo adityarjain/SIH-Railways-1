@@ -29,19 +29,10 @@ export const NAV_SECTIONS_BY_ROLE = {
       ],
     },
     {
-      groupKey: 'nav.groupAnalytics',
-      items: [
-        { id: 'analytics', labelKey: 'nav.riskAnalytics' },
-        { id: 'performance', labelKey: 'nav.performance' },
-        { id: 'evaluation', labelKey: 'nav.evaluation' },
-      ],
-    },
-    {
       groupKey: 'nav.groupVerification',
       items: [
         { id: 'decision-trace', labelKey: 'nav.decisionTrace' },
         { id: 'general-verify', labelKey: 'nav.workVerification' },
-        { id: 'system-verification', labelKey: 'nav.systemVerification' },
       ],
     },
     {
@@ -71,6 +62,18 @@ export const NAV_SECTIONS_BY_ROLE = {
       items: [
         { id: 'issues', labelKey: 'nav.issues' },
         { id: 'completed', labelKey: 'nav.completion' },
+      ],
+    },
+  ],
+
+  [ROLES.ADMIN]: [
+    {
+      groupKey: 'nav.groupMetrics',
+      items: [
+        { id: 'analytics', labelKey: 'nav.riskAnalytics' },
+        { id: 'performance', labelKey: 'nav.performance' },
+        { id: 'evaluation', labelKey: 'nav.evaluation' },
+        { id: 'system-verification', labelKey: 'nav.systemVerification' },
       ],
     },
   ],

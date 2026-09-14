@@ -3,22 +3,25 @@ import React, { createContext, useContext, useState } from 'react';
 const AuthContext = createContext();
 
 /**
- * Two operational experiences, and only two.
+ * Three operational experiences.
  *
  * AUTHORITY — plan, control, optimize (divisional / OCC planning).
  * GROUND    — execute, update, report (section maintenance crews).
+ * ADMIN     — model evaluation, solver telemetry and system verification.
  *
  * There is deliberately no public/citizen persona: this is a tool for railway
- * personnel, and the verification workflow lives inside AUTHORITY.
+ * personnel, and the operational verification workflow lives inside AUTHORITY.
  */
 export const ROLES = {
   AUTHORITY: 'Authority',
   GROUND: 'Ground Operations',
+  ADMIN: 'Admin',
 };
 
 export const ROLE_LABEL = {
   [ROLES.AUTHORITY]: 'AUTHORITY',
   [ROLES.GROUND]: 'GROUND OPS',
+  [ROLES.ADMIN]: 'ADMIN',
 };
 
 export const DEPARTMENTS = [
@@ -39,14 +42,15 @@ const PROFILE = {
     name: 'Senior Section Engineer',
     department: null, // resolved from the selected department
   },
+  [ROLES.ADMIN]: {
+    username: 'admin',
+    name: 'System Administrator',
+    department: 'Systems & Verification',
+  },
 };
 
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState({
-    ...PROFILE[ROLES.AUTHORITY],
-    role: ROLES.AUTHORITY,
-    station: 'Northern Railway',
-  });
+  const [currentUser, setCurrentUser] = useState(null);
 
   // Electrical / TRD is the department that owns TASK-000005, the task the
   // guided demo follows end to end.

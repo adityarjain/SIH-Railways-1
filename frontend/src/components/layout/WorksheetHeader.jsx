@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePlan } from '../../context/PlanContext';
-import { ROLES } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { useDemoGuide } from '../../context/DemoGuideContext';
 import { useI18n } from '../../i18n';
 import { LanguageSwitch } from './LanguageSwitch';
@@ -17,6 +17,7 @@ import { NAV_ITEMS_BY_ROLE } from './Sidebar';
  */
 export const WorksheetHeader = ({ activeTab, onNavigate, subtitle }) => {
   const { baselineMetrics: metrics } = usePlan();
+  const { currentUser } = useAuth();
   const { isGuideActive, toggleGuide, currentStepIndex, totalSteps } = useDemoGuide();
   const { t, isHindi } = useI18n();
 
@@ -29,7 +30,7 @@ export const WorksheetHeader = ({ activeTab, onNavigate, subtitle }) => {
     /(\d{4})-(\d{2})-(\d{2})\s*\.\.\s*(\d{4})-(\d{2})-(\d{2})/,
   );
 
-  const navItems = NAV_ITEMS_BY_ROLE[ROLES.AUTHORITY] || [];
+  const navItems = NAV_ITEMS_BY_ROLE[currentUser?.role] || [];
   const activeItem = navItems.find((item) => item.id === activeTab);
 
   const defaultSubtitle = (

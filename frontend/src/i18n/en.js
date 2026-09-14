@@ -28,15 +28,20 @@ export const en = {
   role: {
     authority: 'Authority',
     ground: 'Ground Operations',
+    admin: 'Admin',
     authorityShort: 'AUTHORITY',
     groundShort: 'GROUND OPS',
+    adminShort: 'ADMIN',
     switchLabel: 'Select operational role',
+    authorityDesc: 'Plan · control · optimize — network overview, block planning, replanning, verification.',
+    groundDesc: 'Execute · update · report — assigned work orders, block status, completion.',
+    adminDesc: 'Model evaluation, solver performance and system verification — technical oversight, not operational control.',
   },
 
   nav: {
     groupOperations: 'OPERATIONS',
     groupMaintenance: 'MAINTENANCE',
-    groupAnalytics: 'ANALYTICS',
+    groupMetrics: 'METRICS',
     groupVerification: 'VERIFICATION',
     groupDemo: 'DEMO',
     groupMyWork: 'MY WORK',
@@ -1022,6 +1027,15 @@ export const en = {
     reasonEmergency: 'Conflicting emergency work elsewhere',
     reasonAccess: 'Access to the section not available',
     reasonOther: 'Other',
+  },
+
+  login: {
+    selectRole: 'Select operational role',
+    enter: 'ENTER',
+    notAuthTitle: 'Not an authentication system',
+    notAuthBody: 'Role selection is a demonstration control. No credential is checked and no account exists. Any of the three experiences can be entered directly, and the role can be switched at any time from the header.',
+    stack: 'risk model · OR-Tools CP-SAT optimizer · dynamic replanning',
+    department: 'Department',
   },
 
   demo: {

@@ -7,6 +7,7 @@ import { DemoGuideProvider } from './context/DemoGuideContext';
 
 import { AppLayout } from './components/layout/AppLayout';
 import { NAV_ITEMS_BY_ROLE } from './components/layout/Sidebar';
+import { Login } from './pages/Login';
 import { StyleGuide } from './pages/StyleGuide';
 
 // Authority
@@ -79,6 +80,10 @@ const roleCanReach = (role, tab) =>
 function AppShell() {
   const { currentUser, login } = useAuth();
   const [activeTab, setActiveTab] = useState(landingTab(ROLES.AUTHORITY));
+
+  if (!currentUser) {
+    return <Login onLoginSuccess={(role) => setActiveTab(landingTab(role))} />;
+  }
 
   /**
    * The single navigation entry point. The guided demo crosses roles (step 13

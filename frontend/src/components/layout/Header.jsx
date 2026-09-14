@@ -39,6 +39,7 @@ export const RoleSwitch = ({ onNavigate, tone = 'dark' }) => {
     >
       {seg(ROLES.AUTHORITY, t('role.authorityShort'))}
       {seg(ROLES.GROUND, t('role.groundShort'))}
+      {seg(ROLES.ADMIN, t('role.adminShort'))}
     </div>
   );
 };
