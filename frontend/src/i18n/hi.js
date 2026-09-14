@@ -351,6 +351,7 @@ export const hi = {
     subOfRoster: 'पूर्ण नामावली में से',
     subSimActive: 'अनुरूपित घटना सक्रिय',
     subNoneRecorded: 'कोई अभिलिखित नहीं',
+    bundlingHint: 'इस विंडो हेतु अंतर-विभागीय बंडलिंग अवसर मेंटेनेंस ब्लॉक्स पृष्ठ पर उपलब्ध हैं।',
   },
 
   demand: {

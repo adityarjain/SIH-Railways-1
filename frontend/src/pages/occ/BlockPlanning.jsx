@@ -2,14 +2,12 @@ import React, { useState } from 'react';
 import { BlockTrainGantt } from '../../components/timeline/BlockTrainGantt';
 import { BlockDrawer } from '../../components/timeline/BlockDrawer';
 import { DecisionTraceModal } from '../../components/timeline/DecisionTraceModal';
-import { BundlingView } from '../../components/timeline/BundlingView';
 import { TrafficContext } from '../../components/timeline/TrafficContext';
 import { WeeklyViewWorksheet } from '../../components/planning/WeeklyViewWorksheet';
 import { MonthlyHeatmapWorksheet } from '../../components/planning/MonthlyHeatmapWorksheet';
 import { RecommendationActions } from '../../components/occ/RecommendationActions';
 import { RegionHeader, SegmentedControl, StatFigure, WsSelect } from '../../components/ui/worksheet';
 import teamsData from '../../data/teams.json';
-import bundlingData from '../../data/bundling.json';
 import { usePlan } from '../../context/PlanContext';
 import { useI18n } from '../../i18n';
 import corridorsSectionsData from '../../data/corridors_sections.json';
@@ -40,7 +38,7 @@ const buildCorridorOptions = (tasks) => {
     .sort((a, b) => b.count - a.count || a.id.localeCompare(b.id));
 };
 
-export const BlockPlanning = () => {
+export const BlockPlanning = ({ onNavigate }) => {
   const { scheduledTasks, metrics, activeEvent } = usePlan();
   const { t, isHindi } = useI18n();
 
@@ -86,7 +84,6 @@ export const BlockPlanning = () => {
   }, [selectedCorridor, t]);
 
   const trafficSectionId = drawerTask?.section_id || sections[0]?.section_id || 'SEC-0004';
-  const bundlePairs = bundlingData.concurrent_bundle_pairs || [];
 
   const handleOpenDecisionTrace = (task) => {
     setDecisionTraceTask(task);
@@ -186,10 +183,15 @@ export const BlockPlanning = () => {
         <TrafficContext sectionId={trafficSectionId} />
       </div>
 
-      {/* 05 — cross-department bundling */}
-      <div className="bg-ws-surface px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
-        <RegionHeader number="05" title={t('maintenanceBlocks.bundlingTitle')} meta={t('maintenanceBlocks.bundlingPairs', { count: bundlePairs.length })} isHindi={isHindi} />
-        <BundlingView />
+      {/* cross-department bundling lives on Maintenance Blocks — link out rather than duplicate the register here */}
+      <div className="bg-ws-paper border-t border-ws-rule px-3.5 md:px-4 xl:px-5 py-2.5 flex items-center justify-between gap-3 flex-wrap">
+        <span className="font-ws text-xs text-ws-mid">{t('blockPlanning.bundlingHint')}</span>
+        <button
+          onClick={() => onNavigate && onNavigate('maintenance-blocks')}
+          className="font-display text-[11px] font-bold uppercase tracking-wide text-ws-mid hover:text-ws-ink transition-colors shrink-0"
+        >
+          {t('nav.maintenanceBlocks')} →
+        </button>
       </div>
 
       <BlockDrawer

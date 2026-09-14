@@ -346,6 +346,7 @@ export const en = {
     subOfRoster: 'Of the full roster',
     subSimActive: 'Simulated event active',
     subNoneRecorded: 'None recorded',
+    bundlingHint: 'Cross-department bundling opportunities for this window are tracked on Maintenance Blocks.',
   },
 
   demand: {
