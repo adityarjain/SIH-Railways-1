@@ -244,7 +244,6 @@ export const hi = {
     conflictingServicesSub: 'शून्य होना अनिवार्य (C002)',
     adjacentServices: 'निकटवर्ती गाड़ियाँ',
     adjacentServicesSub: '±{min} मिनट C008 बफ़र',
-    estimatedDelay: 'अनुमानित विलंब',
     downstreamImpact: 'अग्रवर्ती प्रभाव',
     downstreamImpactSub: 'डेटासेट में आगे की यात्रा-सूची उपलब्ध नहीं',
 
@@ -732,8 +731,7 @@ export const hi = {
     s4Scope: 'मूल्यांकन क्रम में सभी {count} अवधियाँ',
     s5: '5 · चयनित आवंटन',
     s5Scope: 'अनुकूलन संस्तुति',
-    s6: '6 · ट्रेन प्रभाव',
-    s6Scope: 'इस अवधि हेतु प्रभावित गाड़ियाँ',
+    trainImpactHint: 'इस ब्लॉक अवधि हेतु ट्रेन प्रभाव, ट्रेन प्रभाव पृष्ठ पर उपलब्ध है।',
     blockWindow: 'ब्लॉक अवधि',
     dateTime: 'तिथि / समय',
     shift: '{team} पाली',

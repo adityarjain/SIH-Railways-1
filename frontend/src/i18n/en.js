@@ -239,7 +239,6 @@ export const en = {
     conflictingServicesSub: 'must be zero (C002)',
     adjacentServices: 'Adjacent services',
     adjacentServicesSub: '±{min} min C008 buffer',
-    estimatedDelay: 'Estimated delay',
     downstreamImpact: 'Downstream impact',
     downstreamImpactSub: 'no onward itinerary in the dataset',
 
@@ -733,8 +732,7 @@ export const en = {
     s4Scope: 'All {count} windows, in evaluation order',
     s5: '5 · Selected assignment',
     s5Scope: 'Optimization recommendation',
-    s6: '6 · Train impact',
-    s6Scope: 'Affected services for this window',
+    trainImpactHint: 'Train impact for this possession is tracked on Train Impact.',
     blockWindow: 'Block window',
     dateTime: 'Date / time',
     shift: '{team} shift',

@@ -22,13 +22,12 @@ const RULE_KEY = {
  * the worked example only, and the page says so rather than implying every task
  * carries one.
  */
-export const DecisionTrace = () => {
+export const DecisionTrace = ({ onNavigate }) => {
   const { t, isHindi } = useI18n();
   const req = trace.request || {};
   const sum = trace.candidate_summary || {};
   const risk = trace.risk_signal || {};
   const sel = trace.selected || {};
-  const impact = trace.train_impact || {};
   const byRule = sum.rejected_by_rule || {};
 
   return (
@@ -113,35 +112,34 @@ export const DecisionTrace = () => {
         </div>
       </div>
 
-      {/* 06/07 — selected assignment / train impact */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 bg-ws-rule gap-px border-b border-ws-rule">
-        <div className="bg-ws-surface px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
-          <RegionHeader number="06" title={t('decisionTrace.s5')} meta={t('decisionTrace.s5Scope')} isHindi={isHindi} />
-          <div className="border-t border-ws-rule">
-            <FieldRow label={t('decisionTrace.blockWindow')} value={(sel.block_ids || []).join(' + ')} tone="text-ws-ok font-bold" />
-            <FieldRow label={t('decisionTrace.dateTime')} value={`${sel.date} · ${sel.window}`} />
-            <FieldRow label={t('common.crew')} value={(sel.teams || []).map((tm) => tm.team_id || tm).join(', ')} />
-            {(sel.teams || []).map((tm) => (
-              typeof tm === 'object' ? (
-                <FieldRow
-                  key={tm.team_id}
-                  label={t('decisionTrace.shift', { team: tm.team_id })}
-                  value={`${tm.shift || '—'}${tm.team_size != null ? ` · ${t('decisionTrace.crewVs', { size: tm.team_size, required: req.required_team_size })}` : ''}`}
-                />
-              ) : null
-            ))}
-          </div>
+      {/* 06 — selected assignment */}
+      <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
+        <RegionHeader number="06" title={t('decisionTrace.s5')} meta={t('decisionTrace.s5Scope')} isHindi={isHindi} />
+        <div className="border-t border-ws-rule">
+          <FieldRow label={t('decisionTrace.blockWindow')} value={(sel.block_ids || []).join(' + ')} tone="text-ws-ok font-bold" />
+          <FieldRow label={t('decisionTrace.dateTime')} value={`${sel.date} · ${sel.window}`} />
+          <FieldRow label={t('common.crew')} value={(sel.teams || []).map((tm) => tm.team_id || tm).join(', ')} />
+          {(sel.teams || []).map((tm) => (
+            typeof tm === 'object' ? (
+              <FieldRow
+                key={tm.team_id}
+                label={t('decisionTrace.shift', { team: tm.team_id })}
+                value={`${tm.shift || '—'}${tm.team_size != null ? ` · ${t('decisionTrace.crewVs', { size: tm.team_size, required: req.required_team_size })}` : ''}`}
+              />
+            ) : null
+          ))}
         </div>
+      </div>
 
-        <div className="bg-ws-surface border-t border-ws-rule lg:border-t-0 px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
-          <RegionHeader number="07" title={t('decisionTrace.s6')} meta={t('decisionTrace.s6Scope')} isHindi={isHindi} />
-          <div className="border-t border-ws-rule">
-            <FieldRow label={t('overview.conflictingServices')} value={(impact.conflicting || []).length} tone={(impact.conflicting || []).length ? 'text-ws-critical font-bold' : 'text-ws-ok font-bold'} />
-            <FieldRow label={t('overview.adjacentServices')} value={(impact.adjacent || []).length} tone="text-ws-ok font-bold" />
-            <FieldRow label={t('overview.estimatedDelay')} value={`0 ${t('common.min')}`} tone="text-ws-ok font-bold" />
-          </div>
-          <p className="font-ws text-[11px] text-ws-mid leading-relaxed pt-2">{impact.note}</p>
-        </div>
+      {/* train impact for this possession lives on Train Impact — link out rather than duplicate it here */}
+      <div className="bg-ws-paper border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-2.5 flex items-center justify-between gap-3 flex-wrap">
+        <span className="font-ws text-xs text-ws-mid">{t('decisionTrace.trainImpactHint')}</span>
+        <button
+          onClick={() => onNavigate && onNavigate('train-impact')}
+          className="font-display text-[11px] font-bold uppercase tracking-wide text-ws-mid hover:text-ws-ink transition-colors shrink-0"
+        >
+          {t('nav.trainImpact')} →
+        </button>
       </div>
 
       <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-3.5 space-y-2.5">
