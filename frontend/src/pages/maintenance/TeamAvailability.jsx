@@ -1,34 +1,29 @@
 import React, { useMemo, useState } from 'react';
 import { usePlan } from '../../context/PlanContext';
 import { useI18n } from '../../i18n';
-import {
-  Panel, PanelHeader, PanelBody, Metric, DataTable, StatusBadge,
-  Select, TextInput, EmptyState, Alert, ScopeCaption,
-} from '../../components/ui';
+import { RegionHeader, StatFigure, AdvisoryNote, Pill, WsInput, WsSelect } from '../../components/ui/worksheet';
 import { minToHhmm } from '../../utils/time';
 import teamsData from '../../data/teams.json';
 
 /**
  * Authority — Resources.
  *
- * Crew roster and what the plan actually assigned each crew. The previous
- * version hardcoded assignment notes onto two team ids and never read the plan,
- * so it disagreed with the schedule whenever the schedule changed.
+ * Crew roster and what the plan actually assigned each crew. Assignments are
+ * derived from the plan, so this follows the replan.
  */
 export const TeamAvailability = ({ onNavigate }) => {
   const { scheduledTasks, baselineMetrics, isReplanned } = usePlan();
-  const { t: tx } = useI18n();
+  const { t, isHindi } = useI18n();
   const [query, setQuery] = useState('');
   const [deptFilter, setDeptFilter] = useState('ALL');
   const [shiftFilter, setShiftFilter] = useState('ALL');
 
-  /** Assignments derived from the plan, so this follows the replan. */
   const assignmentsByTeam = useMemo(() => {
     const map = new Map();
-    for (const t of scheduledTasks) {
-      for (const teamId of t.assigned_teams || []) {
+    for (const task of scheduledTasks) {
+      for (const teamId of task.assigned_teams || []) {
         if (!map.has(teamId)) map.set(teamId, []);
-        map.get(teamId).push(t);
+        map.get(teamId).push(task);
       }
     }
     for (const list of map.values()) {
@@ -37,142 +32,132 @@ export const TeamAvailability = ({ onNavigate }) => {
     return map;
   }, [scheduledTasks]);
 
-  const departments = useMemo(
-    () => [...new Set(teamsData.map((t) => t.department))].sort(),
-    [],
-  );
+  const departments = useMemo(() => [...new Set(teamsData.map((tm) => tm.department))].sort(), []);
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
     return teamsData
-      .filter((t) => (deptFilter === 'ALL' ? true : t.department === deptFilter))
-      .filter((t) => {
+      .filter((tm) => (deptFilter === 'ALL' ? true : tm.department === deptFilter))
+      .filter((tm) => {
         if (shiftFilter === 'ALL') return true;
-        if (shiftFilter === 'ASSIGNED') return assignmentsByTeam.has(t.team_id);
-        if (shiftFilter === 'IDLE') return !assignmentsByTeam.has(t.team_id);
-        return (t.shift || '').includes(shiftFilter);
+        if (shiftFilter === 'ASSIGNED') return assignmentsByTeam.has(tm.team_id);
+        if (shiftFilter === 'IDLE') return !assignmentsByTeam.has(tm.team_id);
+        return (tm.shift || '').includes(shiftFilter);
       })
-      .filter((t) => {
+      .filter((tm) => {
         if (!q) return true;
         return (
-          t.team_id.toLowerCase().includes(q) ||
-          (t.team_name || '').toLowerCase().includes(q) ||
-          (t.department || '').toLowerCase().includes(q)
+          tm.team_id.toLowerCase().includes(q) ||
+          (tm.team_name || '').toLowerCase().includes(q) ||
+          (tm.department || '').toLowerCase().includes(q)
         );
       })
       .sort((a, b) => a.team_id.localeCompare(b.team_id));
   }, [query, deptFilter, shiftFilter, assignmentsByTeam]);
 
   const assignedCount = assignmentsByTeam.size;
-  const totalCrew = teamsData.reduce((n, t) => n + (t.crew_size ?? t.team_size ?? 0), 0);
+  const totalCrew = teamsData.reduce((n, tm) => n + (tm.crew_size ?? tm.team_size ?? 0), 0);
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h2 className="t-section-title">{tx('resources.title')}</h2>
-        <p className="text-xs text-rail-500 mt-0.5 max-w-3xl leading-relaxed">
-          {tx('resources.subtitle')}
-        </p>
+    <div className="bg-ws-band min-h-full">
+      <div className="bg-ws-paper border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-2.5">
+        <p className="font-ws text-xs text-ws-mid max-w-3xl leading-relaxed">{t('resources.subtitle')}</p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Panel><PanelBody><Metric label={tx('resources.crewsOnRoster')} value={teamsData.length} scope="teams.csv" /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label={tx('resources.assignedInPlan')} value={assignedCount} tone={assignedCount ? 'ok' : 'idle'} scope={tx('scope.demoScenario')} /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label={tx('resources.crewsUtilized')} value={`${baselineMetrics.operational_metrics?.teams_utilized ?? 0} / ${teamsData.length}`} tone="warn" scope={tx('scope.fullRun')} /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label={tx('resources.totalCrew')} value={totalCrew} sub={tx('resources.totalCrewSub')} scope="teams.csv" /></PanelBody></Panel>
+      {/* 01 — roster stats */}
+      <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
+        <RegionHeader number="01" title={t('resources.title')} meta="teams.csv" isHindi={isHindi} />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-5 gap-y-3.5 border-t border-ws-rule pt-3">
+          <StatFigure value={teamsData.length} label={t('resources.crewsOnRoster')} />
+          <StatFigure value={assignedCount} label={t('resources.assignedInPlan')} tone={assignedCount ? 'text-ws-ok' : 'text-ws-idle'} />
+          <StatFigure value={`${baselineMetrics.operational_metrics?.teams_utilized ?? 0} / ${teamsData.length}`} label={t('resources.crewsUtilized')} tone="text-ws-warn" />
+          <StatFigure value={totalCrew} label={t('resources.totalCrew')} />
+        </div>
       </div>
 
-      <Panel>
-        <PanelHeader
-          title={tx('resources.roster')}
-          scope={tx('resources.rosterScope', { shown: rows.length, total: teamsData.length })}
-        />
-        <PanelBody className="border-b border-line flex flex-wrap items-center gap-2.5">
-          <TextInput
-            placeholder={tx('resources.searchPlaceholder')}
+      {/* 02 — roster register */}
+      <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-3.5">
+        <RegionHeader number="02" title={t('resources.roster')} meta={t('resources.rosterScope', { shown: rows.length, total: teamsData.length })} isHindi={isHindi} />
+        <div className="flex flex-wrap items-center gap-2.5">
+          <WsInput
+            placeholder={t('resources.searchPlaceholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="min-w-[220px] flex-1"
           />
-          <Select label={tx('common.dept')} value={deptFilter} onChange={(e) => setDeptFilter(e.target.value)}>
-            <option value="ALL">{tx('common.allDepartments')}</option>
+          <WsSelect value={deptFilter} onChange={(e) => setDeptFilter(e.target.value)}>
+            <option value="ALL">{t('common.allDepartments')}</option>
             {departments.map((d) => <option key={d} value={d}>{d}</option>)}
-          </Select>
-          <Select label={tx('common.filter')} value={shiftFilter} onChange={(e) => setShiftFilter(e.target.value)}>
-            <option value="ALL">{tx('resources.filterAll')}</option>
-            <option value="ASSIGNED">{tx('resources.filterAssigned')}</option>
-            <option value="IDLE">{tx('resources.filterIdle')}</option>
-            <option value="Night">{tx('resources.filterNight')}</option>
-            <option value="Day">{tx('resources.filterDay')}</option>
-            <option value="Evening">{tx('resources.filterEvening')}</option>
-          </Select>
-        </PanelBody>
+          </WsSelect>
+          <WsSelect value={shiftFilter} onChange={(e) => setShiftFilter(e.target.value)}>
+            <option value="ALL">{t('resources.filterAll')}</option>
+            <option value="ASSIGNED">{t('resources.filterAssigned')}</option>
+            <option value="IDLE">{t('resources.filterIdle')}</option>
+            <option value="Night">{t('resources.filterNight')}</option>
+            <option value="Day">{t('resources.filterDay')}</option>
+            <option value="Evening">{t('resources.filterEvening')}</option>
+          </WsSelect>
+        </div>
+      </div>
 
-        <DataTable
-          getKey={(t) => t.team_id}
-          columns={[
-            { key: 'team_id', header: tx('common.crew'), render: (t) => (
-              <span>
-                <span className="t-mono-id block">{t.team_id}</span>
-                <span className="text-[10px] text-rail-400">{t.team_name}</span>
-              </span>
-            ) },
-            { key: 'department', header: tx('common.department'), render: (t) => (
-              <span className="text-[11px]">{t.department}</span>
-            ) },
-            { key: 'shift', header: tx('resources.shift'), render: (t) => (
-              <span className="font-mono text-[11px]">
-                {t.shift_start_minute != null
-                  ? `${minToHhmm(t.shift_start_minute)}–${minToHhmm(t.shift_end_minute)}`
-                  : t.shift || '—'}
-              </span>
-            ) },
-            { key: 'crew_size', header: tx('resources.size'), align: 'right', render: (t) => (
-              <span className="font-mono text-[11px]">{t.crew_size ?? t.team_size}</span>
-            ) },
-            { key: 'availability_percent', header: tx('resources.availability'), align: 'right', render: (t) => (
-              <StatusBadge tone={t.availability_percent >= 90 ? 'ok' : t.availability_percent >= 75 ? 'warn' : 'critical'} size="sm">
-                {t.availability_percent}%
-              </StatusBadge>
-            ) },
-            { key: 'assigned', header: tx('resources.assignedPossessions'), render: (t) => {
-              const list = assignmentsByTeam.get(t.team_id) || [];
-              if (list.length === 0) {
-                return <span className="text-[10px] text-rail-400">{tx('resources.noneInPlan')}</span>;
-              }
+      <div className="bg-ws-surface border-b border-ws-rule overflow-x-auto custom-scrollbar">
+        <table className="w-full text-left border-collapse min-w-[760px]">
+          <thead className="border-b border-ws-rule bg-ws-tick">
+            <tr>
+              {[t('common.crew'), t('common.department'), t('resources.shift'), t('resources.size'), t('resources.availability'), t('resources.assignedPossessions')].map((h, i) => (
+                <th key={h} className={`px-3.5 py-2 font-display text-[10px] font-semibold uppercase tracking-wide text-ws-light whitespace-nowrap ${i >= 3 && i <= 4 ? 'text-right' : ''}`}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.length === 0 && (
+              <tr><td colSpan={6} className="px-3.5 py-8 text-center font-ws text-xs text-ws-mid">{t('resources.noCrewMatch')}</td></tr>
+            )}
+            {rows.map((tm) => {
+              const list = assignmentsByTeam.get(tm.team_id) || [];
               return (
-                <span className="space-y-0.5 block">
-                  {list.slice(0, 3).map((a) => (
-                    <span key={a.task_id} className="block font-mono text-[10px] text-rail-700">
-                      {a.task_id} · {a.date} · {minToHhmm(a.start_minute)}–{minToHhmm(a.end_minute)}
-                    </span>
-                  ))}
-                  {list.length > 3 && (
-                    <span className="block text-[9px] text-rail-400">{tx('resources.andMore', { count: list.length - 3 })}</span>
-                  )}
-                </span>
+                <tr key={tm.team_id} onClick={() => onNavigate && onNavigate('maintenance-blocks')} className="border-b border-ws-hairline last:border-b-0 hover:bg-ws-paper cursor-pointer">
+                  <td className="px-3.5 py-1.5 whitespace-nowrap">
+                    <div className="font-mono text-[11px] font-medium text-ws-ink">{tm.team_id}</div>
+                    <div className="font-ws text-[10px] text-ws-light">{tm.team_name}</div>
+                  </td>
+                  <td className="px-3.5 py-1.5 font-ws text-[11px] text-ws-body whitespace-nowrap">{tm.department}</td>
+                  <td className="px-3.5 py-1.5 font-mono text-[11px] text-ws-body whitespace-nowrap">
+                    {tm.shift_start_minute != null ? `${minToHhmm(tm.shift_start_minute)}–${minToHhmm(tm.shift_end_minute)}` : tm.shift || '—'}
+                  </td>
+                  <td className="px-3.5 py-1.5 font-mono text-[11px] text-ws-body text-right whitespace-nowrap">{tm.crew_size ?? tm.team_size}</td>
+                  <td className="px-3.5 py-1.5 text-right whitespace-nowrap">
+                    <Pill tone={tm.availability_percent >= 90 ? 'ok' : tm.availability_percent >= 75 ? 'warn' : 'critical'} size="sm">{tm.availability_percent}%</Pill>
+                  </td>
+                  <td className="px-3.5 py-1.5">
+                    {list.length === 0 ? (
+                      <span className="font-ws text-[10px] text-ws-light">{t('resources.noneInPlan')}</span>
+                    ) : (
+                      <span className="space-y-0.5 block">
+                        {list.slice(0, 3).map((a) => (
+                          <span key={a.task_id} className="block font-mono text-[10px] text-ws-body whitespace-nowrap">{a.task_id} · {a.date} · {minToHhmm(a.start_minute)}–{minToHhmm(a.end_minute)}</span>
+                        ))}
+                        {list.length > 3 && <span className="block font-ws text-[9px] text-ws-light">{t('resources.andMore', { count: list.length - 3 })}</span>}
+                      </span>
+                    )}
+                  </td>
+                </tr>
               );
-            } },
-          ]}
-          rows={rows}
-          onRowClick={() => onNavigate && onNavigate('maintenance-blocks')}
-          empty={<EmptyState title={tx('resources.noCrewMatch')} />}
-        />
-      </Panel>
+            })}
+          </tbody>
+        </table>
+      </div>
 
-      {isReplanned && (
-        <Alert tone="warn" title={tx('resources.replannedTitle')}>
-          {tx('resources.replannedBody')}
-        </Alert>
-      )}
+      <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-3.5 space-y-2.5">
+        {isReplanned && (
+          <AdvisoryNote tone="warn" title={t('resources.replannedTitle')}>{t('resources.replannedBody')}</AdvisoryNote>
+        )}
+        <AdvisoryNote tone="idle" title={t('resources.availabilityTitle')}>{t('resources.availabilityBody')}</AdvisoryNote>
+      </div>
 
-      <Alert tone="idle" title={tx('resources.availabilityTitle')}>
-        {tx('resources.availabilityBody')}
-      </Alert>
-
-      <ScopeCaption className="block">
-        {tx('resources.rosterScopeNote', { count: teamsData.length })}
-      </ScopeCaption>
+      <div className="bg-ws-band px-3.5 md:px-4 xl:px-5 py-2">
+        <span className="font-mono text-[10px] text-ws-mid">{t('resources.rosterScopeNote', { count: teamsData.length })}</span>
+      </div>
     </div>
   );
 };

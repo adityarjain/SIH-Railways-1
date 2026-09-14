@@ -1,10 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { usePlan } from '../../context/PlanContext';
 import { useI18n } from '../../i18n';
-import {
-  Panel, PanelHeader, PanelBody, Metric, StatusBadge, Button, Alert,
-  DataTable, EmptyState, Select, TextInput, ScopeCaption,
-} from '../../components/ui';
+import { RegionHeader, StatFigure, Pill, AdvisoryNote, WsInput, WsSelect } from '../../components/ui/worksheet';
+import { Button } from '../../components/ui';
 import { Modal } from '../../components/common/Modal';
 import { minToHhmm } from '../../utils/time';
 import { bandOf, bandTone } from '../../utils/risk';
@@ -13,10 +11,8 @@ import completedWorkJson from '../../data/completed_work.json';
 /**
  * Work Verification (Authority).
  *
- * Previously a public-facing portal whose cards were a hardcoded three-element
- * fixture — one of which (TASK-000005) is not completed work at all, but the
- * task the demo replans. This reads completed_work.json instead, so every row
- * on screen is a possession the plan actually handed back.
+ * Reads completed_work.json, so every row on screen is a possession the plan
+ * actually handed back.
  */
 
 const ACTIONS = {
@@ -26,10 +22,11 @@ const ACTIONS = {
 };
 
 const VERDICT_TONE = { Approved: 'ok', Rejected: 'critical', Flagged: 'warn' };
+const RISK_PILL = { critical: 'critical', warn: 'warn', info: 'info', ok: 'ok', idle: 'idle' };
 
 export const GeneralPortal = () => {
   const { verifications, submitVerification } = usePlan();
-  const { t } = useI18n();
+  const { t, isHindi } = useI18n();
   const [query, setQuery] = useState('');
   const [deptFilter, setDeptFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -95,103 +92,98 @@ export const GeneralPortal = () => {
   const cfg = modal ? ACTIONS[modal.action] : null;
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h2 className="t-section-title">{t('verification.title')}</h2>
-        <p className="text-xs text-rail-500 mt-0.5 max-w-3xl leading-relaxed">
-          {t('verification.subtitle')}
-        </p>
+    <div className="bg-ws-band min-h-full">
+      <div className="bg-ws-paper border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-2.5">
+        <p className="font-ws text-xs text-ws-mid max-w-3xl leading-relaxed">{t('verification.subtitle')}</p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Panel><PanelBody><Metric label={t('verification.awaitingVerification')} value={counts.pending} tone={counts.pending ? 'warn' : 'ok'} scope={t('scope.thisSession')} /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label={t('verification.approved')} value={counts.approved} tone="ok" scope={t('scope.thisSession')} /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label={t('verification.rejected')} value={counts.rejected} tone="critical" scope={t('scope.thisSession')} /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label={t('verification.flaggedForReview')} value={counts.flagged} tone="warn" scope={t('scope.thisSession')} /></PanelBody></Panel>
+      {/* 01 — verification stats */}
+      <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
+        <RegionHeader number="01" title={t('verification.title')} meta={t('scope.thisSession').toUpperCase()} isHindi={isHindi} />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-5 gap-y-3.5 border-t border-ws-rule pt-3">
+          <StatFigure value={counts.pending} label={t('verification.awaitingVerification')} tone={counts.pending ? 'text-ws-warn' : 'text-ws-ok'} />
+          <StatFigure value={counts.approved} label={t('verification.approved')} tone="text-ws-ok" />
+          <StatFigure value={counts.rejected} label={t('verification.rejected')} tone="text-ws-critical" />
+          <StatFigure value={counts.flagged} label={t('verification.flaggedForReview')} tone="text-ws-warn" />
+        </div>
       </div>
 
-      <Panel>
-        <PanelHeader
-          title={t('verification.completedPossessions')}
-          scope={`${rows.length} of ${completedWorkJson.length} records · completed_work.json`}
-        />
-        <PanelBody className="border-b border-line flex flex-wrap items-center gap-2.5">
-          <TextInput
-            placeholder={t('verification.searchPlaceholder')}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="min-w-[240px] flex-1"
-          />
-          <Select label={t('common.dept')} value={deptFilter} onChange={(e) => setDeptFilter(e.target.value)}>
+      {/* 02 — completed possessions register */}
+      <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-3.5">
+        <RegionHeader number="02" title={t('verification.completedPossessions')} meta={t('verification.completedScope', { shown: rows.length, total: completedWorkJson.length })} isHindi={isHindi} />
+        <div className="flex flex-wrap items-center gap-2.5">
+          <WsInput placeholder={t('verification.searchPlaceholder')} value={query} onChange={(e) => setQuery(e.target.value)} className="min-w-[220px] flex-1" />
+          <WsSelect value={deptFilter} onChange={(e) => setDeptFilter(e.target.value)}>
             <option value="ALL">{t('common.allDepartments')}</option>
             {departments.map((d) => <option key={d} value={d}>{d}</option>)}
-          </Select>
-          <Select label={t('common.status')} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+          </WsSelect>
+          <WsSelect value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
             <option value="ALL">{t('common.all')}</option>
             <option value="PENDING">{t('verification.awaitingVerification')}</option>
             <option value="Approved">{t('verification.approved')}</option>
             <option value="Rejected">{t('verification.rejected')}</option>
             <option value="Flagged">{t('status.flagged')}</option>
-          </Select>
-        </PanelBody>
+          </WsSelect>
+        </div>
+      </div>
 
-        <DataTable
-          getKey={(j) => j.task_id}
-          columns={[
-            { key: 'task_id', header: t('common.task'), render: (j) => (
-              <span>
-                <span className="t-mono-id block">{j.task_id}</span>
-                <span className="text-[10px] text-rail-400">{j.maintenance_type}</span>
-              </span>
-            ) },
-            { key: 'section_id', header: t('common.section'), render: (j) => (
-              <span className="font-mono text-[11px]">{j.section_id}<span className="block text-[9px] text-rail-400">{j.corridor_id}</span></span>
-            ) },
-            { key: 'execution_date', header: t('verification.executed'), render: (j) => (
-              <span className="font-mono text-[11px]">
-                {j.execution_date}
-                <span className="block text-[9px] text-rail-400">{minToHhmm(j.start_minute)}–{minToHhmm(j.end_minute)}</span>
-              </span>
-            ) },
-            { key: 'block_ids', header: t('common.blocks'), render: (j) => (
-              <span className="font-mono text-[10px]">{(j.block_ids || []).join(' + ')}</span>
-            ) },
-            { key: 'assigned_teams', header: t('common.crew'), render: (j) => (
-              <span className="font-mono text-[10px]">{(j.assigned_teams || []).join(', ')}</span>
-            ) },
-            { key: 'risk', header: t('common.risk'), align: 'right', render: (j) => {
+      <div className="bg-ws-surface border-b border-ws-rule overflow-x-auto custom-scrollbar">
+        <table className="w-full text-left border-collapse min-w-[860px]">
+          <thead className="border-b border-ws-rule bg-ws-tick">
+            <tr>
+              {[t('common.task'), t('common.section'), t('verification.executed'), t('common.blocks'), t('common.crew'), t('common.risk'), t('verification.verificationCol'), ''].map((h, i) => (
+                <th key={h || 'actions'} className={`px-3.5 py-2 font-display text-[10px] font-semibold uppercase tracking-wide text-ws-light whitespace-nowrap ${i >= 5 ? 'text-right' : ''}`}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.length === 0 && (
+              <tr><td colSpan={8} className="px-3.5 py-8 text-center font-ws text-xs text-ws-mid">{t('verification.noMatch')}</td></tr>
+            )}
+            {rows.map((j) => {
               const band = bandOf(j);
-              return <StatusBadge tone={bandTone(band)} size="sm">{j.risk_score?.toFixed?.(1) ?? '—'}</StatusBadge>;
-            } },
-            { key: 'verdict', header: t('verification.verificationCol'), align: 'right', render: (j) => {
               const v = verdictOf(j.task_id);
-              return v
-                ? <StatusBadge tone={VERDICT_TONE[v] || 'idle'} size="sm">{v}</StatusBadge>
-                : <span className="text-[10px] text-rail-400">{t('status.awaiting')}</span>;
-            } },
-            { key: 'actions', header: '', align: 'right', render: (j) => (
-              <span className="inline-flex gap-1 justify-end">
-                <Button size="sm" variant="secondary" onClick={() => open(j, 'approve')}>{t('verification.approve')}</Button>
-                <Button size="sm" variant="warn" onClick={() => open(j, 'flag')}>{t('verification.flag')}</Button>
-                <Button size="sm" variant="secondary" onClick={() => open(j, 'reject')}>{t('verification.reject')}</Button>
-              </span>
-            ) },
-          ]}
-          rows={rows}
-          empty={<EmptyState title={t('verification.noMatch')} />}
-        />
-      </Panel>
+              return (
+                <tr key={j.task_id} className="border-b border-ws-hairline last:border-b-0">
+                  <td className="px-3.5 py-1.5 whitespace-nowrap">
+                    <div className="font-mono text-[11px] font-medium text-ws-ink">{j.task_id}</div>
+                    <div className="font-ws text-[10px] text-ws-light">{j.maintenance_type}</div>
+                  </td>
+                  <td className="px-3.5 py-1.5 whitespace-nowrap">
+                    <div className="font-mono text-[11px] text-ws-body">{j.section_id}</div>
+                    <div className="font-mono text-[9px] text-ws-light">{j.corridor_id}</div>
+                  </td>
+                  <td className="px-3.5 py-1.5 whitespace-nowrap">
+                    <div className="font-mono text-[11px] text-ws-body">{j.execution_date}</div>
+                    <div className="font-mono text-[9px] text-ws-light">{minToHhmm(j.start_minute)}–{minToHhmm(j.end_minute)}</div>
+                  </td>
+                  <td className="px-3.5 py-1.5 font-mono text-[10px] text-ws-mid whitespace-nowrap">{(j.block_ids || []).join(' + ')}</td>
+                  <td className="px-3.5 py-1.5 font-mono text-[10px] text-ws-mid whitespace-nowrap">{(j.assigned_teams || []).join(', ')}</td>
+                  <td className="px-3.5 py-1.5 text-right whitespace-nowrap"><Pill tone={RISK_PILL[bandTone(band)] || 'idle'} size="sm">{j.risk_score?.toFixed?.(1) ?? '—'}</Pill></td>
+                  <td className="px-3.5 py-1.5 text-right whitespace-nowrap">
+                    {v ? <Pill tone={RISK_PILL[VERDICT_TONE[v]] || 'idle'} size="sm">{v}</Pill> : <span className="font-ws text-[10px] text-ws-light">{t('status.awaiting')}</span>}
+                  </td>
+                  <td className="px-3.5 py-1.5 text-right whitespace-nowrap">
+                    <span className="inline-flex gap-1 justify-end">
+                      <Button size="sm" variant="secondary" onClick={() => open(j, 'approve')}>{t('verification.approve')}</Button>
+                      <Button size="sm" variant="warn" onClick={() => open(j, 'flag')}>{t('verification.flag')}</Button>
+                      <Button size="sm" variant="secondary" onClick={() => open(j, 'reject')}>{t('verification.reject')}</Button>
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
-      <Alert tone="idle" title={t('verification.sessionOnlyTitle')}>
-        Verification decisions are held in the browser for this session. Nothing is written to an
-        external register, no notification is sent, and no maintenance record is amended. This is
-        not an audit system and does not claim independent third-party certification.
-      </Alert>
+      <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-3.5">
+        <AdvisoryNote tone="idle" title={t('verification.sessionOnlyTitle')}>{t('verification.sessionOnlyBody')}</AdvisoryNote>
+      </div>
 
-      <ScopeCaption className="block">
-        Source: completed_work.json · {completedWorkJson.length} possessions handed back, generated
-        by scripts/generate_tasks_inventory.py
-      </ScopeCaption>
+      <div className="bg-ws-band px-3.5 md:px-4 xl:px-5 py-2">
+        <span className="font-mono text-[10px] text-ws-mid">{t('verification.sourceNote', { count: completedWorkJson.length })}</span>
+      </div>
 
       <Modal
         isOpen={Boolean(modal)}
@@ -202,32 +194,32 @@ export const GeneralPortal = () => {
       >
         {modal && (
           <div className="space-y-3">
-            <p className="text-xs text-rail-600 leading-relaxed">{t(cfg.blurbKey)}</p>
+            <p className="font-ws text-xs text-ws-mid leading-relaxed">{t(cfg.blurbKey)}</p>
 
-            <div className="grid grid-cols-2 gap-px bg-line border border-line">
+            <div className="grid grid-cols-2 gap-px bg-ws-rule border border-ws-rule">
               {[
                 [t('verification.executed'), modal.job.execution_date],
                 [t('common.window'), `${minToHhmm(modal.job.start_minute)}–${minToHhmm(modal.job.end_minute)}`],
                 [t('common.blocks'), (modal.job.block_ids || []).join(' + ')],
                 [t('common.crew'), (modal.job.assigned_teams || []).join(', ')],
               ].map(([k, v]) => (
-                <div key={k} className="bg-surface-panel px-3 py-2">
-                  <div className="t-label">{k}</div>
-                  <div className="font-mono text-[11px] text-rail-900 mt-0.5">{v}</div>
+                <div key={k} className="bg-ws-surface px-3 py-2">
+                  <div className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{k}</div>
+                  <div className="font-mono text-[11px] text-ws-ink mt-0.5">{v}</div>
                 </div>
               ))}
             </div>
 
             <div>
-              <label className="t-label block mb-1">
-                {t('verification.comment')} {cfg.requiresComment ? <span className="text-status-critical">· {t('verification.required')}</span> : `· ${t('verification.optional')}`}
+              <label className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light block mb-1">
+                {t('verification.comment')} {cfg.requiresComment ? <span className="text-ws-critical">· {t('verification.required')}</span> : `· ${t('verification.optional')}`}
               </label>
               <textarea
                 rows={3}
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder={cfg.requiresComment ? t('verification.commentPlaceholderRequired') : t('verification.commentPlaceholderOptional')}
-                className="w-full text-xs bg-surface-panel border border-line rounded-sm px-2.5 py-2 text-rail-900 placeholder:text-rail-400 focus:outline-none focus:ring-1 focus:ring-status-info"
+                className="w-full font-ws text-xs bg-ws-surface border border-ws-rule px-2.5 py-2 text-ws-ink placeholder:text-ws-light focus:outline-none focus:ring-1 focus:ring-ws-info"
               />
             </div>
 

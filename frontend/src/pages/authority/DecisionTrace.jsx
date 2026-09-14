@@ -1,9 +1,6 @@
 import React from 'react';
 import { useI18n } from '../../i18n';
-import {
-  Panel, PanelHeader, PanelBody, MetricRow, Metric, Alert,
-  DataTable, StatusBadge, ProvenanceNote,
-} from '../../components/ui';
+import { RegionHeader, FieldRow, StatFigure, Pill, AdvisoryNote } from '../../components/ui/worksheet';
 import trace from '../../data/decision_trace.json';
 
 const STATUS_TONE = { SELECTED: 'ok', FEASIBLE: 'info', REJECTED: 'critical' };
@@ -26,7 +23,7 @@ const RULE_KEY = {
  * carries one.
  */
 export const DecisionTrace = () => {
-  const { t: tx } = useI18n();
+  const { t, isHindi } = useI18n();
   const req = trace.request || {};
   const sum = trace.candidate_summary || {};
   const risk = trace.risk_signal || {};
@@ -35,135 +32,128 @@ export const DecisionTrace = () => {
   const byRule = sum.rejected_by_rule || {};
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h2 className="t-section-title">{tx('decisionTrace.title')}</h2>
-        <p className="text-xs text-rail-500 mt-0.5 max-w-3xl leading-relaxed">
-          {tx('decisionTrace.subtitle')}
-        </p>
+    <div className="bg-ws-band min-h-full">
+      <div className="bg-ws-paper border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-2.5">
+        <p className="font-ws text-xs text-ws-mid max-w-3xl leading-relaxed">{t('decisionTrace.subtitle')}</p>
       </div>
 
-      <Panel>
-        <PanelHeader
-          title={tx('decisionTrace.assignmentTrace', { task: req.task_id })}
-          scope={`${req.section_id} · ${req.section_name} · ${sum.date_evaluated}`}
-          action={<StatusBadge tone="ok">{tx('decisionTrace.feasibleAssignment')}</StatusBadge>}
+      {/* 01 — assignment trace */}
+      <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
+        <RegionHeader
+          number="01"
+          title={t('decisionTrace.assignmentTrace', { task: req.task_id })}
+          meta={`${req.section_id} · ${req.section_name} · ${sum.date_evaluated}`}
+          isHindi={isHindi}
         />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-line">
-          <div className="bg-surface-panel p-3"><Metric label={tx('decisionTrace.windowsConsidered')} value={sum.block_windows_considered} /></div>
-          <div className="bg-surface-panel p-3"><Metric label={tx('decisionTrace.rejected')} value={sum.rejected} tone="critical" /></div>
-          <div className="bg-surface-panel p-3"><Metric label={tx('decisionTrace.feasible')} value={sum.feasible} tone="ok" /></div>
-          <div className="bg-surface-panel p-3"><Metric label={tx('decisionTrace.selected')} value={(sel.block_ids || []).length} sub={tx('decisionTrace.chainedBlocks')} /></div>
+        <div className="flex items-center gap-2.5 pb-1">
+          <Pill tone="ok">{t('decisionTrace.feasibleAssignment')}</Pill>
         </div>
-      </Panel>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-5 gap-y-3.5 border-t border-ws-rule pt-3">
+          <StatFigure value={sum.block_windows_considered} label={t('decisionTrace.windowsConsidered')} />
+          <StatFigure value={sum.rejected} label={t('decisionTrace.rejected')} tone="text-ws-critical" />
+          <StatFigure value={sum.feasible} label={t('decisionTrace.feasible')} tone="text-ws-ok" />
+          <StatFigure value={(sel.block_ids || []).length} label={`${t('decisionTrace.selected')} · ${t('decisionTrace.chainedBlocks')}`} />
+        </div>
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Panel>
-          <PanelHeader title={tx('decisionTrace.s1')} scope="maintenance_tasks.csv" />
-          <MetricRow label={tx('common.type')} value={req.maintenance_type} />
-          <MetricRow label={tx('common.department')} value={req.department} />
-          <MetricRow label={tx('common.duration')} value={`${req.required_duration_minutes} ${tx('common.min')}`} sub={`${req.blocks_required} ${tx('decisionTrace.chainedBlocks')}`} />
-          <MetricRow label={tx('demand.crewRequired')} value={req.required_team_size} />
-          <MetricRow label={tx('common.deadline')} value={req.deadline} tone="warn" />
-        </Panel>
+      {/* 02/03/04 — requirement / risk signal / rejections */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 bg-ws-rule gap-px border-b border-ws-rule">
+        <div className="bg-ws-surface px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
+          <RegionHeader number="02" title={t('decisionTrace.s1')} meta="maintenance_tasks.csv" isHindi={isHindi} />
+          <div className="border-t border-ws-rule">
+            <FieldRow label={t('common.type')} value={req.maintenance_type} />
+            <FieldRow label={t('common.department')} value={req.department} />
+            <FieldRow label={t('common.duration')} value={`${req.required_duration_minutes} ${t('common.min')}`} />
+            <FieldRow label={t('demand.crewRequired')} value={req.required_team_size} />
+            <FieldRow label={t('common.deadline')} value={req.deadline} tone="text-ws-warn font-bold" />
+          </div>
+        </div>
 
-        <Panel>
-          <PanelHeader title={tx('decisionTrace.s2')} scope={tx('decisionTrace.s2Scope')} />
-          <MetricRow label={tx('risk.score')} value={risk.risk_score?.toFixed?.(1) ?? risk.risk_score} tone="critical" sub={risk.risk_level} />
-          <MetricRow label={tx('risk.failureProb30')} value={risk.failure_probability_30d != null ? `${(risk.failure_probability_30d * 100).toFixed(2)}%` : '—'} />
-          <MetricRow label={tx('common.priority')} value={risk.priority_score} />
-          <PanelBody className="border-t border-line">
-            {/* The artifact records the source as a model name plus a file; cite
-                the file, which is the verifiable part. */}
-            <div className="font-mono text-[9px] text-rail-400 break-all">
-              {tx('common.source')}: {risk.source?.match(/\(([^)]+)\)/)?.[1] || 'neev_predictions_for_optimizer.csv'}
+        <div className="bg-ws-surface border-t border-ws-rule lg:border-t-0 px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
+          <RegionHeader number="03" title={t('decisionTrace.s2')} meta={t('decisionTrace.s2Scope')} isHindi={isHindi} />
+          <div className="border-t border-ws-rule">
+            <FieldRow label={t('risk.score')} value={risk.risk_score?.toFixed?.(1) ?? risk.risk_score} tone="text-ws-critical font-bold" />
+            <FieldRow label={t('risk.failureProb30')} value={risk.failure_probability_30d != null ? `${(risk.failure_probability_30d * 100).toFixed(2)}%` : '—'} />
+            <FieldRow label={t('common.priority')} value={risk.priority_score} />
+          </div>
+          <div className="font-mono text-[9px] text-ws-light break-all pt-2">
+            {t('common.source')}: {risk.source?.match(/\(([^)]+)\)/)?.[1] || 'neev_predictions_for_optimizer.csv'}
+          </div>
+        </div>
+
+        <div className="bg-ws-surface border-t border-ws-rule lg:border-t-0 px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
+          <RegionHeader number="04" title={t('decisionTrace.s3')} meta={t('decisionTrace.s3Scope')} isHindi={isHindi} />
+          <div className="border-t border-ws-rule">
+            {Object.entries(byRule).map(([rule, count]) => (
+              <FieldRow key={rule} label={RULE_KEY[rule] ? t(RULE_KEY[rule]) : rule} value={count} tone="text-ws-critical font-bold" />
+            ))}
+          </div>
+          <p className="font-ws text-[11px] text-ws-mid leading-relaxed pt-2">{t('decisionTrace.s3Note')}</p>
+        </div>
+      </div>
+
+      {/* 05 — constraint check */}
+      <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
+        <RegionHeader number="05" title={t('decisionTrace.s4')} meta={t('decisionTrace.s4Scope', { count: (trace.candidates || []).length })} isHindi={isHindi} />
+        <div className="border-t border-ws-rule">
+          {(trace.candidates || []).map((c, i) => (
+            <div
+              key={`${(c.block_ids || []).join('-')}-${c.window}-${i}`}
+              className={`grid grid-cols-[86px_70px_72px_minmax(0,1fr)] items-center gap-2 py-1.5 border-b border-ws-hairline last:border-b-0 ${c.status === 'SELECTED' ? 'bg-ws-selected' : ''}`}
+            >
+              <span className="font-mono text-[11px] font-medium text-ws-ink">{(c.block_ids || []).join(' + ')}</span>
+              <span className="font-mono text-[11px] text-ws-body">{c.window}</span>
+              <Pill tone={STATUS_TONE[c.status] || 'idle'} size="sm">{c.status}</Pill>
+              <span className="font-ws text-[11px] text-ws-mid overflow-hidden text-ellipsis whitespace-nowrap">
+                {c.rule && <span className="font-mono text-ws-critical mr-1.5">{c.rule}</span>}
+                {c.reason}
+              </span>
             </div>
-          </PanelBody>
-        </Panel>
-
-        <Panel>
-          <PanelHeader title={tx('decisionTrace.s3')} scope={tx('decisionTrace.s3Scope')} />
-          {Object.entries(byRule).map(([rule, count]) => (
-            <MetricRow key={rule} label={RULE_KEY[rule] ? tx(RULE_KEY[rule]) : rule} value={count} tone="critical" />
           ))}
-          <PanelBody className="border-t border-line">
-            <p className="text-[10px] text-rail-500 leading-relaxed">
-              {tx('decisionTrace.s3Note')}
-            </p>
-          </PanelBody>
-        </Panel>
+        </div>
       </div>
 
-      <Panel>
-        <PanelHeader title={tx('decisionTrace.s4')} scope={tx('decisionTrace.s4Scope', { count: (trace.candidates || []).length })} />
-        <DataTable
-          getKey={(c) => (c.block_ids || []).join('-') + c.window}
-          rowClassName={(c) => (c.status === 'SELECTED' ? 'bg-status-ok-tint' : '')}
-          columns={[
-            { key: 'block_ids', header: tx('decisionTrace.blockWindow'), render: (c) => (
-              <span className="font-mono text-[11px]">{(c.block_ids || []).join(' + ')}</span>
-            ) },
-            { key: 'window', header: tx('common.time'), render: (c) => <span className="font-mono text-[11px]">{c.window}</span> },
-            { key: 'status', header: tx('common.status'), render: (c) => (
-              <StatusBadge tone={STATUS_TONE[c.status] || 'idle'} size="sm">{c.status}</StatusBadge>
-            ) },
-            { key: 'rule', header: tx('common.rule'), render: (c) => (
-              c.rule ? <span className="font-mono text-[10px] text-status-critical">{c.rule}</span> : <span className="text-rail-400">—</span>
-            ) },
-            { key: 'reason', header: tx('common.reason'), render: (c) => (
-              <span className="text-[11px] text-rail-600">{c.reason}</span>
-            ) },
-          ]}
-          rows={trace.candidates || []}
-        />
-      </Panel>
+      {/* 06/07 — selected assignment / train impact */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 bg-ws-rule gap-px border-b border-ws-rule">
+        <div className="bg-ws-surface px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
+          <RegionHeader number="06" title={t('decisionTrace.s5')} meta={t('decisionTrace.s5Scope')} isHindi={isHindi} />
+          <div className="border-t border-ws-rule">
+            <FieldRow label={t('decisionTrace.blockWindow')} value={(sel.block_ids || []).join(' + ')} tone="text-ws-ok font-bold" />
+            <FieldRow label={t('decisionTrace.dateTime')} value={`${sel.date} · ${sel.window}`} />
+            <FieldRow label={t('common.crew')} value={(sel.teams || []).map((tm) => tm.team_id || tm).join(', ')} />
+            {(sel.teams || []).map((tm) => (
+              typeof tm === 'object' ? (
+                <FieldRow
+                  key={tm.team_id}
+                  label={t('decisionTrace.shift', { team: tm.team_id })}
+                  value={`${tm.shift || '—'}${tm.team_size != null ? ` · ${t('decisionTrace.crewVs', { size: tm.team_size, required: req.required_team_size })}` : ''}`}
+                />
+              ) : null
+            ))}
+          </div>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Panel>
-          <PanelHeader title={tx('decisionTrace.s5')} scope={tx('decisionTrace.s5Scope')} />
-          <MetricRow label={tx('decisionTrace.blockWindow')} value={(sel.block_ids || []).join(' + ')} tone="ok" />
-          <MetricRow label={tx('decisionTrace.dateTime')} value={`${sel.date} · ${sel.window}`} />
-          <MetricRow label={tx('common.crew')} value={(sel.teams || []).map((tm) => tm.team_id || tm).join(', ')} />
-          {(sel.teams || []).map((tm) => (
-            typeof tm === 'object' ? (
-              <MetricRow
-                key={tm.team_id}
-                label={tx('decisionTrace.shift', { team: tm.team_id })}
-                value={tm.shift || '—'}
-                sub={tm.team_size != null ? tx('decisionTrace.crewVs', { size: tm.team_size, required: req.required_team_size }) : undefined}
-              />
-            ) : null
-          ))}
-        </Panel>
-
-        <Panel>
-          <PanelHeader title={tx('decisionTrace.s6')} scope={tx('decisionTrace.s6Scope')} />
-          <MetricRow label={tx('overview.conflictingServices')} value={(impact.conflicting || []).length} tone={(impact.conflicting || []).length ? 'critical' : 'ok'} sub={tx('decisionTrace.blocksPossession')} />
-          <MetricRow label={tx('overview.adjacentServices')} value={(impact.adjacent || []).length} tone="ok" sub={tx('decisionTrace.withinBuffer', { min: impact.adjacency_buffer_minutes ?? 60 })} />
-          <MetricRow label={tx('overview.estimatedDelay')} value={`0 ${tx('common.min')}`} tone="ok" sub={tx('decisionTrace.noDisplaced')} />
-          <PanelBody className="border-t border-line">
-            <p className="text-[10px] text-rail-500 leading-relaxed">{impact.note}</p>
-          </PanelBody>
-        </Panel>
+        <div className="bg-ws-surface border-t border-ws-rule lg:border-t-0 px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
+          <RegionHeader number="07" title={t('decisionTrace.s6')} meta={t('decisionTrace.s6Scope')} isHindi={isHindi} />
+          <div className="border-t border-ws-rule">
+            <FieldRow label={t('overview.conflictingServices')} value={(impact.conflicting || []).length} tone={(impact.conflicting || []).length ? 'text-ws-critical font-bold' : 'text-ws-ok font-bold'} />
+            <FieldRow label={t('overview.adjacentServices')} value={(impact.adjacent || []).length} tone="text-ws-ok font-bold" />
+            <FieldRow label={t('overview.estimatedDelay')} value={`0 ${t('common.min')}`} tone="text-ws-ok font-bold" />
+          </div>
+          <p className="font-ws text-[11px] text-ws-mid leading-relaxed pt-2">{impact.note}</p>
+        </div>
       </div>
 
-      {trace.explanation && (
-        <Alert tone="info" title={tx('decisionTrace.whyPreferred')}>{trace.explanation}</Alert>
-      )}
+      <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-3.5 space-y-2.5">
+        {trace.explanation && <AdvisoryNote tone="info" title={t('decisionTrace.whyPreferred')}>{trace.explanation}</AdvisoryNote>}
+        <AdvisoryNote tone="idle" title={t('decisionTrace.onePublishedTitle')}>{t('decisionTrace.onePublishedBody')}</AdvisoryNote>
+      </div>
 
-      <Alert tone="idle" title={tx('decisionTrace.onePublishedTitle')}>
-        {tx('decisionTrace.onePublishedBody')}
-      </Alert>
-
-      <Panel>
-        <PanelBody>
-          <ProvenanceNote
-            generatedBy={trace.provenance?.dataset}
-            command={`PYTHONPATH=. python scripts/generate_decision_trace.py ${req.task_id}`}
-            dataset={trace.provenance?.dataset}
-          />
-        </PanelBody>
-      </Panel>
+      <div className="bg-ws-band px-3.5 md:px-4 xl:px-5 py-2">
+        <span className="font-mono text-[10px] text-ws-light break-all">
+          {trace.provenance?.dataset} · $ PYTHONPATH=. python scripts/generate_decision_trace.py {req.task_id}
+        </span>
+      </div>
     </div>
   );
 };

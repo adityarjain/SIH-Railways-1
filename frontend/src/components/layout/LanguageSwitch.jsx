@@ -12,6 +12,9 @@ export const LanguageSwitch = ({ tone = 'dark', className = '' }) => {
 
   const base = tone === 'dark'
     ? { wrap: 'border-rail-700 bg-rail-950', idle: 'text-rail-400 hover:text-white', active: 'bg-rail-700 text-white' }
+    : tone === 'ws'
+    // "Industrial worksheet" (design 2A) provenance strip — Authority Overview only.
+    ? { wrap: 'border-[#4A4338] bg-transparent', idle: 'text-[#A79F90] hover:text-white', active: 'bg-[#4A4338] text-white' }
     : { wrap: 'border-line bg-surface-panel', idle: 'text-rail-500 hover:text-rail-900', active: 'bg-rail-900 text-white' };
 
   return (

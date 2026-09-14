@@ -4,13 +4,12 @@ import { useI18n } from '../../i18n';
 import { makeScale, ticksFor, packLanes, DOMAIN_PRESETS, possessionDomain } from '../../utils/timeScale';
 import { minToHhmm } from '../../utils/time';
 import { bandOf } from '../../utils/risk';
-import { EmptyState, ScopeCaption } from '../ui';
+import { SegmentedControl, wsCase } from '../ui/worksheet';
 import sectionTrains from '../../data/section_trains.json';
 
 /**
- * Block / train / conflict timeline.
- *
- * Three lanes per section, in a deliberate hierarchy:
+ * Block / train / conflict timeline (design 2A idiom) — the Block Planning
+ * worksheet's hero. Three lanes per section, in a deliberate hierarchy:
  *
  *   BLOCK     what the optimizer plans — tall, saturated, dominant
  *   TRAIN     real occupancy projected from trains.csv — thin, muted context
@@ -18,26 +17,29 @@ import sectionTrains from '../../data/section_trains.json';
  *
  * The conflict lane never performs overlap arithmetic of its own. A red hatch
  * means some engine output says the two collide, not that two bars happen to
- * intersect on screen.
+ * intersect on screen. This is a deliberate visual fork of `DaySheet`
+ * (Overview's hero) rather than a shared component — `DaySheet` renders one
+ * corridor with no conflict/simulated-train lanes; this renders all corridors
+ * with the full conflict-detection surface Block Planning needs.
  */
 
-const LANE_H = 19;      // maintenance block bar
+const LANE_H = 19;
 const LANE_GAP = 2;
-const TRAIN_H = 6;      // train occupancy bar
+const TRAIN_H = 6;
 const TRACK_PAD = 4;
 
 const blockTone = (task, replannedTaskId) => {
   if (replannedTaskId && task.task_id === replannedTaskId) {
-    return { bg: 'bg-status-warn', text: 'text-white', label: 'Replanned' };
+    return { bg: 'bg-ws-warn', text: 'text-white' };
   }
-  if (task.is_bundled) return { bg: 'bg-bundle', text: 'text-white', label: 'Bundled' };
-  if (bandOf(task) === 'CRITICAL') return { bg: 'bg-status-critical', text: 'text-white', label: 'Critical' };
-  return { bg: 'bg-status-info', text: 'text-white', label: 'Planned' };
+  if (task.is_bundled) return { bg: 'bg-ws-bundle', text: 'text-white' };
+  if (bandOf(task) === 'CRITICAL') return { bg: 'bg-ws-critical', text: 'text-white' };
+  return { bg: 'bg-ws-info', text: 'text-white' };
 };
 
 const LegendSwatch = ({ className, h = 10, hatch }) => (
   <span
-    className={`inline-block w-4 shrink-0 ${hatch ? 'conflict-hatch border border-status-critical' : className}`}
+    className={`inline-block w-4 shrink-0 ${hatch ? 'ws-conflict-hatch border border-ws-critical' : className}`}
     style={{ height: h }}
   />
 );
@@ -52,8 +54,9 @@ export const BlockTrainGantt = ({
   compact = false,
 }) => {
   const { activeEvent, rerouteScenario, holdScenario, replanScenario, blockUnavailableScenario, replannedRecord } = usePlan();
-  const { t: tx } = useI18n();
+  const { t: tx, isHindi } = useI18n();
   const [domainId, setDomainId] = useState('day');
+  const { uc } = wsCase(isHindi);
 
   const tasksBySection = useMemo(() => {
     const map = new Map(sections.map((s) => [s.section_id, []]));
@@ -136,77 +139,65 @@ export const BlockTrainGantt = ({
 
   const hasPossessionDomain = possessionDomain(visibleTasks) != null;
 
-  const DOMAIN_BUTTONS = [
-    { id: 'day', label: 'Full day' },
-    { id: 'night', label: 'Night' },
-    { id: 'possession', label: 'Possession ±2h', disabled: !hasPossessionDomain },
+  const DOMAIN_OPTIONS = [
+    { id: 'day', label: tx('overview.fullDay') },
+    { id: 'night', label: tx('overview.night0006') },
+    { id: 'possession', label: tx('overview.possessionWindow'), disabled: !hasPossessionDomain },
   ];
 
   return (
-    <div className="bg-surface-panel border border-line rounded-lg">
+    <div className="bg-ws-surface border border-ws-rule">
       {/* header */}
-      <div className="px-3 py-2.5 bg-surface-sunken border-b border-line flex items-start justify-between gap-3 rounded-t-lg">
+      <div className="px-3.5 py-2.5 bg-ws-tick border-b border-ws-rule flex items-start justify-between gap-3 flex-wrap">
         <div className="min-w-0">
-          <div className="t-label">Block / train timeline</div>
-          <div className="font-mono text-[11px] text-rail-900 mt-0.5 truncate">
-            {corridorLabel ? `${corridorLabel} · ` : ''}{selectedDate || 'all dates'}
+          <div className={`font-display text-xs font-semibold ${uc} tracking-[0.1em] text-ws-light`}>{tx('gantt.title')}</div>
+          <div className="font-mono text-[11px] text-ws-ink mt-0.5 truncate">
+            {corridorLabel ? `${corridorLabel} · ` : ''}{selectedDate || tx('gantt.allDates')}
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          {scope && <ScopeCaption>{scope}</ScopeCaption>}
-          <div className="flex items-stretch border border-line bg-surface-panel">
-            {DOMAIN_BUTTONS.map((b) => (
-              <button
-                key={b.id}
-                disabled={b.disabled}
-                onClick={() => setDomainId(b.id)}
-                className={`px-2 py-1 text-[10px] font-semibold transition-colors disabled:opacity-35 disabled:cursor-not-allowed ${
-                  domainId === b.id ? 'bg-rail-900 text-white' : 'text-rail-500 hover:bg-surface-sunken'
-                }`}
-              >
-                {b.label}
-              </button>
-            ))}
-          </div>
+          {scope && <span className="font-mono text-[10px] text-ws-light uppercase">{scope}</span>}
+          <SegmentedControl options={DOMAIN_OPTIONS} value={domainId} onChange={setDomainId} isHindi={isHindi} size="sm" />
         </div>
       </div>
 
       {/* legend */}
-      <div className="px-3 py-2 border-b border-line flex flex-wrap items-center gap-x-4 gap-y-1.5">
+      <div className="px-3.5 py-2 border-b border-ws-rule flex flex-wrap items-center gap-x-4 gap-y-1.5">
         {[
-          [tx('gantt.legendBlock'), 'bg-status-info', 10],
-          [tx('gantt.legendCritical'), 'bg-status-critical', 10],
-          [tx('gantt.legendBundled'), 'bg-bundle', 10],
-          [tx('gantt.legendReplanned'), 'bg-status-warn', 10],
-          [tx('gantt.legendTrain'), 'bg-rail-400', 5],
-          [tx('gantt.legendSimulated'), 'bg-rail-700', 5],
+          [tx('gantt.legendBlock'), 'bg-ws-info', 10],
+          [tx('gantt.legendCritical'), 'bg-ws-critical', 10],
+          [tx('gantt.legendBundled'), 'bg-ws-bundle', 10],
+          [tx('gantt.legendReplanned'), 'bg-ws-warn', 10],
+          [tx('gantt.legendTrain'), 'bg-ws-mid', 5],
+          [tx('gantt.legendSimulated'), 'bg-ws-body', 5],
         ].map(([label, cls, h]) => (
-          <span key={label} className="inline-flex items-center gap-1.5 text-[10px] text-rail-500">
+          <span key={label} className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
             <LegendSwatch className={cls} h={h} />
             {label}
           </span>
         ))}
-        <span className="inline-flex items-center gap-1.5 text-[10px] text-rail-500">
+        <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
           <LegendSwatch hatch h={10} />
           {tx('gantt.legendConflict')}
         </span>
       </div>
 
       {sections.length === 0 ? (
-        <EmptyState title="No sections carry a possession for this date and corridor.">
-          Change the date or corridor above; the selectors only offer combinations the plan covers.
-        </EmptyState>
+        <div className="py-8 text-center">
+          <div className="font-ws text-xs font-semibold text-ws-mid">{tx('gantt.noSections')}</div>
+          <div className="font-ws text-[11px] text-ws-light mt-1 max-w-md mx-auto leading-relaxed">{tx('gantt.noSectionsBody')}</div>
+        </div>
       ) : (
-        <div className="p-3 overflow-x-auto custom-scrollbar">
+        <div className="p-3.5 overflow-x-auto custom-scrollbar">
           <div className="min-w-[720px]">
-            {/* ruler — labels absolutely positioned on their own gridline */}
+            {/* ruler */}
             <div className="flex">
               <div className="w-28 shrink-0" />
               <div className="relative flex-1 h-4">
                 {ticks.map((t) => (
                   <span
                     key={t.minute}
-                    className="absolute font-mono text-[9px] text-rail-400 -translate-x-1/2"
+                    className="absolute font-mono text-[9px] text-ws-light -translate-x-1/2"
                     style={{ left: `${t.percent}%` }}
                   >
                     {t.label}
@@ -234,22 +225,21 @@ export const BlockTrainGantt = ({
               const trackH = TRACK_PAD * 2 + laneCount * LANE_H + (laneCount - 1) * LANE_GAP + TRAIN_H + 5;
 
               return (
-                <div key={section.section_id} className="flex items-stretch border-b border-line-subtle last:border-b-0">
+                <div key={section.section_id} className="flex items-stretch border-b border-ws-hairline last:border-b-0">
                   <div className="w-28 shrink-0 py-2 pr-2">
-                    <div className="font-mono text-[11px] font-bold text-rail-900">{section.section_id}</div>
-                    <div className="text-[9px] text-rail-400 truncate">{section.section_name}</div>
+                    <div className="font-mono text-[11px] font-bold text-ws-ink">{section.section_id}</div>
+                    <div className="font-ws text-[9px] text-ws-light truncate">{section.section_name}</div>
                     {!hasTrainData && !compact && (
-                      <div className="text-[8px] text-rail-400 mt-0.5 italic">no train records</div>
+                      <div className="font-ws text-[8px] text-ws-light mt-0.5 italic">{tx('gantt.noTrainRecordsShort')}</div>
                     )}
                   </div>
 
                   <div className="flex-1 py-1.5">
-                    <div className="relative bg-surface-base border border-line-subtle" style={{ height: trackH }}>
-                      {/* gridlines */}
+                    <div className="relative bg-ws-surface border border-ws-hairline" style={{ height: trackH }}>
                       {ticks.map((t) => (
                         <span
                           key={t.minute}
-                          className="absolute top-0 bottom-0 w-px bg-line-subtle"
+                          className="absolute top-0 bottom-0 w-px bg-ws-tick"
                           style={{ left: `${t.percent}%` }}
                         />
                       ))}
@@ -257,13 +247,13 @@ export const BlockTrainGantt = ({
                       {/* LANE A — maintenance possessions */}
                       {packed.map(({ item: task, lane }) => {
                         const [a, b] = scale.clamp(task.start_minute, task.end_minute);
-                        const t = blockTone(task, replannedRecord?.task_id && task.date === replannedRecord?.date ? replannedRecord.task_id : null);
+                        const tone = blockTone(task, replannedRecord?.task_id && task.date === replannedRecord?.date ? replannedRecord.task_id : null);
                         return (
                           <button
                             key={task.task_id}
                             onClick={() => onSelectTask && onSelectTask(task)}
                             title={`${task.task_id} · ${minToHhmm(task.start_minute)}–${minToHhmm(task.end_minute)} · ${task.maintenance_type || ''}`}
-                            className={`absolute flex items-center px-1.5 overflow-hidden ${t.bg} ${t.text} hover:brightness-110 transition-[filter]`}
+                            className={`absolute flex items-center px-1.5 overflow-hidden ${tone.bg} ${tone.text} hover:brightness-110 transition-[filter]`}
                             style={{
                               left: `${scale.toPercent(a)}%`,
                               width: `${scale.toWidth(a, b)}%`,
@@ -271,7 +261,7 @@ export const BlockTrainGantt = ({
                               height: LANE_H,
                             }}
                           >
-                            <span className="text-[9px] font-semibold whitespace-nowrap">
+                            <span className="font-mono text-[9px] font-semibold whitespace-nowrap">
                               {task.task_id}
                               {!compact && ` · ${task.duration_minutes}m`}
                             </span>
@@ -286,13 +276,8 @@ export const BlockTrainGantt = ({
                           <span
                             key={`${tr.train_id}-${tr.arrival_minute}`}
                             title={`${tr.train_id} · ${minToHhmm(tr.arrival_minute)}–${minToHhmm(tr.departure_minute)}${tr.priority_class ? ` · priority ${tr.priority_class}` : ''} (trains.csv)`}
-                            className="absolute bg-rail-400"
-                            style={{
-                              left: `${scale.toPercent(a)}%`,
-                              width: `${scale.toWidth(a, b)}%`,
-                              bottom: 4,
-                              height: TRAIN_H,
-                            }}
+                            className="absolute bg-ws-mid"
+                            style={{ left: `${scale.toPercent(a)}%`, width: `${scale.toWidth(a, b)}%`, bottom: 4, height: TRAIN_H }}
                           />
                         );
                       })}
@@ -302,13 +287,8 @@ export const BlockTrainGantt = ({
                           <span
                             key={ev.event_id}
                             title={`${ev.train_id} · ${ev.train_name || ''} · simulated event`}
-                            className="absolute bg-rail-700 border border-rail-900"
-                            style={{
-                              left: `${scale.toPercent(a)}%`,
-                              width: `${scale.toWidth(a, b)}%`,
-                              bottom: 4,
-                              height: TRAIN_H,
-                            }}
+                            className="absolute bg-ws-body border border-ws-ink"
+                            style={{ left: `${scale.toPercent(a)}%`, width: `${scale.toWidth(a, b)}%`, bottom: 4, height: TRAIN_H }}
                           />
                         );
                       })}
@@ -320,24 +300,16 @@ export const BlockTrainGantt = ({
                           <span
                             key={`${c.trains.join('-')}-${i}`}
                             title={`${c.type}: ${c.trains.join(', ')} vs ${c.blocks.join(' + ')} (${minToHhmm(c.start)}–${minToHhmm(c.end)})`}
-                            className="absolute conflict-hatch border border-status-critical pointer-events-none"
-                            style={{
-                              left: `${scale.toPercent(a)}%`,
-                              width: `${scale.toWidth(a, b)}%`,
-                              top: 1,
-                              bottom: 1,
-                              opacity: 0.55,
-                            }}
+                            className="absolute ws-conflict-hatch border border-ws-critical pointer-events-none"
+                            style={{ left: `${scale.toPercent(a)}%`, width: `${scale.toWidth(a, b)}%`, top: 1, bottom: 1, opacity: 0.55 }}
                           />
                         );
                       })}
 
                       {/* truthful empty state — never a placeholder bar */}
                       {tasks.length === 0 && projected.length === 0 && simulated.length === 0 && (
-                        <span className="absolute inset-0 flex items-center justify-center text-[9px] text-rail-400">
-                          {hasTrainData
-                            ? 'No possession or train movement in this window'
-                            : 'No train timing records available for this section/date'}
+                        <span className="absolute inset-0 flex items-center justify-center font-ws text-[9px] text-ws-light">
+                          {hasTrainData ? tx('gantt.noActivity') : tx('gantt.noTrainRecords')}
                         </span>
                       )}
                     </div>
@@ -347,12 +319,11 @@ export const BlockTrainGantt = ({
             })}
           </div>
 
-          <p className="text-[10px] text-rail-400 mt-2.5 leading-relaxed">
-            Upper lane: maintenance possessions the optimizer planned. Lower lane: train
-            occupancy projected verbatim from <span className="font-mono">trains.csv</span>{' '}
-            ({sectionTrains.provenance?.records_emitted ?? 0} records across{' '}
-            {sectionTrains.provenance?.sections ?? 0} sections). Hatching marks a conflict
-            recorded by an engine artifact — overlaps are never inferred here.
+          <p className="font-ws text-[10px] text-ws-light mt-2.5 leading-relaxed">
+            {tx('gantt.footnote', {
+              records: sectionTrains.provenance?.records_emitted ?? 0,
+              sections: sectionTrains.provenance?.sections ?? 0,
+            })}
           </p>
         </div>
       )}

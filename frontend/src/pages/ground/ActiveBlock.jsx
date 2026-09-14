@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { usePlan } from '../../context/PlanContext';
 import { useAuth } from '../../context/AuthContext';
 import { useI18n } from '../../i18n';
-import { Panel, PanelHeader, EmptyState, Alert, Button, StatusBadge } from '../../components/ui';
+import { Pill, AdvisoryNote } from '../../components/ui/worksheet';
 import { TaskActionModal } from '../../components/maintenance/TaskActionModal';
 import {
   WorkOrderHeader, WorkOrderFacts, BlockStatusBanner, SectionContext,
@@ -24,7 +24,7 @@ const ACTION_STATUS = {
 export const ActiveBlock = ({ onNavigate }) => {
   const { tasksInventory, updateTaskStatus } = usePlan();
   const { selectedDept } = useAuth();
-  const { t: tx } = useI18n();
+  const { t } = useI18n();
   const [action, setAction] = useState(null);
 
   const deptTasks = useMemo(
@@ -32,7 +32,6 @@ export const ActiveBlock = ({ onNavigate }) => {
     [tasksInventory, selectedDept],
   );
 
-  /** In-progress work wins; otherwise the earliest scheduled possession. */
   const active = useMemo(() => {
     const started = deptTasks.find((t) => t.status === 'In Progress');
     if (started) return started;
@@ -52,12 +51,16 @@ export const ActiveBlock = ({ onNavigate }) => {
 
   if (!active) {
     return (
-      <Panel>
-        <PanelHeader title={tx('ground.activeBlockTitle')} scope={selectedDept} />
-        <EmptyState title={tx('ground.noAssignment')}>
-          {tx('ground.noAssignmentBody')}
-        </EmptyState>
-      </Panel>
+      <div className="border border-ws-rule bg-ws-surface">
+        <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
+          <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{t('ground.activeBlockTitle')}</span>
+          <span className="font-mono text-[10px] text-ws-light block mt-0.5">{selectedDept}</span>
+        </div>
+        <div className="px-4 py-6 text-center">
+          <div className="font-ws text-xs font-semibold text-ws-mid">{t('ground.noAssignment')}</div>
+          <div className="font-ws text-[11px] text-ws-light mt-1">{t('ground.noAssignmentBody')}</div>
+        </div>
+      </div>
     );
   }
 
@@ -67,34 +70,31 @@ export const ActiveBlock = ({ onNavigate }) => {
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="t-section-title">{tx('ground.activeBlockTitle')}</h2>
-          <p className="text-xs text-rail-500 mt-0.5">
-            {isStarted ? tx('ground.activeBlockInProgress') : tx('ground.activeBlockNext')}
-          </p>
+          <h2 className="font-display text-[15px] font-semibold text-ws-ink">{t('ground.activeBlockTitle')}</h2>
+          <p className="font-ws text-xs text-ws-mid mt-0.5">{isStarted ? t('ground.activeBlockInProgress') : t('ground.activeBlockNext')}</p>
         </div>
-        <StatusBadge tone={isStarted ? 'info' : 'ok'} size="lg">
-          {isStarted ? tx('status.inProgressCaps') : tx('status.readyToStart')}
-        </StatusBadge>
+        <Pill tone={isStarted ? 'info' : 'ok'} size="md">{isStarted ? t('status.inProgressCaps') : t('status.readyToStart')}</Pill>
       </div>
 
-      <Panel className="border-l-4 border-l-status-info overflow-hidden">
+      <div className="border border-ws-rule border-l-4 border-l-ws-info bg-ws-surface overflow-hidden">
         <WorkOrderHeader task={active} status={active.status} />
         <WorkOrderFacts task={active} />
         <BlockStatusBanner task={active} status={active.status} />
         <ActionBar status={active.status} onAction={(a) => setAction(a)} />
-      </Panel>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <SectionContext task={active} />
         <OperationalGaps />
       </div>
 
-      <Alert tone="idle" title={tx('ground.sessionOnlyTitle')}>
-        {tx('ground.sessionOnlyBody')}
-        <Button size="sm" variant="ghost" className="ml-2" onClick={() => onNavigate && onNavigate('my-tasks')}>
-          {tx('ground.viewAllWork')}
-        </Button>
-      </Alert>
+      <AdvisoryNote
+        tone="idle"
+        title={t('ground.sessionOnlyTitle')}
+        action={<button onClick={() => onNavigate && onNavigate('my-tasks')} className="font-display text-[11px] font-bold uppercase tracking-wide text-ws-mid hover:text-ws-ink">{t('ground.viewAllWork')}</button>}
+      >
+        {t('ground.sessionOnlyBody')}
+      </AdvisoryNote>
 
       <TaskActionModal
         isOpen={Boolean(action)}

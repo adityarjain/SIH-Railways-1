@@ -1,10 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { usePlan } from '../../context/PlanContext';
 import { useI18n } from '../../i18n';
-import {
-  Panel, PanelHeader, PanelBody, MetricRow, Metric, Alert, DataTable,
-  StatusBadge, Select, EmptyState, ProvenanceNote,
-} from '../../components/ui';
+import { RegionHeader, FieldRow, StatFigure, AdvisoryNote, WsSelect } from '../../components/ui/worksheet';
 import { minToHhmm } from '../../utils/time';
 import sectionTrains from '../../data/section_trains.json';
 import decisionTrace from '../../data/decision_trace.json';
@@ -23,7 +20,7 @@ const SECTION_NAME = Object.fromEntries(
  */
 export const TrainImpact = ({ onNavigate }) => {
   const { scheduledTasks } = usePlan();
-  const { t: tx } = useI18n();
+  const { t, isHindi } = useI18n();
 
   const pairs = useMemo(() => {
     const out = [];
@@ -46,12 +43,6 @@ export const TrainImpact = ({ onNavigate }) => {
     [scheduledTasks, section, date],
   );
 
-  /**
-   * A possession and a train are reported as *coincident* only in the plain
-   * arithmetic sense of sharing minutes. That is a scheduling observation, not
-   * a validated conflict: C002 conflicts are established by the optimizer's own
-   * preprocessing, and the plan under view already satisfies them.
-   */
   const coincident = useMemo(() => {
     const out = [];
     for (const p of possessions) {
@@ -62,7 +53,6 @@ export const TrainImpact = ({ onNavigate }) => {
       }
     }
     return out;
-    // `trains` is a stable slice of the static section_trains import.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [possessions, section, date]);
 
@@ -70,132 +60,119 @@ export const TrainImpact = ({ onNavigate }) => {
   const traceMatches = decisionTrace.request?.section_id === section;
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 className="t-section-title">{tx('trainImpactPage.title')}</h2>
-          <p className="text-xs text-rail-500 mt-0.5 max-w-3xl leading-relaxed">
-            {tx('trainImpactPage.subtitle')}
-          </p>
-        </div>
-        <Select
-          label={tx('trainImpactPage.sectionDate')}
-          value={pair}
-          onChange={(e) => setPair(e.target.value)}
-        >
+    <div className="bg-ws-band min-h-full">
+      <div className="bg-ws-paper border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-2.5 flex items-center justify-between gap-4 flex-wrap">
+        <p className="font-ws text-xs text-ws-mid max-w-3xl leading-relaxed flex-1 min-w-[240px]">{t('trainImpactPage.subtitle')}</p>
+        <WsSelect value={pair} onChange={(e) => setPair(e.target.value)} className="shrink-0">
           {pairs.map((p) => {
             const [s, d] = p.split('|');
             const n = sectionTrains.sections[s][d].length;
-            return <option key={p} value={p}>{s} · {d} · {tx('trainImpactPage.trainsLabel', { count: n })}</option>;
+            return <option key={p} value={p}>{s} · {d} · {t('trainImpactPage.trainsLabel', { count: n })}</option>;
           })}
-        </Select>
+        </WsSelect>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Panel><PanelBody><Metric label={tx('trainImpactPage.trainMovements')} value={trains.length} sub={SECTION_NAME[section] || section} scope="trains.csv" /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label={tx('trainImpactPage.possessionsPlanned')} value={possessions.length} scope={tx('scope.demoScenario')} /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label={tx('trainImpactPage.coincidentMinutes')} value={coincident.length} tone={coincident.length ? 'warn' : 'ok'} sub={tx('trainImpactPage.coincidentSub')} /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label={tx('trainImpactPage.priority1Services')} value={trains.filter((t) => t.priority_class === 1).length} sub={tx('trainImpactPage.priority1Sub')} scope="trains.csv" /></PanelBody></Panel>
+      {/* 01 — section snapshot */}
+      <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
+        <RegionHeader number="01" title={t('trainImpactPage.title')} meta={`${section} · ${date}`} isHindi={isHindi} />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-5 gap-y-3.5 border-t border-ws-rule pt-3">
+          <StatFigure value={trains.length} label={`${t('trainImpactPage.trainMovements')} · ${SECTION_NAME[section] || section}`} tone="text-ws-info" />
+          <StatFigure value={possessions.length} label={t('trainImpactPage.possessionsPlanned')} />
+          <StatFigure value={coincident.length} label={t('trainImpactPage.coincidentSub')} tone={coincident.length ? 'text-ws-warn' : 'text-ws-ok'} />
+          <StatFigure value={trains.filter((t) => t.priority_class === 1).length} label={t('trainImpactPage.priority1Services')} tone="text-ws-critical" />
+        </div>
       </div>
 
+      {/* 02 — recorded impact */}
       {traceMatches && (
-        <Panel>
-          <PanelHeader
-            title={tx('trainImpactPage.recordedImpact')}
-            scope={`${decisionTrace.request.task_id} · ${decisionTrace.selected?.window || ''}`}
-          />
-          <MetricRow label={tx('overview.conflictingServices')} value={(impact.conflicting || []).length} tone={(impact.conflicting || []).length ? 'critical' : 'ok'} sub={tx('trainImpactPage.mustBeZero')} />
-          <MetricRow label={tx('overview.adjacentServices')} value={(impact.adjacent || []).length} tone="ok" sub={tx('trainImpactPage.adjacentSub', { min: impact.adjacency_buffer_minutes ?? 60 })} />
-          <PanelBody className="border-t border-line">
-            <p className="text-[10px] text-rail-500 leading-relaxed">{impact.note}</p>
-          </PanelBody>
-        </Panel>
+        <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
+          <RegionHeader number="02" title={t('trainImpactPage.recordedImpact')} meta={`${decisionTrace.request.task_id} · ${decisionTrace.selected?.window || ''}`} isHindi={isHindi} />
+          <div className="border-t border-ws-rule">
+            <FieldRow label={t('overview.conflictingServices')} value={(impact.conflicting || []).length} tone={(impact.conflicting || []).length ? 'text-ws-critical font-bold' : 'text-ws-ok font-bold'} />
+            <FieldRow label={t('overview.adjacentServices')} value={(impact.adjacent || []).length} tone="text-ws-ok font-bold" />
+          </div>
+          <p className="font-ws text-[11px] text-ws-mid leading-relaxed pt-2">{impact.note}</p>
+        </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Panel>
-          <PanelHeader title={tx('trainImpactPage.trainMovements')} scope={tx('trainImpactPage.trainMovementsScope', { section, date })} />
+      {/* 03/04 — train movements + possessions */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 bg-ws-rule gap-px border-b border-ws-rule">
+        <div className="bg-ws-surface px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
+          <RegionHeader number="03" title={t('trainImpactPage.trainMovements')} meta={t('trainImpactPage.trainMovementsScope', { section, date })} isHindi={isHindi} />
           {trains.length === 0 ? (
-            <EmptyState title={tx('gantt.noTrainRecords')} />
+            <div className="py-6 font-ws text-xs text-ws-mid">{t('gantt.noTrainRecords')}</div>
           ) : (
-            <DataTable
-              getKey={(t) => `${t.train_id}-${t.arrival_minute}`}
-              columns={[
-                { key: 'train_id', header: tx('replanning.train'), render: (t) => <span className="t-mono-id">{t.train_id}</span> },
-                { key: 'train_type', header: tx('common.type'), render: (t) => <span className="text-[11px]">{t.train_type || '—'}</span> },
-                { key: 'window', header: tx('trainImpactPage.occupancy'), render: (t) => (
-                  <span className="font-mono text-[11px]">{minToHhmm(t.arrival_minute)}–{minToHhmm(t.departure_minute)}</span>
-                ) },
-                { key: 'priority_class', header: tx('common.priority'), align: 'right', render: (t) => (
-                  <StatusBadge tone={t.priority_class === 1 ? 'critical' : t.priority_class === 2 ? 'warn' : 'idle'} size="sm">
-                    {t.priority_class ?? '—'}
-                  </StatusBadge>
-                ) },
-                { key: 'load', header: tx('trainImpactPage.load'), align: 'right', render: (t) => (
-                  <span className="font-mono text-[11px]">{t.passenger_load_percent != null ? `${t.passenger_load_percent}%` : '—'}</span>
-                ) },
-              ]}
-              rows={trains}
-            />
+            <div className="overflow-x-auto custom-scrollbar">
+              <table className="w-full text-left border-collapse min-w-[420px]">
+                <thead className="border-b border-ws-rule">
+                  <tr>
+                    {[t('replanning.train'), t('common.type'), t('trainImpactPage.occupancy'), t('common.priority'), t('trainImpactPage.load')].map((h, i) => (
+                      <th key={h} className={`py-1.5 font-display text-[10px] font-semibold uppercase tracking-wide text-ws-light ${i > 2 ? 'text-right' : ''}`}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {trains.map((tr) => (
+                    <tr key={`${tr.train_id}-${tr.arrival_minute}`} className="border-b border-ws-hairline last:border-b-0">
+                      <td className="py-1.5 font-mono text-[11px] font-medium text-ws-ink">{tr.train_id}</td>
+                      <td className="py-1.5 font-ws text-[11px] text-ws-body">{tr.train_type || '—'}</td>
+                      <td className="py-1.5 font-mono text-[11px] text-ws-body">{minToHhmm(tr.arrival_minute)}–{minToHhmm(tr.departure_minute)}</td>
+                      <td className="py-1.5 font-mono text-[11px] text-right">
+                        <span className={tr.priority_class === 1 ? 'text-ws-critical font-bold' : tr.priority_class === 2 ? 'text-ws-warn font-bold' : 'text-ws-idle'}>{tr.priority_class ?? '—'}</span>
+                      </td>
+                      <td className="py-1.5 font-mono text-[11px] text-right text-ws-body">{tr.passenger_load_percent != null ? `${tr.passenger_load_percent}%` : '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
-        </Panel>
+        </div>
 
-        <div className="space-y-4">
-          <Panel>
-            <PanelHeader title={tx('trainImpactPage.possessionsOnSection')} scope={tx('scope.demoScenario')} />
+        <div className="bg-ws-surface px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4 space-y-3.5">
+          <div>
+            <RegionHeader number="04" title={t('trainImpactPage.possessionsOnSection')} meta={t('scope.demoScenario')} isHindi={isHindi} />
             {possessions.length === 0 ? (
-              <EmptyState title={tx('trainImpactPage.noPossessionHere')} />
+              <div className="py-4 font-ws text-xs text-ws-mid">{t('trainImpactPage.noPossessionHere')}</div>
             ) : (
-              <DataTable
-                getKey={(p) => p.task_id}
-                onRowClick={() => onNavigate && onNavigate('block-planning')}
-                columns={[
-                  { key: 'task_id', header: tx('common.task'), render: (p) => <span className="t-mono-id">{p.task_id}</span> },
-                  { key: 'maintenance_type', header: tx('common.type'), render: (p) => <span className="text-[11px]">{p.maintenance_type}</span> },
-                  { key: 'window', header: tx('common.window'), render: (p) => (
-                    <span className="font-mono text-[11px]">{minToHhmm(p.start_minute)}–{minToHhmm(p.end_minute)}</span>
-                  ) },
-                  { key: 'blocks', header: tx('common.blocks'), align: 'right', render: (p) => (
-                    <span className="font-mono text-[10px]">{(p.block_ids || []).join(' + ')}</span>
-                  ) },
-                ]}
-                rows={possessions}
-              />
+              <div className="border-t border-ws-rule">
+                {possessions.map((p) => (
+                  <button
+                    key={p.task_id}
+                    onClick={() => onNavigate && onNavigate('block-planning')}
+                    className="w-full flex items-center justify-between gap-3 py-1.5 border-b border-ws-hairline last:border-b-0 hover:bg-ws-paper transition-colors text-left"
+                  >
+                    <span className="font-mono text-[11px] font-semibold text-ws-ink shrink-0">{p.task_id}</span>
+                    <span className="font-ws text-xs text-ws-mid flex-1 min-w-0 truncate px-2">{p.maintenance_type}</span>
+                    <span className="font-mono text-[11px] text-ws-body shrink-0">{minToHhmm(p.start_minute)}–{minToHhmm(p.end_minute)}</span>
+                  </button>
+                ))}
+              </div>
             )}
-          </Panel>
+          </div>
 
           {coincident.length > 0 ? (
-            <Alert tone="warn" title={tx('trainImpactPage.coincidentTitle', { count: coincident.length })}>
+            <AdvisoryNote tone="warn" title={t('trainImpactPage.coincidentTitle', { count: coincident.length })}>
               {coincident.slice(0, 4).map(({ possession, train }) => (
                 <div key={`${possession.task_id}-${train.train_id}`} className="font-mono text-[10px] mt-0.5">
                   {possession.task_id} ∩ {train.train_id} · {minToHhmm(Math.max(possession.start_minute, train.arrival_minute))}–{minToHhmm(Math.min(possession.end_minute, train.departure_minute))}
                 </div>
               ))}
-              <div className="mt-1.5">
-                {tx('trainImpactPage.coincidentBody')}
-              </div>
-            </Alert>
+              <div className="mt-1.5">{t('trainImpactPage.coincidentBody')}</div>
+            </AdvisoryNote>
           ) : (
-            <Alert tone="ok" title={tx('trainImpactPage.noCoincidentTitle')}>
-              {tx('trainImpactPage.noCoincidentBody')}
-            </Alert>
+            <AdvisoryNote tone="ok" title={t('trainImpactPage.noCoincidentTitle')}>{t('trainImpactPage.noCoincidentBody')}</AdvisoryNote>
           )}
 
-          <Alert tone="idle" title={tx('trainImpactPage.downstreamTitle')}>
-            {tx('trainImpactPage.downstreamBody')}
-          </Alert>
+          <AdvisoryNote tone="idle" title={t('trainImpactPage.downstreamTitle')}>{t('trainImpactPage.downstreamBody')}</AdvisoryNote>
         </div>
       </div>
 
-      <Panel>
-        <PanelBody>
-          <ProvenanceNote
-            generatedBy={sectionTrains.provenance?.source}
-            command={sectionTrains.provenance?.command}
-            note={sectionTrains.provenance?.filter}
-          />
-        </PanelBody>
-      </Panel>
+      <div className="bg-ws-band px-3.5 md:px-4 xl:px-5 py-2 flex flex-wrap items-center gap-3.5">
+        <span className="font-mono text-[10px] text-ws-light break-all">
+          {sectionTrains.provenance?.source} · $ {sectionTrains.provenance?.command}
+        </span>
+      </div>
     </div>
   );
 };

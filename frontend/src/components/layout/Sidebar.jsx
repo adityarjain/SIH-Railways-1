@@ -1,6 +1,4 @@
-import React from 'react';
-import { useAuth, ROLES } from '../../context/AuthContext';
-import { useI18n } from '../../i18n';
+import { ROLES } from '../../context/AuthContext';
 
 /**
  * Single source of truth for which tabs each role can reach. App.jsx derives
@@ -85,65 +83,3 @@ export const NAV_ITEMS_BY_ROLE = Object.fromEntries(
     sections.flatMap((s) => s.items),
   ]),
 );
-
-/**
- * Authority navigation rail. Ground does not use this component at all — it has
- * its own top tab strip, because a field work tool is not a filtered version of
- * a planning console.
- */
-export const Sidebar = ({ activeTab, onTabChange }) => {
-  const { currentUser, logout } = useAuth();
-  const { t } = useI18n();
-  const role = currentUser?.role || ROLES.AUTHORITY;
-  const sections = NAV_SECTIONS_BY_ROLE[role] || NAV_SECTIONS_BY_ROLE[ROLES.AUTHORITY];
-
-  return (
-    <aside className="w-56 bg-rail-950 flex flex-col h-screen sticky top-0 shrink-0 select-none border-r border-rail-800">
-      <nav className="flex-1 py-3 overflow-y-auto custom-scrollbar">
-        {sections.map((section) => (
-          <div key={t(section.groupKey)}>
-            <div className="px-4 pt-3.5 pb-1.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-rail-500">
-              {t(section.groupKey)}
-            </div>
-            {section.items.map((item) => {
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => onTabChange(item.id)}
-                  className={`w-full flex items-center gap-2 px-4 py-[7px] text-[11px] transition-colors border-l-2 ${
-                    isActive
-                      ? 'bg-rail-800 text-white font-semibold border-status-info'
-                      : 'text-rail-300 hover:bg-rail-900 hover:text-white font-normal border-transparent'
-                  }`}
-                >
-                  <span className="flex-1 text-left truncate">{t(item.labelKey)}</span>
-                  {item.highlight && !isActive && (
-                    <span className="h-1 w-1 rounded-full bg-status-info shrink-0" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        ))}
-      </nav>
-
-      <div className="px-4 py-3 border-t border-rail-800 bg-rail-950 space-y-2">
-        <p className="text-[10px] leading-snug text-rail-500">
-          {t('nav.footerNote')}
-        </p>
-        <div className="flex items-center justify-between">
-          <span className="bg-rail-800 text-rail-400 text-[9px] px-1.5 py-0.5 font-mono border border-rail-700">
-            {t('nav.synthetic')}
-          </span>
-          <button
-            onClick={logout}
-            className="text-rail-400 hover:text-status-critical text-[10px] transition-colors"
-          >
-            {t('nav.signOut')}
-          </button>
-        </div>
-      </div>
-    </aside>
-  );
-};

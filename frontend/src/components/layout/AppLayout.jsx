@@ -1,27 +1,38 @@
 import React from 'react';
 import { useAuth, ROLES } from '../../context/AuthContext';
 import { useI18n } from '../../i18n';
-import { Sidebar, NAV_SECTIONS_BY_ROLE } from './Sidebar';
-import { Header, RoleSwitch } from './Header';
+import { NAV_SECTIONS_BY_ROLE } from './Sidebar';
+import { RoleSwitch } from './Header';
 import { InstitutionalHeader, AppIdentity } from './InstitutionalHeader';
 import { LanguageSwitch } from './LanguageSwitch';
 import { DemoGuideBar } from './DemoGuideBar';
+import { WorksheetHeader } from './WorksheetHeader';
 
 /**
- * Authority shell — dense desktop planning console. Two-level header: the
- * government identity band, then the application bar.
+ * Authority shell — the "industrial worksheet" (design 2A) chrome, sitewide.
+ * Every Authority tab shares the same full-bleed provenance strip, masthead
+ * and horizontal nav. Overview renders its own copy of that same
+ * `WorksheetHeader` directly (it needs a day-sheet-specific masthead
+ * subtitle the other tabs don't have), so the shell skips rendering it a
+ * second time for that one tab only.
+ *
+ * Pages that compose their own dense, edge-to-edge worksheet regions (rather
+ * than sitting inside the padded panel-grid column) own their own padding
+ * and background, so the shell renders them full-bleed too.
  */
+const FULL_BLEED_TABS = new Set([
+  'overview', 'replanning', 'maintenance-blocks', 'block-planning', 'train-impact',
+  'teams', 'performance', 'evaluation', 'decision-trace', 'system-verification',
+  'live-ops', 'demand', 'analytics', 'general-verify', 'simulator',
+]);
+
 const AuthorityShell = ({ activeTab, onTabChange, children }) => (
   <div className="min-h-screen bg-surface-base flex flex-col">
-    <InstitutionalHeader />
-    <div className="flex flex-1 min-h-0">
-      <Sidebar activeTab={activeTab} onTabChange={onTabChange} />
-      <div className="flex-1 flex flex-col min-w-0">
-        <Header onNavigate={onTabChange} />
-        <DemoGuideBar onNavigate={onTabChange} />
-        <main className="flex-1 p-5 space-y-4 min-w-0">{children}</main>
-      </div>
-    </div>
+    {activeTab !== 'overview' && <WorksheetHeader activeTab={activeTab} onNavigate={onTabChange} />}
+    <DemoGuideBar onNavigate={onTabChange} />
+    <main className={FULL_BLEED_TABS.has(activeTab) ? 'flex-1 min-w-0' : 'flex-1 p-5 space-y-4 min-w-0'}>
+      {children}
+    </main>
   </div>
 );
 
@@ -65,7 +76,7 @@ const GroundShell = ({ activeTab, onTabChange, children }) => {
               <button
                 key={s.groupKey}
                 onClick={() => onTabChange(s.items[0].id)}
-                className={`px-4 py-3 text-[11px] font-semibold tracking-wide whitespace-nowrap border-b-2 -mb-px transition-colors ${
+                className={`px-4 py-3 font-display text-[11px] font-semibold uppercase tracking-wide whitespace-nowrap border-b-2 -mb-px transition-colors ${
                   active ? 'border-status-info text-rail-900' : 'border-transparent text-rail-500 hover:text-rail-700'
                 }`}
               >

@@ -1,9 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { usePlan } from '../../context/PlanContext';
 import { useAuth } from '../../context/AuthContext';
-import {
-  Panel, PanelHeader, StatusBadge, Button, Alert, EmptyState,
-} from '../../components/ui';
+import { Pill } from '../../components/ui/worksheet';
 import { TaskActionModal } from '../../components/maintenance/TaskActionModal';
 import {
   WorkOrderHeader, WorkOrderFacts, BlockStatusBanner, SectionContext,
@@ -21,6 +19,7 @@ const ACTION_STATUS = {
 };
 
 const ISSUE_STATUSES = new Set(['Issue Reported', 'Paused', 'Rejected by Field Crew']);
+const RISK_PILL = { critical: 'critical', warn: 'warn', info: 'info', ok: 'ok', idle: 'idle' };
 
 /**
  * Ground landing — "Today's Tasks".
@@ -47,7 +46,6 @@ export const MaintDashboard = ({ onNavigate }) => {
     [deptTasks],
   );
 
-  // In-progress work is what you are doing; otherwise the earliest possession.
   const next = useMemo(
     () => scheduled.find((t) => t.status === 'In Progress') || scheduled[0] || null,
     [scheduled],
@@ -78,22 +76,15 @@ export const MaintDashboard = ({ onNavigate }) => {
       {/* today line */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <div className="t-label">Today</div>
-          <div className="text-[17px] font-semibold text-rail-900 mt-0.5">
-            {today || 'No possession scheduled'}
-          </div>
-          <div className="text-xs text-rail-500 mt-0.5">{selectedDept}</div>
+          <div className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">Today</div>
+          <div className="text-[17px] font-semibold text-ws-ink mt-0.5">{today || 'No possession scheduled'}</div>
+          <div className="font-ws text-xs text-ws-mid mt-0.5">{selectedDept}</div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="px-2.5 py-1.5 bg-status-info-tint border border-status-info text-[10px] font-semibold text-status-info tracking-wide">
-            {counts.scheduled} SCHEDULED
-          </span>
+          <Pill tone="info">{counts.scheduled} SCHEDULED</Pill>
           {counts.issues > 0 && (
-            <button
-              onClick={() => onNavigate && onNavigate('issues')}
-              className="px-2.5 py-1.5 bg-status-warn-tint border border-status-warn text-[10px] font-semibold text-status-warn tracking-wide"
-            >
-              {counts.issues} ISSUE{counts.issues === 1 ? '' : 'S'}
+            <button onClick={() => onNavigate && onNavigate('issues')}>
+              <Pill tone="warn">{counts.issues} ISSUE{counts.issues === 1 ? '' : 'S'}</Pill>
             </button>
           )}
         </div>
@@ -101,25 +92,26 @@ export const MaintDashboard = ({ onNavigate }) => {
 
       {/* NEXT TASK — the dominant element */}
       {!next ? (
-        <Panel>
-          <PanelHeader title="Next task" scope={selectedDept} />
-          <EmptyState title="No possession is assigned to your department.">
-            Work appears here once the optimizer places a task from your department into a block
-            possession.
-          </EmptyState>
-        </Panel>
+        <div className="border border-ws-rule bg-ws-surface">
+          <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
+            <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">Next task</span>
+            <span className="font-mono text-[10px] text-ws-light block mt-0.5">{selectedDept}</span>
+          </div>
+          <div className="px-4 py-6 text-center">
+            <div className="font-ws text-xs font-semibold text-ws-mid">No possession is assigned to your department.</div>
+            <div className="font-ws text-[11px] text-ws-light mt-1">Work appears here once the optimizer places a task from your department into a block possession.</div>
+          </div>
+        </div>
       ) : (
-        <Panel className="border-l-4 border-l-status-info overflow-hidden">
+        <div className="border border-ws-rule border-l-4 border-l-ws-info bg-ws-surface overflow-hidden">
           <div className="px-4 pt-3">
-            <StatusBadge tone={next.status === 'In Progress' ? 'info' : 'ok'} size="sm">
-              {next.status === 'In Progress' ? 'IN PROGRESS' : 'NEXT TASK'}
-            </StatusBadge>
+            <Pill tone={next.status === 'In Progress' ? 'info' : 'ok'}>{next.status === 'In Progress' ? 'IN PROGRESS' : 'NEXT TASK'}</Pill>
           </div>
           <WorkOrderHeader task={next} status={next.status} />
           <WorkOrderFacts task={next} />
           <BlockStatusBanner task={next} status={next.status} />
           <ActionBar status={next.status} onAction={(a) => setAction(a)} />
-        </Panel>
+        </div>
       )}
 
       {/* status row */}
@@ -133,12 +125,11 @@ export const MaintDashboard = ({ onNavigate }) => {
           <button
             key={label}
             onClick={() => onNavigate && onNavigate(go)}
-            className="bg-surface-panel border border-line rounded-lg px-3 py-3 text-left hover:border-line-strong hover:bg-surface-sunken transition-colors min-h-touch"
+            className="bg-ws-surface border border-ws-rule px-3 py-3 text-left hover:border-ws-mid hover:bg-ws-paper transition-colors min-h-touch"
           >
-            <div className="t-label">{label}</div>
+            <div className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{label}</div>
             <div className={`font-mono text-2xl font-semibold mt-1 ${
-              tone === 'warn' ? 'text-status-warn' : tone === 'info' ? 'text-status-info'
-                : tone === 'ok' ? 'text-status-ok' : 'text-rail-900'
+              tone === 'warn' ? 'text-ws-warn' : tone === 'info' ? 'text-ws-info' : tone === 'ok' ? 'text-ws-ok' : 'text-ws-ink'
             }`}>
               {value}
             </div>
@@ -154,47 +145,50 @@ export const MaintDashboard = ({ onNavigate }) => {
       )}
 
       {/* later today */}
-      <Panel>
-        <PanelHeader title="Later" scope={`${later.length} further possession${later.length === 1 ? '' : 's'}`} />
+      <div className="border border-ws-rule bg-ws-surface">
+        <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
+          <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">Later</span>
+          <span className="font-mono text-[10px] text-ws-light block mt-0.5">{later.length} further possession{later.length === 1 ? '' : 's'}</span>
+        </div>
         {later.length === 0 ? (
-          <EmptyState title="Nothing else scheduled for your department." />
+          <div className="px-4 py-6 text-center font-ws text-xs font-semibold text-ws-mid">Nothing else scheduled for your department.</div>
         ) : (
-          <div className="divide-y divide-line">
+          <div>
             {later.map((t) => {
               const band = bandOf(t);
               return (
                 <button
                   key={t.task_id}
                   onClick={() => onNavigate && onNavigate('my-tasks')}
-                  className="w-full text-left px-3 py-3 flex flex-wrap items-center justify-between gap-3 hover:bg-surface-sunken transition-colors min-h-touch"
+                  className="w-full text-left px-3 py-3 flex flex-wrap items-center justify-between gap-3 hover:bg-ws-paper transition-colors min-h-touch border-b border-ws-hairline last:border-b-0"
                 >
                   <span className="min-w-0">
-                    <span className="font-mono text-[13px] font-semibold text-rail-900">{t.task_id}</span>
-                    <span className="block text-[11px] text-rail-500 mt-0.5">
-                      {t.maintenance_type} · {t.section_id}
-                    </span>
+                    <span className="font-mono text-[13px] font-semibold text-ws-ink">{t.task_id}</span>
+                    <span className="block font-ws text-[11px] text-ws-mid mt-0.5">{t.maintenance_type} · {t.section_id}</span>
                   </span>
                   <span className="flex items-center gap-3 shrink-0">
-                    <span className="font-mono text-[12px] text-rail-900">
+                    <span className="font-mono text-[12px] text-ws-ink">
                       {t.start_minute != null ? `${minToHhmm(t.start_minute)} → ${minToHhmm(t.end_minute)}` : '—'}
                     </span>
-                    {band && <StatusBadge tone={bandTone(band)} size="sm">{band} {t.risk_score?.toFixed?.(1)}</StatusBadge>}
-                    {t.status && <StatusBadge tone={statusTone(t.status)} size="sm">{t.status}</StatusBadge>}
+                    {band && <Pill tone={RISK_PILL[bandTone(band)] || 'idle'} size="sm">{band} {t.risk_score?.toFixed?.(1)}</Pill>}
+                    {t.status && <Pill tone={RISK_PILL[statusTone(t.status)] || 'idle'} size="sm">{t.status}</Pill>}
                   </span>
                 </button>
               );
             })}
           </div>
         )}
-      </Panel>
+      </div>
 
-      <Alert tone="idle" title="Session state only">
-        Status changes are held in the browser for this session. Nothing is written to an external
-        register and no notification is sent.
-        <Button size="sm" variant="ghost" className="ml-2" onClick={() => onNavigate && onNavigate('my-tasks')}>
+      <div className="border-l-[3px] border-l-ws-idle bg-ws-paper px-3 py-2.5 flex items-center justify-between gap-3 flex-wrap">
+        <div>
+          <div className="font-display text-[11px] font-bold uppercase tracking-wide text-ws-idle">Session state only</div>
+          <div className="font-ws text-xs text-ws-body leading-relaxed mt-1">Status changes are held in the browser for this session. Nothing is written to an external register and no notification is sent.</div>
+        </div>
+        <button onClick={() => onNavigate && onNavigate('my-tasks')} className="font-display text-[11px] font-bold uppercase tracking-wide text-ws-mid hover:text-ws-ink shrink-0">
           View all assigned work
-        </Button>
-      </Alert>
+        </button>
+      </div>
 
       <TaskActionModal
         isOpen={Boolean(action)}

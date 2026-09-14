@@ -207,7 +207,7 @@ export const DecisionTraceModal = ({ isOpen, onClose, task }) => {
           <div className="p-4 rounded-lg border border-line bg-surface-panel space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="h-6 w-6 rounded-full bg-sky-100 text-sky-700 font-bold text-xs flex items-center justify-center">5</span>
+                <span className="h-6 w-6 rounded-full bg-status-info-tint text-status-info font-bold text-xs flex items-center justify-center">5</span>
                 <h5 className="text-xs font-bold text-rail-900 uppercase tracking-wide">
                   Step 5 — Affected Train Services
                 </h5>

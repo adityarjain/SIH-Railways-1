@@ -59,7 +59,7 @@ export const StyleGuide = () => {
         <Section
           id="type"
           title="Typography"
-          note="Inter for interface text, JetBrains Mono for identifiers, timestamps, minutes and counts. Mono is never used for prose."
+          note="Barlow for interface text, Barlow Semi Condensed for headings/labels, JetBrains Mono for identifiers, timestamps, minutes and counts. Mono is never used for prose."
         >
           <Panel>
             <PanelBody className="space-y-3">
@@ -80,7 +80,7 @@ export const StyleGuide = () => {
         <Section
           id="colour"
           title="Colour"
-          note="Chrome is deep navy. Status colour is semantic and never decorative: red blocked/critical, amber conflict/attention, green feasible/complete, blue selected/planning, grey inactive/deferred. Purple survives only for bundling, where it carries real meaning."
+          note="Chrome is warm ink (design 2A, &quot;industrial worksheet&quot;). Status colour is semantic and never decorative: red blocked/critical, amber conflict/attention, green feasible/complete, blue selected/planning, grey inactive/deferred. Teal survives only for bundling, where it carries real meaning."
         >
           <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
             <Swatch name="rail-950" cls="bg-rail-950" />

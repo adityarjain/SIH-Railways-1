@@ -20,7 +20,7 @@ import { LanguageSwitch } from './LanguageSwitch';
  */
 
 const NamePair = ({ hi, en, strong = false }) => (
-  <div className="leading-tight">
+  <div className="leading-tight font-display">
     <div lang="hi" className={`${strong ? 'text-[12px] font-semibold' : 'text-[11px] font-medium'} text-white`}>
       {hi}
     </div>
@@ -65,10 +65,10 @@ export const AppIdentity = ({ sub }) => {
   const { t, isHindi } = useI18n();
   return (
     <div className="min-w-0">
-      <div className={`text-white truncate font-semibold uppercase ${isHindi ? 'text-[12px] tracking-[0.06em]' : 'text-[11px] tracking-[0.14em]'}`}>
+      <div className={`font-display text-white truncate font-semibold uppercase ${isHindi ? 'text-[12px] tracking-[0.06em]' : 'text-[11px] tracking-[0.14em]'}`}>
         {t('institution.appName')}
       </div>
-      <div className={`text-rail-400 mt-0.5 truncate font-medium ${isHindi ? 'text-[10px]' : 'text-[10px] tracking-wide'}`}>
+      <div className={`font-ws text-rail-400 mt-0.5 truncate font-medium ${isHindi ? 'text-[10px]' : 'text-[10px] tracking-wide'}`}>
         {sub || t('institution.appSub')}
       </div>
     </div>

@@ -76,7 +76,7 @@ export const DemoGuideBar = ({ onNavigate }) => {
         <button
           onClick={handleNext}
           disabled={currentStepIndex === totalSteps - 1}
-          className="flex items-center gap-1 px-2.5 py-1 bg-status-info hover:bg-blue-700 disabled:opacity-30 disabled:cursor-not-allowed text-[11px] font-semibold text-white transition-colors"
+          className="flex items-center gap-1 px-2.5 py-1 bg-status-info hover:bg-[#153c6d] disabled:opacity-30 disabled:cursor-not-allowed text-[11px] font-semibold text-white transition-colors"
           title={t('common.next')} aria-label={t('common.next')}
         >
           <span>{t('common.next')}</span>

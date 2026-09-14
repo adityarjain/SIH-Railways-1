@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePlan } from '../../context/PlanContext';
 import { useI18n } from '../../i18n';
-import { Panel, PanelHeader, PanelBody, MetricRow, Metric, Alert, ProvenanceNote, DataTable, StatusBadge } from '../../components/ui';
+import { RegionHeader, FieldRow, StatFigure, AdvisoryNote, Pill } from '../../components/ui/worksheet';
 
 const REASON_KEY = {
   batch_limit_excluded_on_deadline: 'performance.reasonBatch',
@@ -21,7 +21,7 @@ const GENUINE_EXHAUSTION = new Set([
 /** Solver performance and the deferral audit for the full baseline run. */
 export const Performance = () => {
   const { baselineMetrics, metrics } = usePlan();
-  const { t: tx } = useI18n();
+  const { t, isHindi } = useI18n();
   const s = baselineMetrics.summary;
   const op = baselineMetrics.operational_metrics || {};
   const prov = baselineMetrics.provenance || {};
@@ -34,86 +34,88 @@ export const Performance = () => {
   const genuine = rows.filter((r) => GENUINE_EXHAUSTION.has(r.key)).reduce((n, r) => n + r.count, 0);
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h2 className="t-section-title">{tx('performance.title')}</h2>
-        <p className="text-xs text-rail-500 mt-0.5 max-w-3xl leading-relaxed">
-          {tx('performance.subtitle')}
-        </p>
+    <div className="bg-ws-band min-h-full">
+      <div className="bg-ws-paper border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-2.5">
+        <p className="font-ws text-xs text-ws-mid max-w-3xl leading-relaxed">{t('performance.subtitle')}</p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <Panel><PanelBody><Metric label={tx('performance.solverStatus')} value={s.solver_status} tone={s.solver_status === 'OPTIMAL' ? 'ok' : 'warn'} scope={tx('scope.fullRun')} mono={false} /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label={tx('performance.wallTime')} value={`${s.runtime_seconds}s`} sub={tx('performance.wallTimeSub')} scope={tx('scope.fullRun')} /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label={tx('performance.tasksScheduled')} value={s.total_scheduled.toLocaleString()} sub={tx('performance.tasksScheduledSub', { pct: s.scheduled_percentage, total: s.total_tasks_considered.toLocaleString() })} scope={tx('scope.fullRun')} /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label={tx('performance.possessionsUsed')} value={(op.unique_blocks_utilized ?? 0).toLocaleString()} scope={tx('scope.fullRun')} /></PanelBody></Panel>
-        <Panel><PanelBody><Metric label={tx('performance.crewHours')} value={(op.total_team_maintenance_hours ?? 0).toLocaleString()} scope={tx('scope.fullRun')} /></PanelBody></Panel>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Panel>
-          <PanelHeader title={tx('performance.deferralAudit')} scope={tx('performance.deferralScope', { count: totalDeferred.toLocaleString() })} />
-          <DataTable
-            getKey={(r) => r.key}
-            columns={[
-              { key: 'key', header: tx('common.reason'), render: (r) => (
-                <div>
-                  <div className="text-xs text-rail-900">{REASON_KEY[r.key] ? tx(REASON_KEY[r.key]) : r.key}</div>
-                  <div className="font-mono text-[9px] text-rail-400 mt-0.5">{r.key}</div>
-                </div>
-              ) },
-              { key: 'kind', header: tx('performance.kind'), render: (r) => (
-                GENUINE_EXHAUSTION.has(r.key)
-                  ? <StatusBadge tone="critical" size="sm">{tx('performance.kindResource')}</StatusBadge>
-                  : r.key === 'solver_objective_outranked'
-                    ? <StatusBadge tone="info" size="sm">{tx('performance.kindObjective')}</StatusBadge>
-                    : <StatusBadge tone="idle" size="sm">{tx('performance.kindBatch')}</StatusBadge>
-              ) },
-              { key: 'count', header: tx('performance.count'), align: 'right', render: (r) => (
-                <span className="font-mono font-semibold">{r.count.toLocaleString()}</span>
-              ) },
-            ]}
-            rows={rows}
-          />
-          <PanelBody className="border-t border-line">
-            <p className="text-[10px] text-rail-500 leading-relaxed">
-              {tx('performance.deferralNote', { count: genuine.toLocaleString() })}
-            </p>
-          </PanelBody>
-        </Panel>
-
-        <div className="space-y-4">
-          <Panel>
-            <PanelHeader title={tx('performance.solverConfig')} scope="optimizer/config.py" />
-            <MetricRow label={tx('performance.maxPool')} value={(prov.max_daily_candidate_pool ?? '—').toLocaleString?.() ?? prov.max_daily_candidate_pool} />
-            <MetricRow label={tx('performance.timeLimit')} value={`${prov.solver_time_limit_seconds_per_day ?? '—'}s`} />
-            <MetricRow label={tx('performance.planningHorizon')} value={prov.planning_horizon || '—'} />
-            <MetricRow label={tx('performance.postSolveValidation')} value={prov.post_solve_validation || tx('header.notRecorded')} tone="ok" />
-          </Panel>
-
-          <Alert tone="idle" title={tx('performance.poolTitle')}>
-            {tx('performance.poolBody')}
-          </Alert>
-
-          <Panel>
-            <PanelHeader title={tx('performance.scenarioComparison')} scope={tx('performance.scenarioScope')} />
-            <MetricRow label={tx('performance.tasksConsidered')} value={metrics.summary.total_tasks_considered.toLocaleString()} sub={tx('performance.subsetNote')} />
-            <MetricRow label={tx('status.scheduled')} value={`${metrics.summary.total_scheduled} (${metrics.summary.scheduled_percentage}%)`} tone="ok" />
-            <MetricRow label={tx('performance.runtime')} value={`${metrics.summary.runtime_seconds}s`} />
-          </Panel>
+      {/* 01 — solver performance */}
+      <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
+        <RegionHeader number="01" title={t('performance.title')} meta={t('scope.fullRun').toUpperCase()} isHindi={isHindi} />
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-x-5 gap-y-3.5 border-t border-ws-rule pt-3">
+          <StatFigure value={s.solver_status} label={t('performance.solverStatus')} tone={s.solver_status === 'OPTIMAL' ? 'text-ws-ok' : 'text-ws-warn'} />
+          <StatFigure value={`${s.runtime_seconds}s`} label={t('performance.wallTime')} />
+          <StatFigure value={s.total_scheduled.toLocaleString()} label={t('performance.tasksScheduled')} />
+          <StatFigure value={(op.unique_blocks_utilized ?? 0).toLocaleString()} label={t('performance.possessionsUsed')} />
+          <StatFigure value={(op.total_team_maintenance_hours ?? 0).toLocaleString()} label={t('performance.crewHours')} />
         </div>
       </div>
 
-      <Panel>
-        <PanelBody>
-          <ProvenanceNote
-            generatedBy={prov.scope}
-            command={prov.command}
-            dataset={prov.dataset}
-            note={tx('performance.provenanceNote')}
-          />
-        </PanelBody>
-      </Panel>
+      {/* 02 — deferral audit + 03 — solver config / scenario */}
+      <div className="grid grid-cols-1 lg:grid-cols-[60fr_40fr] bg-ws-rule gap-px border-b border-ws-rule">
+        <div className="bg-ws-surface px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
+          <RegionHeader number="02" title={t('performance.deferralAudit')} meta={t('performance.deferralScope', { count: totalDeferred.toLocaleString() })} isHindi={isHindi} />
+          <div className="overflow-x-auto custom-scrollbar">
+            <table className="w-full text-left border-collapse">
+              <thead className="border-b border-ws-rule">
+                <tr>
+                  <th className="py-1.5 font-display text-[10px] font-semibold uppercase tracking-wide text-ws-light">{t('common.reason')}</th>
+                  <th className="py-1.5 font-display text-[10px] font-semibold uppercase tracking-wide text-ws-light">{t('performance.kind')}</th>
+                  <th className="py-1.5 font-display text-[10px] font-semibold uppercase tracking-wide text-ws-light text-right">{t('performance.count')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r) => (
+                  <tr key={r.key} className="border-b border-ws-hairline last:border-b-0">
+                    <td className="py-1.5">
+                      <div className="font-ws text-xs text-ws-ink">{REASON_KEY[r.key] ? t(REASON_KEY[r.key]) : r.key}</div>
+                      <div className="font-mono text-[9px] text-ws-light mt-0.5">{r.key}</div>
+                    </td>
+                    <td className="py-1.5">
+                      {GENUINE_EXHAUSTION.has(r.key)
+                        ? <Pill tone="critical" size="sm">{t('performance.kindResource')}</Pill>
+                        : r.key === 'solver_objective_outranked'
+                          ? <Pill tone="info" size="sm">{t('performance.kindObjective')}</Pill>
+                          : <Pill tone="idle" size="sm">{t('performance.kindBatch')}</Pill>}
+                    </td>
+                    <td className="py-1.5 font-mono text-[11px] font-semibold text-ws-ink text-right">{r.count.toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="font-ws text-[11px] text-ws-mid leading-relaxed pt-2.5">{t('performance.deferralNote', { count: genuine.toLocaleString() })}</p>
+        </div>
+
+        <div className="bg-ws-surface border-t border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4 space-y-3.5">
+          <div>
+            <RegionHeader number="03" title={t('performance.solverConfig')} meta="optimizer/config.py" isHindi={isHindi} />
+            <div className="border-t border-ws-rule">
+              <FieldRow label={t('performance.maxPool')} value={(prov.max_daily_candidate_pool ?? '—').toLocaleString?.() ?? prov.max_daily_candidate_pool} />
+              <FieldRow label={t('performance.timeLimit')} value={`${prov.solver_time_limit_seconds_per_day ?? '—'}s`} />
+              <FieldRow label={t('performance.planningHorizon')} value={prov.planning_horizon || '—'} />
+              <FieldRow label={t('performance.postSolveValidation')} value={prov.post_solve_validation || t('header.notRecorded')} tone="text-ws-ok font-bold" />
+            </div>
+          </div>
+
+          <AdvisoryNote tone="idle" title={t('performance.poolTitle')}>{t('performance.poolBody')}</AdvisoryNote>
+
+          <div>
+            <RegionHeader number="04" title={t('performance.scenarioComparison')} meta={t('performance.scenarioScope')} isHindi={isHindi} />
+            <div className="border-t border-ws-rule">
+              <FieldRow label={t('performance.tasksConsidered')} value={metrics.summary.total_tasks_considered.toLocaleString()} />
+              <FieldRow label={t('status.scheduled')} value={`${metrics.summary.total_scheduled} (${metrics.summary.scheduled_percentage}%)`} tone="text-ws-ok font-bold" />
+              <FieldRow label={t('performance.runtime')} value={`${metrics.summary.runtime_seconds}s`} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-ws-band px-3.5 md:px-4 xl:px-5 py-2 flex flex-wrap items-center gap-3.5">
+        <span className="font-mono text-[10px] text-ws-light break-all">{prov.scope} · $ {prov.command}</span>
+        <span className="flex-1 min-w-2" />
+        <span className="font-ws text-xs text-ws-mid">{t('performance.provenanceNote')}</span>
+      </div>
     </div>
   );
 };

@@ -1,9 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { usePlan } from '../../context/PlanContext';
 import { useAuth } from '../../context/AuthContext';
-import {
-  Panel, StatusBadge, Button, Alert, EmptyState, Select, TextInput,
-} from '../../components/ui';
+import { Pill, WsInput, WsSelect } from '../../components/ui/worksheet';
+import { Button } from '../../components/ui';
 import { TaskActionModal } from '../../components/maintenance/TaskActionModal';
 import { statusTone, SECTION } from '../../components/ground/WorkOrder';
 import { minToHhmm } from '../../utils/time';
@@ -17,6 +16,7 @@ const ACTION_STATUS = {
   issue: 'Issue Reported',
   reject: 'Rejected by Field Crew',
 };
+const RISK_PILL = { critical: 'critical', warn: 'warn', info: 'info', ok: 'ok', idle: 'idle' };
 
 /**
  * Ground — Assigned Work.
@@ -69,32 +69,25 @@ export const MyTasks = ({ onNavigate }) => {
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="t-section-title">Assigned Work</h2>
-          <p className="text-xs text-rail-500 mt-0.5">
-            {selectedDept} · {tasks.length} work order{tasks.length === 1 ? '' : 's'}
-          </p>
+          <h2 className="font-display text-[15px] font-semibold text-ws-ink">Assigned Work</h2>
+          <p className="font-ws text-xs text-ws-mid mt-0.5">{selectedDept} · {tasks.length} work order{tasks.length === 1 ? '' : 's'}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <TextInput
-            placeholder="Search task, section, type…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="min-w-[200px]"
-          />
-          <Select value={filter} onChange={(e) => setFilter(e.target.value)}>
+          <WsInput placeholder="Search task, section, type…" value={query} onChange={(e) => setQuery(e.target.value)} className="min-w-[200px]" />
+          <WsSelect value={filter} onChange={(e) => setFilter(e.target.value)}>
             <option value="ALL">All work</option>
             <option value="SCHEDULED">Scheduled</option>
             <option value="UNSCHEDULED">Not yet scheduled</option>
             <option value="ACTIVE">In progress</option>
             <option value="DONE">Completed</option>
-          </Select>
+          </WsSelect>
         </div>
       </div>
 
       {tasks.length === 0 ? (
-        <Panel>
-          <EmptyState title="No work order matches the current filters." />
-        </Panel>
+        <div className="border border-ws-rule bg-ws-surface px-4 py-8 text-center font-ws text-xs font-semibold text-ws-mid">
+          No work order matches the current filters.
+        </div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
           {tasks.map((t) => {
@@ -105,77 +98,55 @@ export const MyTasks = ({ onNavigate }) => {
             const sec = SECTION[t.section_id];
 
             return (
-              <Panel key={t.task_id} className={`overflow-hidden ${started ? 'border-l-4 border-l-status-info' : ''}`}>
+              <div key={t.task_id} className={`border border-ws-rule bg-ws-surface overflow-hidden ${started ? 'border-l-4 border-l-ws-info' : ''}`}>
                 <div className="px-3.5 py-3 flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="font-mono text-[15px] font-bold text-rail-900">{t.task_id}</div>
-                    <div className="text-[12px] font-medium text-rail-900 mt-0.5">{t.maintenance_type}</div>
-                    <div className="font-mono text-[10px] text-rail-400 mt-0.5">
-                      {t.section_id}{sec ? ` · ${sec.section_name}` : ''} · asset {t.asset_id}
-                    </div>
+                    <div className="font-mono text-[15px] font-bold text-ws-ink">{t.task_id}</div>
+                    <div className="font-ws text-[12px] font-medium text-ws-ink mt-0.5">{t.maintenance_type}</div>
+                    <div className="font-mono text-[10px] text-ws-light mt-0.5">{t.section_id}{sec ? ` · ${sec.section_name}` : ''} · asset {t.asset_id}</div>
                   </div>
                   <div className="text-right shrink-0 space-y-1">
-                    {band && (
-                      <StatusBadge tone={bandTone(band)} size="sm">
-                        {band} · {t.risk_score?.toFixed?.(1)}
-                      </StatusBadge>
-                    )}
-                    <div><StatusBadge tone={statusTone(t.status)} size="sm">{t.status || 'Scheduled'}</StatusBadge></div>
+                    {band && <Pill tone={RISK_PILL[bandTone(band)] || 'idle'} size="sm">{band} · {t.risk_score?.toFixed?.(1)}</Pill>}
+                    <div><Pill tone={RISK_PILL[statusTone(t.status)] || 'idle'} size="sm">{t.status || 'Scheduled'}</Pill></div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-px bg-line border-y border-line">
-                  <div className="bg-surface-panel px-3 py-2">
-                    <div className="t-label">Window</div>
-                    <div className={`font-mono text-[11px] mt-0.5 ${scheduled ? 'text-rail-900' : 'text-status-warn'}`}>
+                <div className="grid grid-cols-3 gap-px bg-ws-rule border-y border-ws-rule">
+                  <div className="bg-ws-surface px-3 py-2">
+                    <div className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">Window</div>
+                    <div className={`font-mono text-[11px] mt-0.5 ${scheduled ? 'text-ws-ink' : 'text-ws-warn'}`}>
                       {scheduled ? `${minToHhmm(t.start_minute)}–${minToHhmm(t.end_minute)}` : 'Not scheduled'}
                     </div>
-                    <div className="text-[9px] text-rail-400 mt-0.5">
-                      {scheduled ? t.scheduled_date : `due ${t.deadline}`}
-                    </div>
+                    <div className="font-mono text-[9px] text-ws-light mt-0.5">{scheduled ? t.scheduled_date : `due ${t.deadline}`}</div>
                   </div>
-                  <div className="bg-surface-panel px-3 py-2">
-                    <div className="t-label">Block</div>
-                    <div className="font-mono text-[11px] text-rail-900 mt-0.5">
-                      {(t.block_ids || []).join(' + ') || '—'}
-                    </div>
-                    <div className="text-[9px] text-rail-400 mt-0.5">
-                      {t.required_duration_minutes} min
-                    </div>
+                  <div className="bg-ws-surface px-3 py-2">
+                    <div className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">Block</div>
+                    <div className="font-mono text-[11px] text-ws-ink mt-0.5">{(t.block_ids || []).join(' + ') || '—'}</div>
+                    <div className="font-mono text-[9px] text-ws-light mt-0.5">{t.required_duration_minutes} min</div>
                   </div>
-                  <div className="bg-surface-panel px-3 py-2">
-                    <div className="t-label">Crew</div>
-                    <div className="font-mono text-[11px] text-rail-900 mt-0.5">
-                      {(t.assigned_teams || []).join(', ') || '—'}
-                    </div>
-                    <div className="text-[9px] text-rail-400 mt-0.5">
-                      {t.required_team_size} required
-                    </div>
+                  <div className="bg-ws-surface px-3 py-2">
+                    <div className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">Crew</div>
+                    <div className="font-mono text-[11px] text-ws-ink mt-0.5">{(t.assigned_teams || []).join(', ') || '—'}</div>
+                    <div className="font-mono text-[9px] text-ws-light mt-0.5">{t.required_team_size} required</div>
                   </div>
                 </div>
 
                 {t.statusMeta?.reason && (
-                  <div className="px-3.5 py-2 bg-status-warn-tint border-b border-line">
-                    <span className="t-label text-status-warn">Crew note</span>
-                    <p className="text-[11px] text-rail-700 mt-0.5">{t.statusMeta.reason}</p>
+                  <div className="px-3.5 py-2 bg-[#F5ECD6] border-b border-ws-rule">
+                    <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-warn">Crew note</span>
+                    <p className="font-ws text-[11px] text-ws-body mt-0.5">{t.statusMeta.reason}</p>
                   </div>
                 )}
 
                 <div className="px-3.5 py-2.5 flex flex-wrap gap-2">
                   {!scheduled ? (
-                    <span className="text-[11px] text-rail-400 py-2">
-                      Awaiting a block possession — no action available yet.
-                    </span>
+                    <span className="font-ws text-[11px] text-ws-light py-2">Awaiting a block possession — no action available yet.</span>
                   ) : done ? (
-                    <span className="text-[11px] text-status-ok py-2 font-medium">
-                      Completed — awaiting verification.
-                    </span>
+                    <span className="font-ws text-[11px] text-ws-ok py-2 font-medium">Completed — awaiting verification.</span>
                   ) : (
                     <>
                       {!started && (
-                        <Button size="md" variant="primary" onClick={() => setModal({ task: t, actionType: 'in_progress' })}>
-                          Start work
-                        </Button>
+                        <Button size="md" variant="primary" onClick={() => setModal({ task: t, actionType: 'in_progress' })}>Start work</Button>
                       )}
                       {started && (
                         <>
@@ -188,19 +159,21 @@ export const MyTasks = ({ onNavigate }) => {
                     </>
                   )}
                 </div>
-              </Panel>
+              </div>
             );
           })}
         </div>
       )}
 
-      <Alert tone="idle" title="Session state only">
-        Status changes are held in the browser for this session. Nothing is written to an external
-        register and no notification is sent.
-        <Button size="sm" variant="ghost" className="ml-2" onClick={() => onNavigate && onNavigate('completed')}>
+      <div className="border-l-[3px] border-l-ws-idle bg-ws-paper px-3 py-2.5 flex items-center justify-between gap-3 flex-wrap">
+        <div>
+          <div className="font-display text-[11px] font-bold uppercase tracking-wide text-ws-idle">Session state only</div>
+          <div className="font-ws text-xs text-ws-body leading-relaxed mt-1">Status changes are held in the browser for this session. Nothing is written to an external register and no notification is sent.</div>
+        </div>
+        <button onClick={() => onNavigate && onNavigate('completed')} className="font-display text-[11px] font-bold uppercase tracking-wide text-ws-mid hover:text-ws-ink shrink-0">
           Completion / handoff
-        </Button>
-      </Alert>
+        </button>
+      </div>
 
       <TaskActionModal
         isOpen={Boolean(modal)}

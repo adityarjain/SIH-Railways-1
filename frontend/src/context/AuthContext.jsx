@@ -63,11 +63,9 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
-  const logout = () => setCurrentUser(null);
-
   return (
     <AuthContext.Provider
-      value={{ currentUser, selectedDept, setSelectedDept, login, logout, ROLES, DEPARTMENTS }}
+      value={{ currentUser, selectedDept, setSelectedDept, login, ROLES, DEPARTMENTS }}
     >
       {children}
     </AuthContext.Provider>

@@ -142,10 +142,10 @@ export const Button = ({
   variant = 'secondary', size = 'md', children, className = '', ...props
 }) => {
   const variants = {
-    primary: 'bg-status-info text-white border-status-info hover:bg-blue-700',
+    primary: 'bg-status-info text-white border-status-info hover:bg-[#153c6d]',
     secondary: 'bg-surface-panel text-rail-700 border-line hover:bg-surface-sunken',
-    danger: 'bg-status-critical text-white border-status-critical hover:bg-red-800',
-    warn: 'bg-status-warn-tint text-status-warn border-status-warn hover:bg-amber-100',
+    danger: 'bg-status-critical text-white border-status-critical hover:bg-[#7e1a14]',
+    warn: 'bg-status-warn-tint text-status-warn border-status-warn hover:bg-[#f0e4c8]',
     ghost: 'bg-transparent text-rail-500 border-transparent hover:bg-surface-sunken',
   };
   const sizes = {

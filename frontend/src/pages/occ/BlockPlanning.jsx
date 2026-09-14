@@ -1,23 +1,21 @@
 import React, { useState } from 'react';
 import { BlockTrainGantt } from '../../components/timeline/BlockTrainGantt';
-import { MetricCard } from '../../components/common/MetricCard';
-import { ScopeCaption, FilterBar, Select } from '../../components/ui';
-import teamsData from '../../data/teams.json';
 import { BlockDrawer } from '../../components/timeline/BlockDrawer';
 import { DecisionTraceModal } from '../../components/timeline/DecisionTraceModal';
 import { BundlingView } from '../../components/timeline/BundlingView';
 import { TrafficContext } from '../../components/timeline/TrafficContext';
-import { WeeklyView } from '../../components/planning/WeeklyView';
-import { MonthlyHeatmap } from '../../components/planning/MonthlyHeatmap';
+import { WeeklyViewWorksheet } from '../../components/planning/WeeklyViewWorksheet';
+import { MonthlyHeatmapWorksheet } from '../../components/planning/MonthlyHeatmapWorksheet';
 import { RecommendationActions } from '../../components/occ/RecommendationActions';
+import { RegionHeader, SegmentedControl, StatFigure, WsSelect } from '../../components/ui/worksheet';
+import teamsData from '../../data/teams.json';
+import bundlingData from '../../data/bundling.json';
 import { usePlan } from '../../context/PlanContext';
 import { useI18n } from '../../i18n';
 import corridorsSectionsData from '../../data/corridors_sections.json';
 
 // Both selectors are derived from the plan the optimizer actually produced, so
-// every option renders a populated timeline. Previously the date and corridor
-// lists were hardcoded to values the demo plan does not use, leaving 11 of 12
-// combinations empty.
+// every option renders a populated timeline.
 const buildDateOptions = (tasks) => {
   const counts = {};
   tasks.forEach((t) => {
@@ -44,14 +42,11 @@ const buildCorridorOptions = (tasks) => {
 
 export const BlockPlanning = () => {
   const { scheduledTasks, metrics, activeEvent } = usePlan();
-  const { t } = useI18n();
+  const { t, isHindi } = useI18n();
 
   const dateOptions = React.useMemo(() => buildDateOptions(scheduledTasks), [scheduledTasks]);
   const corridorOptions = React.useMemo(() => buildCorridorOptions(scheduledTasks), [scheduledTasks]);
 
-  // Default to the busiest day and its busiest corridor, so the first view is
-  // dense but scannable (one corridor, a handful of section rows) rather than
-  // every section in the plan. "All corridors" stays one click away.
   const busiestDate =
     dateOptions.reduce((best, o) => (!best || o.count > best.count ? o : best), null)?.date ||
     '2026-09-03';
@@ -70,9 +65,6 @@ export const BlockPlanning = () => {
   const [decisionTraceOpen, setDecisionTraceOpen] = useState(false);
   const [decisionTraceTask, setDecisionTraceTask] = useState(null);
 
-  // Only show sections that carry a scheduled possession on the selected date,
-  // optionally narrowed to one corridor. This keeps the timeline dense instead
-  // of rendering dozens of empty section rows.
   const activeSectionIds = React.useMemo(() => {
     const ids = new Set();
     scheduledTasks.forEach((task) => {
@@ -87,20 +79,14 @@ export const BlockPlanning = () => {
     .filter((s) => activeSectionIds.has(s.section_id))
     .sort((a, b) => a.section_id.localeCompare(b.section_id));
 
-  // Human-readable corridor for the timeline header.
   const corridorLabel = React.useMemo(() => {
-    if (selectedCorridor === 'ALL') return 'All corridors';
+    if (selectedCorridor === 'ALL') return t('common.allCorridors');
     const c = corridorsSectionsData.corridors.find((x) => x.corridor_id === selectedCorridor);
     return c ? `${c.corridor_id} ${c.corridor_name}` : selectedCorridor;
-  }, [selectedCorridor]);
+  }, [selectedCorridor, t]);
 
-  // Show traffic for the section the operator is looking at: the selected
-  // possession's section, else the first section in the corridor.
   const trafficSectionId = drawerTask?.section_id || sections[0]?.section_id || 'SEC-0004';
-
-  const handleSelectTask = (task) => {
-    setDrawerTask(task);
-  };
+  const bundlePairs = bundlingData.concurrent_bundle_pairs || [];
 
   const handleOpenDecisionTrace = (task) => {
     setDecisionTraceTask(task);
@@ -108,133 +94,110 @@ export const BlockPlanning = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Page header */}
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 className="t-section-title">{t('blockPlanning.title')}</h2>
-          <p className="text-xs text-rail-500 mt-0.5 max-w-3xl leading-relaxed">
-            {t('blockPlanning.subtitle')}
-          </p>
-        </div>
-        {/* The solver is Python and is not run from the browser, so this states
-            where the rendered plan came from rather than implying it solved here. */}
+    <div className="bg-ws-band min-h-full">
+      {/* intro */}
+      <div className="bg-ws-paper border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-2.5 flex items-center justify-between gap-4 flex-wrap">
+        <p className="font-ws text-xs text-ws-mid max-w-3xl leading-relaxed flex-1 min-w-[240px]">{t('blockPlanning.subtitle')}</p>
         <div className="text-right shrink-0">
-          <ScopeCaption>{t('blockPlanning.generatedOffline')}</ScopeCaption>
-          <p className="font-mono text-[10px] text-rail-400 mt-0.5">$ python demo.py</p>
+          <div className="font-mono text-[10px] text-ws-light uppercase">{t('blockPlanning.generatedOffline')}</div>
+          <div className="font-mono text-[10px] text-ws-light">$ python demo.py</div>
         </div>
       </div>
 
-      {/* Filter bar & view toggles */}
-      <FilterBar className="justify-between">
-        <div className="flex flex-wrap items-center gap-2.5">
-          <div className="flex items-stretch border border-line">
-            {[['timeline', t('blockPlanning.viewTimeline')], ['weekly', t('blockPlanning.viewWeekly')], ['monthly', t('blockPlanning.viewMonthly')]].map(([id, label]) => (
-              <button
-                key={id}
-                onClick={() => setViewMode(id)}
-                className={`px-2.5 py-1 text-[10px] font-semibold transition-colors ${
-                  viewMode === id ? 'bg-rail-900 text-white' : 'text-rail-500 hover:bg-surface-sunken'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          <Select label={t('common.date')} value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)}>
+      {/* 01 — scenario summary */}
+      <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
+        <RegionHeader number="01" title={t('blockPlanning.scenarioSummary')} meta={t('blockPlanning.scenarioScope')} isHindi={isHindi} />
+        <div className="flex flex-wrap items-center gap-2.5 pb-3.5">
+          <WsSelect value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)}>
             {dateOptions.map((o) => (
-              <option key={o.date} value={o.date}>
-                {o.date} · {o.count} {t('common.tasks')}
-              </option>
+              <option key={o.date} value={o.date}>{o.date} · {o.count} {t('common.tasks')}</option>
             ))}
-          </Select>
-
-          <Select label={t('common.corridor')} value={selectedCorridor} onChange={(e) => setSelectedCorridor(e.target.value)}>
+          </WsSelect>
+          <WsSelect value={selectedCorridor} onChange={(e) => setSelectedCorridor(e.target.value)}>
             <option value="ALL">{t('common.allCorridors')} · {scheduledTasks.length}</option>
             {corridorOptions.map((o) => (
-              <option key={o.id} value={o.id}>
-                {o.id} — {o.name} · {o.count}
-              </option>
+              <option key={o.id} value={o.id}>{o.id} — {o.name} · {o.count}</option>
             ))}
-          </Select>
+          </WsSelect>
+          <span className="flex-1 min-w-2" />
+          {dateOptions.length > 0 && (
+            <span className="font-mono text-[10px] text-ws-light">
+              {t('blockPlanning.planSpan', { from: dateOptions[0].date, to: dateOptions[dateOptions.length - 1].date })}
+            </span>
+          )}
         </div>
-
-        {dateOptions.length > 0 && (
-          <ScopeCaption>
-            {t('blockPlanning.planSpan', { from: dateOptions[0].date, to: dateOptions[dateOptions.length - 1].date })}
-          </ScopeCaption>
-        )}
-      </FilterBar>
-
-      {/* Scenario summary — scoped to the subset rendered below */}
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="t-label">{t('blockPlanning.scenarioSummary')}</h3>
-        <ScopeCaption>
-          {t('blockPlanning.scenarioScope')}
-        </ScopeCaption>
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-        {[
-          [t('blockPlanning.criticalTasks'), metrics.risk_breakdown.critical_risk_scheduled, t('blockPlanning.subRiskGte80'), 'red'],
-          [t('blockPlanning.highRiskTasks'), metrics.risk_breakdown.high_risk_scheduled, t('blockPlanning.subRisk6079'), 'amber'],
-          [t('blockPlanning.tasksConsidered'), metrics.summary.total_tasks_considered, t('blockPlanning.subScenarioSubset'), 'slate'],
-          [t('blockPlanning.plannedBlocks'), metrics.operational_metrics.unique_blocks_utilized, t('blockPlanning.subBlockWindows'), 'blue'],
-          [t('blockPlanning.deferred'), metrics.summary.total_deferred.toLocaleString(), t('blockPlanning.subNotPlaced'), 'slate'],
-          [t('blockPlanning.crewsUtilized'), `${metrics.operational_metrics.teams_utilized}/${teamsData.length}`, t('blockPlanning.subOfRoster'), 'purple'],
-          [t('blockPlanning.trainConflicts'), activeEvent ? 1 : 0, activeEvent ? t('blockPlanning.subSimActive') : t('blockPlanning.subNoneRecorded'), activeEvent ? 'amber' : 'green'],
-        ].map(([title, value, subtext, color]) => (
-          <MetricCard key={title} title={title} value={value} subtext={subtext} color={color} />
-        ))}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-x-5 gap-y-3.5 border-t border-ws-rule pt-3">
+          <StatFigure value={metrics.risk_breakdown.critical_risk_scheduled} label={t('blockPlanning.criticalTasks')} tone="text-ws-critical" />
+          <StatFigure value={metrics.risk_breakdown.high_risk_scheduled} label={t('blockPlanning.highRiskTasks')} tone="text-ws-warn" />
+          <StatFigure value={metrics.summary.total_tasks_considered} label={t('blockPlanning.tasksConsidered')} />
+          <StatFigure value={metrics.operational_metrics.unique_blocks_utilized} label={t('blockPlanning.plannedBlocks')} tone="text-ws-info" />
+          <StatFigure value={metrics.summary.total_deferred.toLocaleString()} label={t('blockPlanning.deferred')} />
+          <StatFigure value={`${metrics.operational_metrics.teams_utilized}/${teamsData.length}`} label={t('blockPlanning.crewsUtilized')} tone="text-ws-bundle" />
+          <StatFigure value={activeEvent ? 1 : 0} label={t('blockPlanning.trainConflicts')} tone={activeEvent ? 'text-ws-warn' : 'text-ws-ok'} />
+        </div>
       </div>
 
-      {/* Main Centerpiece Area: Gantt Timeline / Weekly / Monthly */}
-      <RecommendationActions taskId="TASK-000005" />
+      {/* 02 — controller decision */}
+      <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-3.5">
+        <RecommendationActions taskId="TASK-000005" />
+      </div>
 
+      {/* 03 — timeline / weekly / monthly */}
+      <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-3.5">
+        <RegionHeader number="03" title={t('gantt.title')} isHindi={isHindi} />
+        <SegmentedControl
+          options={[
+            { id: 'timeline', label: t('blockPlanning.viewTimeline') },
+            { id: 'weekly', label: t('blockPlanning.viewWeekly') },
+            { id: 'monthly', label: t('blockPlanning.viewMonthly') },
+          ]}
+          value={viewMode}
+          onChange={setViewMode}
+          isHindi={isHindi}
+          size="sm"
+        />
+      </div>
       {viewMode === 'timeline' && (
-        <BlockTrainGantt
-          sections={sections}
-          scheduledTasks={scheduledTasks}
-          selectedDate={selectedDate}
-          corridorLabel={corridorLabel}
-          onSelectTask={handleSelectTask}
-          scope={t('scope.demoScenario')}
-        />
+        <div className="bg-ws-band px-3.5 md:px-4 xl:px-5 py-3.5">
+          <BlockTrainGantt
+            sections={sections}
+            scheduledTasks={scheduledTasks}
+            selectedDate={selectedDate}
+            corridorLabel={corridorLabel}
+            onSelectTask={setDrawerTask}
+            scope={t('scope.demoScenario')}
+          />
+        </div>
       )}
-
       {viewMode === 'weekly' && (
-        <WeeklyView
-          selectedDate={selectedDate}
-          onSelectDate={(date) => {
-            setSelectedDate(date);
-            setViewMode('timeline');
-          }}
-        />
+        <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-3.5">
+          <WeeklyViewWorksheet selectedDate={selectedDate} onSelectDate={(date) => { setSelectedDate(date); setViewMode('timeline'); }} />
+        </div>
       )}
-
       {viewMode === 'monthly' && (
-        <MonthlyHeatmap
-          onSelectDate={(date) => {
-            setSelectedDate(date);
-            setViewMode('timeline');
-          }}
-        />
+        <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-3.5">
+          <MonthlyHeatmapWorksheet onSelectDate={(date) => { setSelectedDate(date); setViewMode('timeline'); }} />
+        </div>
       )}
 
-      {/* Traffic Context Box (Section 13) */}
-      <TrafficContext sectionId={trafficSectionId} />
+      {/* 04 — operational traffic context */}
+      <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
+        <RegionHeader number="04" title={t('blockPlanning.trafficContextTitle')} meta={`${trafficSectionId} · ${t('header.syntheticData')}`} isHindi={isHindi} />
+        <TrafficContext sectionId={trafficSectionId} />
+      </div>
 
-      {/* Smart Bundling Visualization Component (Section 12) */}
-      <BundlingView />
+      {/* 05 — cross-department bundling */}
+      <div className="bg-ws-surface px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
+        <RegionHeader number="05" title={t('maintenanceBlocks.bundlingTitle')} meta={t('maintenanceBlocks.bundlingPairs', { count: bundlePairs.length })} isHindi={isHindi} />
+        <BundlingView />
+      </div>
 
-      {/* Drawers & Decision Trace Modals */}
       <BlockDrawer
         task={drawerTask}
         isOpen={Boolean(drawerTask)}
         onClose={() => setDrawerTask(null)}
         onOpenDecisionTrace={handleOpenDecisionTrace}
       />
-
       <DecisionTraceModal
         task={decisionTraceTask}
         isOpen={decisionTraceOpen}

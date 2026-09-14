@@ -5,9 +5,6 @@
 @layer base {
   body {
     @apply bg-surface-base text-rail-900 font-sans antialiased text-sm;
-    /* Inter character variants. These are only meaningful now that Inter is
-       actually wired into tailwind.config.js fontFamily. */
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   /* Technical values line up in columns: IDs, timestamps, minutes, counts. */
@@ -21,7 +18,7 @@
      Mono is reserved for IDs, timestamps, minutes and counts. Never prose. */
 
   .t-label {
-    @apply text-[11px] font-semibold uppercase tracking-wide text-rail-500;
+    @apply font-display text-[11px] font-semibold uppercase tracking-wide text-rail-500;
   }
 
   .t-value {
@@ -37,13 +34,13 @@
   }
 
   .t-section-title {
-    @apply text-[15px] font-semibold text-rail-900;
+    @apply font-display text-[15px] font-semibold text-rail-900;
   }
 
   /* The product wordmark is set in the same type as the interface: no logo,
      no icon mark, no colour treatment. */
   .t-wordmark {
-    @apply text-[11px] font-semibold uppercase tracking-[0.14em];
+    @apply font-display text-[11px] font-semibold uppercase tracking-[0.14em];
   }
 
   .t-wordmark-sub {
@@ -61,7 +58,7 @@
    never actually defined until now. */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(85, 103, 138, 0.32) transparent;
+  scrollbar-color: rgba(106, 98, 85, 0.32) transparent;
 }
 
 ::-webkit-scrollbar {
@@ -72,11 +69,11 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(85, 103, 138, 0.28);
+  background: rgba(106, 98, 85, 0.28);
   border-radius: 0;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(85, 103, 138, 0.48);
+  background: rgba(106, 98, 85, 0.48);
 }
 
 /* Conflict hatch. Drawn only where an artifact establishes a conflict, never
@@ -84,10 +81,22 @@
 .conflict-hatch {
   background-image: repeating-linear-gradient(
     45deg,
-    rgba(194, 48, 59, 0.9) 0,
-    rgba(194, 48, 59, 0.9) 3px,
-    rgba(194, 48, 59, 0.35) 3px,
-    rgba(194, 48, 59, 0.35) 6px
+    rgba(178, 42, 34, 0.9) 0,
+    rgba(178, 42, 34, 0.9) 3px,
+    rgba(178, 42, 34, 0.35) 3px,
+    rgba(178, 42, 34, 0.35) 6px
+  );
+}
+
+/* Same hatch, at the "industrial worksheet" (design 2A) critical hex — used
+   only by the Authority Overview day sheet. */
+.ws-conflict-hatch {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(178, 42, 34, 0.9) 0,
+    rgba(178, 42, 34, 0.9) 3px,
+    rgba(178, 42, 34, 0.35) 3px,
+    rgba(178, 42, 34, 0.35) 6px
   );
 }
 
