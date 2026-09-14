@@ -43,7 +43,6 @@ export const Evaluation = () => {
             <FieldRow label={t('evaluation.accuracy')} value={c.accuracy.toFixed(4)} />
             <FieldRow label={t('evaluation.precision')} value={c.precision.toFixed(4)} />
             <FieldRow label={t('evaluation.recall')} value={c.recall.toFixed(4)} tone="text-ws-warn font-bold" />
-            <FieldRow label={t('evaluation.f1')} value={c.f1.toFixed(4)} />
           </div>
           <p className="font-ws text-[11px] text-ws-mid leading-relaxed pt-2">{t('evaluation.recallSub')}</p>
         </div>
