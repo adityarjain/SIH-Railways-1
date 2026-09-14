@@ -42,9 +42,7 @@ export const Performance = () => {
       {/* 01 — solver performance */}
       <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
         <RegionHeader number="01" title={t('performance.title')} meta={t('scope.fullRun').toUpperCase()} isHindi={isHindi} />
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-x-5 gap-y-3.5 border-t border-ws-rule pt-3">
-          <StatFigure value={s.solver_status} label={t('performance.solverStatus')} tone={s.solver_status === 'OPTIMAL' ? 'text-ws-ok' : 'text-ws-warn'} />
-          <StatFigure value={`${s.runtime_seconds}s`} label={t('performance.wallTime')} />
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-3.5 border-t border-ws-rule pt-3">
           <StatFigure value={s.total_scheduled.toLocaleString()} label={t('performance.tasksScheduled')} />
           <StatFigure value={(op.unique_blocks_utilized ?? 0).toLocaleString()} label={t('performance.possessionsUsed')} />
           <StatFigure value={(op.total_team_maintenance_hours ?? 0).toLocaleString()} label={t('performance.crewHours')} />
@@ -94,7 +92,6 @@ export const Performance = () => {
               <FieldRow label={t('performance.maxPool')} value={(prov.max_daily_candidate_pool ?? '—').toLocaleString?.() ?? prov.max_daily_candidate_pool} />
               <FieldRow label={t('performance.timeLimit')} value={`${prov.solver_time_limit_seconds_per_day ?? '—'}s`} />
               <FieldRow label={t('performance.planningHorizon')} value={prov.planning_horizon || '—'} />
-              <FieldRow label={t('performance.postSolveValidation')} value={prov.post_solve_validation || t('header.notRecorded')} tone="text-ws-ok font-bold" />
             </div>
           </div>
 

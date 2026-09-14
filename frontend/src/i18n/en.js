@@ -642,8 +642,6 @@ export const en = {
   performance: {
     title: 'Optimizer Performance',
     subtitle: 'Solver behaviour and the deferral audit for the complete run over the clean dataset.',
-    solverStatus: 'Solver status',
-    wallTime: 'Wall time',
     wallTimeSub: 'machine-dependent',
     tasksScheduled: 'Tasks scheduled',
     tasksScheduledSub: '{pct}% of {total}',
@@ -667,7 +665,6 @@ export const en = {
     maxPool: 'Max daily candidate pool',
     timeLimit: 'Time limit per day batch',
     planningHorizon: 'Planning horizon',
-    postSolveValidation: 'Post-solve validation',
     poolTitle: 'Widening the candidate pool is not free throughput',
     poolBody: 'A measured sweep over an identical 3-day window found 700 → 424 scheduled, 2,000 → 452, and 5,000 → 136: past roughly 2,000 the per-day model outgrows the solver budget and CP-SAT returns a worse incumbent.',
     scenarioComparison: 'Scenario comparison',
