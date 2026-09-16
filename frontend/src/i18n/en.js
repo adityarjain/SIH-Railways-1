@@ -293,7 +293,6 @@ export const en = {
     legendCriticalLower: 'critical',
     otherPossessions: 'other possessions',
     planState: 'Plan state',
-    runState: 'Run state',
     checksLabel: 'checks',
     decisionBasis1: 'Task risk {score} sits in the {band} band (≥ {threshold}); the earliest feasible window is preferred.',
     decisionBasis2: 'Duration required {required} min; the window offers {offered} min across {blocks}.',

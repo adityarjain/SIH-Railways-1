@@ -53,22 +53,30 @@ export const WorksheetHeader = ({ activeTab, onNavigate, subtitle }) => {
 
   return (
     <>
-      {/* 01 — provenance strip */}
-      <div className="bg-ws-ink min-h-[26px] px-3.5 md:px-4 xl:px-5 py-[3px] flex items-center gap-2.5 flex-wrap font-display">
+      {/* 01 — provenance strip: identity on the left, how these numbers were
+           produced on the right. Run state lives here rather than in the
+           masthead because it describes the run, not the page. */}
+      <div className="bg-ws-ink min-h-[28px] px-3.5 md:px-4 xl:px-5 py-[4px] flex items-center gap-2.5 flex-wrap font-display">
         <span className={`text-[13px] font-bold ${uc} tracking-[0.18em] text-white`}>
           {t('institution.appName')}
         </span>
-        <span className="w-px h-[11px] bg-[#4A4338]" />
-        <span className="font-ws text-[11px] text-[#A79F90]">{t('institution.appSub')}</span>
+        <span className="w-px h-[11px] bg-[#4A4338] hidden xl:block" />
+        <span className="font-ws text-[11px] text-[#A79F90] hidden xl:inline">{t('institution.appSub')}</span>
         <span className="flex-1 min-w-2" />
-        <span className="font-mono text-[9px] tracking-wide text-[#A79F90]">
+        <span className="font-mono text-[10px] tracking-wide text-[#A79F90]">
+          <span className="text-white font-bold">{metrics.summary.solver_status}</span> {metrics.summary.runtime_seconds}s
+          {checksMatch && (<> · {t('overview.checksLabel')} <span className="text-white font-bold">{checksMatch[1]}</span></>)}
+          {' · '}<span className="text-white">{t('header.syntheticData')}</span>
+        </span>
+        <span className="w-px h-[11px] bg-[#4A4338] hidden xl:block" />
+        <span className="font-mono text-[9px] tracking-wide text-[#A79F90] hidden xl:inline">
           {t('institution.prototype').toUpperCase()}
         </span>
         <LanguageSwitch tone="ws" />
       </div>
 
       {/* 02 — masthead */}
-      <div className="bg-ws-paper border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-3.5 pb-2.5 flex items-end gap-6 flex-wrap">
+      <div className="bg-ws-paper border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-3.5 pb-3 flex items-end gap-6 flex-wrap">
         <div className="min-w-0">
           <div className={`font-display text-[30px] font-semibold text-ws-ink leading-[1.05] tracking-[-0.005em] ${isHindi ? 'text-[26px]' : ''}`}>
             {t(activeItem?.labelKey || 'nav.overview')}
@@ -78,17 +86,7 @@ export const WorksheetHeader = ({ activeTab, onNavigate, subtitle }) => {
           </div>
         </div>
         <span className="flex-1 min-w-3" />
-        <div className="flex items-center gap-4 flex-wrap">
-          <div className="text-right hidden sm:block">
-            <div className={`font-display text-xs font-semibold ${uc} ${tr} text-ws-light`}>{t('overview.runState')}</div>
-            <div className="font-mono text-[11px] text-ws-body mt-0.5">
-              <span className="text-ws-warn font-bold">{metrics.summary.solver_status}</span> {metrics.summary.runtime_seconds}s
-              {checksMatch && (<> · {t('overview.checksLabel')} <span className="text-ws-ok font-bold">{checksMatch[1]}</span></>)}
-              {' · '}<span className="text-ws-warn">{t('header.syntheticData')}</span>
-            </div>
-          </div>
-          <RoleSwitch onNavigate={onNavigate} tone="ws" />
-        </div>
+        <RoleSwitch onNavigate={onNavigate} tone="ws" />
       </div>
 
       {/* 03 — navigation */}

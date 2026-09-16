@@ -298,7 +298,6 @@ export const hi = {
     legendCriticalLower: 'गंभीर',
     otherPossessions: 'अन्य अधिकार',
     planState: 'योजना स्थिति',
-    runState: 'रन स्थिति',
     checksLabel: 'जाँच',
     decisionBasis1: 'कार्य जोखिम {score}, {band} बैंड (≥ {threshold}) में है; सबसे पहली संभाव्य अवधि वरीय है।',
     decisionBasis2: 'आवश्यक अवधि {required} मिनट; यह अवधि {blocks} में {offered} मिनट प्रदान करती है।',
