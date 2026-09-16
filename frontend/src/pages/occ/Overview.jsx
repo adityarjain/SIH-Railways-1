@@ -99,6 +99,9 @@ export const Overview = ({ onNavigate }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [metrics.provenance?.planning_horizon, taskCounts]);
 
+  // Busiest day in the horizon — the calendar's load bars are drawn relative to it.
+  const maxDayCount = Math.max(1, ...dateOptions.map((o) => o.count));
+
   const tasksOnDate = useMemo(
     () => scheduledTasks.filter((task) => task.date === activeDate),
     [scheduledTasks, activeDate],
@@ -254,38 +257,52 @@ export const Overview = ({ onNavigate }) => {
     <div className="bg-ws-band min-h-full">
       <WorksheetHeader activeTab="overview" onNavigate={onNavigate} subtitle={overviewSubtitle} />
 
-      {/* horizon strip */}
-      <div className="bg-ws-band border-b border-ws-rule flex items-stretch">
-        <div className="px-3.5 py-1.5 hidden lg:flex items-center border-r border-ws-rule shrink-0">
+      {/* horizon calendar */}
+      <div className="bg-ws-band border-b border-ws-rule px-4 md:px-5 xl:px-6 pt-3.5 pb-4">
+        <div className="flex items-baseline gap-2.5 pb-2 flex-wrap">
           <span className={`font-display text-xs font-semibold ${uc} tracking-[0.12em] text-ws-mid`}>
             {t('overview.planHorizonTasks')}
           </span>
+          <span className="flex-1 min-w-6 h-px bg-ws-rule" />
+          <span className="font-mono text-[10px] text-ws-light">
+            {t('scope.demoScenarioTasks', { count: scenario.summary.total_tasks_considered }).toUpperCase()}
+          </span>
         </div>
-        <div className="flex-1 flex border-l border-ws-rule min-w-0 overflow-x-auto custom-scrollbar">
+        <div className="flex gap-px bg-ws-rule border border-ws-rule overflow-x-auto custom-scrollbar">
           {dateOptions.map((o) => {
             const d = new Date(`${o.date}T00:00:00`);
             const weekday = d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+            const weekend = d.getDay() === 0 || d.getDay() === 6;
             const day = o.date.slice(8, 10);
             const active = o.date === activeDate;
             return (
               <button
                 key={o.date}
                 onClick={() => setSelectedDate(o.date)}
-                className={`flex-1 min-w-[44px] border-r border-ws-rule py-[5px] text-center ${active ? 'bg-ws-surface shadow-[inset_0_-3px_0_#1F1C17]' : 'hover:bg-ws-surface'}`}
+                className={`flex-1 min-w-[54px] px-1.5 pt-2 pb-2.5 text-center transition-colors ${
+                  active ? 'bg-ws-ink' : weekend ? 'bg-ws-paper hover:bg-ws-surface' : 'bg-ws-surface hover:bg-ws-paper'
+                }`}
               >
-                <span className="block font-mono text-[11px] font-bold text-ws-ink">{day}</span>
-                <span className="block font-ws text-[9px] tracking-[0.08em] text-ws-light">{weekday}</span>
-                <span className={`block font-mono text-[9px] mt-0.5 ${o.count ? 'text-ws-mid' : 'text-ws-disabled'}`}>
+                <span className={`block font-display text-[10px] font-semibold tracking-[0.1em] ${active ? 'text-[#A79F90]' : 'text-ws-light'}`}>
+                  {weekday}
+                </span>
+                <span className={`block font-mono text-[19px] font-bold leading-none mt-1 ${active ? 'text-white' : 'text-ws-ink'}`}>
+                  {day}
+                </span>
+                <span className={`block h-[3px] mt-2.5 ${active ? 'bg-[#4A4338]' : 'bg-ws-hairline'}`}>
+                  {o.count > 0 && (
+                    <span
+                      className={`block h-full ${active ? 'bg-white' : 'bg-ws-ink'}`}
+                      style={{ width: `${Math.max(10, (o.count / maxDayCount) * 100)}%` }}
+                    />
+                  )}
+                </span>
+                <span className={`block font-mono text-[11px] mt-1.5 ${active ? 'text-white' : o.count ? 'text-ws-mid' : 'text-ws-disabled'}`}>
                   {o.count || '—'}
                 </span>
               </button>
             );
           })}
-        </div>
-        <div className="px-3.5 py-1.5 hidden xl:flex items-center shrink-0">
-          <span className="font-mono text-[10px] text-ws-light">
-            {t('scope.demoScenarioTasks', { count: scenario.summary.total_tasks_considered }).toUpperCase()}
-          </span>
         </div>
       </div>
 
@@ -303,7 +320,7 @@ export const Overview = ({ onNavigate }) => {
 
       {/* 02 — recommendation headline + 03 — attention ledger */}
       <div className="grid grid-cols-1 lg:grid-cols-[60fr_40fr] xl:grid-cols-[64fr_36fr] bg-ws-rule gap-px">
-        <div className="bg-ws-dossier border-t-[3px] border-ws-ink px-3.5 md:px-4 xl:px-5 pt-[15px] pb-[18px] min-w-0">
+        <div className="bg-ws-dossier border-t-[3px] border-ws-ink px-4 md:px-5 xl:px-6 pt-5 pb-6 min-w-0">
           <RegionHeader
             number="02"
             title={t('overview.recommendation')}
@@ -319,7 +336,7 @@ export const Overview = ({ onNavigate }) => {
               </div>
               <div className="font-mono text-xs text-ws-mid mt-0.5">{dSel.date}</div>
             </div>
-            <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3.5 gap-y-1.5 flex-1 min-w-[240px]">
+            <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2.5 flex-1 min-w-[280px]">
               <span className={`font-display text-xs font-semibold ${uc} ${tr} text-ws-light`}>{t('common.blocks')}</span>
               <span className="font-mono text-xs text-ws-ink">{(dSel.block_ids || []).join(' + ')}</span>
               <span className={`font-display text-xs font-semibold ${uc} ${tr} text-ws-light`}>{t('common.crew')}</span>
@@ -345,7 +362,7 @@ export const Overview = ({ onNavigate }) => {
 
           <div className="pt-3.5 pb-0.5">
             <div className={`font-display text-sm font-semibold ${uc} ${tr} text-ws-ink mb-1.5`}>{t('overview.decisionBasis')}</div>
-            <div className="grid grid-cols-[22px_minmax(0,1fr)] gap-x-2.5 gap-y-1.5 font-ws text-[13px] text-ws-body leading-[1.45]">
+            <div className="grid grid-cols-[22px_minmax(0,1fr)] gap-x-2.5 gap-y-2.5 font-ws text-[13px] text-ws-body leading-[1.5]">
               <span className="font-mono text-[11px] text-ws-light">01</span>
               <span>{t('overview.decisionBasis1', {
                 score: dRisk.risk_score?.toFixed?.(1) ?? dRisk.risk_score,
@@ -387,7 +404,7 @@ export const Overview = ({ onNavigate }) => {
         </div>
 
         {/* 03 — attention ledger + 04 — next out */}
-        <div className="bg-ws-surface border-t border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-[18px] min-w-0">
+        <div className="bg-ws-surface border-t border-ws-rule px-4 md:px-5 xl:px-6 pt-5 pb-6 min-w-0">
           <RegionHeader
             number="03"
             title={t('overview.requiresAttention')}
@@ -409,7 +426,7 @@ export const Overview = ({ onNavigate }) => {
                   <button
                     key={`${a.kind}-${i}`}
                     onClick={() => onNavigate && onNavigate(a.go)}
-                    className={`grid grid-cols-[24px_minmax(0,1fr)] gap-2.5 w-full text-left py-2.5 px-1 border-b border-ws-hairline border-l-[3px] border-l-transparent last:border-b-0 hover:bg-ws-paper transition-colors ${borderHover}`}
+                    className={`grid grid-cols-[24px_minmax(0,1fr)] gap-2.5 w-full text-left py-3 px-1.5 border-b border-ws-hairline border-l-[3px] border-l-transparent last:border-b-0 hover:bg-ws-paper transition-colors ${borderHover}`}
                   >
                     <span className={`font-mono text-[17px] font-bold leading-none ${color}`}>{String(i + 1).padStart(2, '0')}</span>
                     <span className="min-w-0">
@@ -447,7 +464,7 @@ export const Overview = ({ onNavigate }) => {
                     <button
                       key={task.task_id}
                       onClick={() => onNavigate && onNavigate('block-planning')}
-                      className="flex items-baseline gap-2.5 w-full text-left py-[5px] px-1 border-b border-ws-hairline last:border-b-0 hover:bg-ws-paper transition-colors"
+                      className="flex items-baseline gap-2.5 w-full text-left py-2 px-1.5 border-b border-ws-hairline last:border-b-0 hover:bg-ws-paper transition-colors"
                     >
                       <span className={`font-mono text-[11px] font-semibold shrink-0 ${critical ? 'text-ws-critical' : 'text-ws-ink'}`}>{task.task_id}</span>
                       <span className="font-ws text-xs text-ws-mid flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
@@ -472,7 +489,7 @@ export const Overview = ({ onNavigate }) => {
       </div>
 
       {/* 05 — corridor situation */}
-      <div className="bg-ws-surface px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4 border-t border-ws-rule">
+      <div className="bg-ws-surface px-4 md:px-5 xl:px-6 pt-5 pb-5 border-t border-ws-rule">
         <RegionHeader
           number="05"
           title={t('overview.corridorSituation')}
@@ -484,7 +501,7 @@ export const Overview = ({ onNavigate }) => {
             <button
               key={c.id}
               onClick={() => setSelectedCorridor(c.id)}
-              className={`grid grid-cols-[52px_minmax(0,1fr)_58px] sm:grid-cols-[72px_minmax(0,1fr)_104px] items-center gap-2 sm:gap-2.5 w-full text-left px-1.5 py-1 border-b border-ws-hairline hover:bg-ws-paper ${
+              className={`grid grid-cols-[52px_minmax(0,1fr)_58px] sm:grid-cols-[72px_minmax(0,1fr)_104px] items-center gap-2 sm:gap-2.5 w-full text-left px-1.5 py-1.5 border-b border-ws-hairline hover:bg-ws-paper ${
                 c.id === activeCorridor ? 'bg-ws-selected' : ''
               }`}
             >
