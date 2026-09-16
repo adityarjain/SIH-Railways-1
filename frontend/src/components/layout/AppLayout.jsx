@@ -4,7 +4,6 @@ import { useI18n } from '../../i18n';
 import { NAV_SECTIONS_BY_ROLE } from './Sidebar';
 import { RoleSwitch } from './Header';
 import { InstitutionalHeader, AppIdentity } from './InstitutionalHeader';
-import { LanguageSwitch } from './LanguageSwitch';
 import { DemoGuideBar } from './DemoGuideBar';
 import { WorksheetHeader } from './WorksheetHeader';
 
@@ -50,25 +49,25 @@ const GroundShell = ({ activeTab, onTabChange, children }) => {
 
   return (
     <div className="min-h-screen bg-surface-base flex flex-col">
-      <InstitutionalHeader compact />
+      <InstitutionalHeader />
 
-      <header className="bg-rail-900 border-b border-rail-800 px-5 py-2.5 flex items-center gap-4 sticky top-0 z-header">
-        <AppIdentity sub={t('role.ground')} />
-        <div className="flex-1" />
-        <div className="text-right min-w-0 hidden sm:block">
-          <div className="text-[11px] font-semibold text-white truncate">
-            {currentUser?.department}
+      {/* Header and tabs stick as one block, so the tab bar needs no hardcoded
+          offset to sit under a header whose height can change. */}
+      <div className="sticky top-0 z-header">
+        {/* Below sm the role switch wraps to its own row rather than squeezing
+            the identity down to a few letters. */}
+        <header className="bg-rail-900 border-b border-rail-800 px-5 py-2.5 flex items-center gap-x-4 gap-y-2 flex-wrap">
+          <AppIdentity sub={t('role.ground')} />
+          <div className="flex-1 hidden sm:block" />
+          <div className="min-w-0 truncate hidden sm:block">
+            <span className="text-[11px] font-semibold text-white">{currentUser?.department}</span>
+            <span className="font-mono text-[9px] text-rail-400"> · {currentUser?.name}</span>
           </div>
-          <div className="font-mono text-[9px] text-rail-400 truncate">
-            {currentUser?.name}
-          </div>
-        </div>
-        <LanguageSwitch tone="dark" className="hidden md:flex" />
-        <RoleSwitch onNavigate={onTabChange} />
-      </header>
+          <RoleSwitch onNavigate={onTabChange} />
+        </header>
 
-      {/* Group tabs, then the pages within the active group. */}
-      <div className="bg-surface-panel border-b border-line sticky top-[57px] z-guide">
+        {/* Group tabs, then the pages within the active group. */}
+        <div className="bg-surface-panel border-b border-line">
         <div className="px-5 flex items-stretch overflow-x-auto custom-scrollbar">
           {sections.map((s) => {
             const active = s.groupKey === activeGroup.groupKey;
@@ -105,6 +104,7 @@ const GroundShell = ({ activeTab, onTabChange, children }) => {
             })}
           </div>
         )}
+        </div>
       </div>
 
       <DemoGuideBar onNavigate={onTabChange} />
