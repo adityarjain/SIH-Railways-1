@@ -44,8 +44,6 @@ const GroundShell = ({ activeTab, onTabChange, children }) => {
   const { currentUser } = useAuth();
   const { t } = useI18n();
   const sections = NAV_SECTIONS_BY_ROLE[ROLES.GROUND];
-  const activeGroup =
-    sections.find((s) => s.items.some((i) => i.id === activeTab)) || sections[0];
 
   return (
     <div className="min-h-screen bg-surface-base flex flex-col">
@@ -66,44 +64,33 @@ const GroundShell = ({ activeTab, onTabChange, children }) => {
           <RoleSwitch onNavigate={onTabChange} />
         </header>
 
-        {/* Group tabs, then the pages within the active group. */}
-        <div className="bg-surface-panel border-b border-line">
-        <div className="px-5 flex items-stretch overflow-x-auto custom-scrollbar">
-          {sections.map((s) => {
-            const active = s.groupKey === activeGroup.groupKey;
-            return (
-              <button
-                key={s.groupKey}
-                onClick={() => onTabChange(s.items[0].id)}
-                className={`px-4 py-3 font-display text-[11px] font-semibold uppercase tracking-wide whitespace-nowrap border-b-2 -mb-px transition-colors ${
-                  active ? 'border-status-info text-rail-900' : 'border-transparent text-rail-500 hover:text-rail-700'
-                }`}
-              >
-                {t(s.groupKey)}
-              </button>
-            );
-          })}
-        </div>
-        {activeGroup.items.length > 1 && (
-          <div className="px-5 py-2 flex items-center gap-1.5 bg-surface-sunken border-t border-line overflow-x-auto custom-scrollbar">
-            {activeGroup.items.map((i) => {
-              const active = i.id === activeTab;
-              return (
-                <button
-                  key={i.id}
-                  onClick={() => onTabChange(i.id)}
-                  className={`px-3 py-1.5 text-[11px] font-medium whitespace-nowrap border rounded-sm transition-colors ${
-                    active
-                      ? 'bg-rail-900 text-white border-rail-900'
-                      : 'bg-surface-panel text-rail-600 border-line hover:border-line-strong'
-                  }`}
-                >
-                  {t(i.labelKey)}
-                </button>
-              );
-            })}
+        {/* Single row: every page is one tap away, groups marked by a rule
+            rather than a second row. Previously a group tab only jumped to
+            its first item, so reaching e.g. Completion took two taps
+            (Reporting, then Completion) — every button here is a real leaf
+            page now, so that's a tap saved as well as a row saved. */}
+        <div className="bg-surface-panel border-b border-line px-5 overflow-x-auto custom-scrollbar">
+          <div className="flex items-stretch">
+            {sections.map((s, si) => (
+              <React.Fragment key={s.groupKey}>
+                {si > 0 && <span className="w-px my-2.5 bg-line shrink-0" aria-hidden="true" />}
+                {s.items.map((i) => {
+                  const active = i.id === activeTab;
+                  return (
+                    <button
+                      key={i.id}
+                      onClick={() => onTabChange(i.id)}
+                      className={`shrink-0 px-3.5 py-3 font-display text-[11px] font-semibold uppercase tracking-wide whitespace-nowrap border-b-2 -mb-px transition-colors ${
+                        active ? 'border-status-info text-rail-900' : 'border-transparent text-rail-500 hover:text-rail-700 hover:border-line'
+                      }`}
+                    >
+                      {t(i.labelKey)}
+                    </button>
+                  );
+                })}
+              </React.Fragment>
+            ))}
           </div>
-        )}
         </div>
       </div>
 
