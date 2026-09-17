@@ -5,8 +5,8 @@ import { ROLES } from '../../context/AuthContext';
  * the landing tab and the reachability guard from this, so the mounted page and
  * the navigation can never drift apart when the role changes.
  *
- * Tab ids are load-bearing: they are keys in PAGES, in roleCanReach, and in
- * DEMO_STEPS[].page simultaneously. Labels are free to change; ids are not.
+ * Tab ids are load-bearing: they are keys in PAGES and in roleCanReach
+ * simultaneously. Labels are free to change; ids are not.
  */
 export const NAV_SECTIONS_BY_ROLE = {
   [ROLES.AUTHORITY]: [
@@ -34,10 +34,6 @@ export const NAV_SECTIONS_BY_ROLE = {
         { id: 'decision-trace', labelKey: 'nav.decisionTrace' },
         { id: 'general-verify', labelKey: 'nav.workVerification' },
       ],
-    },
-    {
-      groupKey: 'nav.groupDemo',
-      items: [{ id: 'simulator', labelKey: 'nav.guidedDemo' }],
     },
   ],
 

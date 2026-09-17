@@ -1,7 +1,6 @@
 import React from 'react';
 import { usePlan } from '../../context/PlanContext';
 import { useAuth } from '../../context/AuthContext';
-import { useDemoGuide } from '../../context/DemoGuideContext';
 import { useI18n } from '../../i18n';
 import { LanguageSwitch } from './LanguageSwitch';
 import { RoleSwitch } from './Header';
@@ -18,7 +17,6 @@ import { NAV_ITEMS_BY_ROLE } from './Sidebar';
 export const WorksheetHeader = ({ activeTab, onNavigate, subtitle }) => {
   const { baselineMetrics: metrics } = usePlan();
   const { currentUser } = useAuth();
-  const { isGuideActive, toggleGuide, currentStepIndex, totalSteps } = useDemoGuide();
   const { t, isHindi } = useI18n();
 
   const prov = metrics.provenance || {};
@@ -108,12 +106,6 @@ export const WorksheetHeader = ({ activeTab, onNavigate, subtitle }) => {
               </button>
             );
           })}
-          <button
-            onClick={toggleGuide}
-            className={`shrink-0 py-[9px] font-display text-sm font-semibold ${uc} ${tr} border-b-2 border-transparent text-ws-mid hover:text-ws-ink hover:border-ws-rule transition-colors`}
-          >
-            {t('header.guidedDemo')}{isGuideActive ? ` · ${currentStepIndex + 1}/${totalSteps}` : ''}
-          </button>
         </div>
       </div>
     </>

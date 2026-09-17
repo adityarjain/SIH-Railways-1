@@ -3,7 +3,7 @@ import { usePlan } from '../../context/PlanContext';
 import { useI18n } from '../../i18n';
 import { RegionHeader, Pill } from '../../components/ui/worksheet';
 import { minToHhmm } from '../../utils/time';
-import { AlertTriangle, CheckCircle2, ArrowRight, RefreshCw, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, RefreshCw, ShieldCheck } from 'lucide-react';
 
 export const LiveOps = ({ onNavigate }) => {
   const {
@@ -39,14 +39,8 @@ export const LiveOps = ({ onNavigate }) => {
 
   return (
     <div className="bg-ws-band min-h-full">
-      <div className="bg-ws-paper border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-2.5 flex items-center justify-between gap-4 flex-wrap">
-        <p className="font-ws text-xs text-ws-mid max-w-3xl leading-relaxed flex-1 min-w-[240px]">{t('liveOps.subtitle')}</p>
-        <button
-          onClick={() => onNavigate('simulator')}
-          className="flex items-center gap-1.5 px-3 py-1.5 font-display text-xs font-bold uppercase tracking-wide bg-ws-ink text-white hover:bg-ws-body transition-colors shrink-0"
-        >
-          {t('liveOps.openSimulator')} <ArrowRight size={13} />
-        </button>
+      <div className="bg-ws-paper border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-2.5">
+        <p className="font-ws text-xs text-ws-mid max-w-3xl leading-relaxed">{t('liveOps.subtitle')}</p>
       </div>
 
       {/* 01 — network state */}

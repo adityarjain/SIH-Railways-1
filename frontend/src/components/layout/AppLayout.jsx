@@ -4,7 +4,6 @@ import { useI18n } from '../../i18n';
 import { NAV_SECTIONS_BY_ROLE } from './Sidebar';
 import { RoleSwitch } from './Header';
 import { InstitutionalHeader, AppIdentity } from './InstitutionalHeader';
-import { DemoGuideBar } from './DemoGuideBar';
 import { WorksheetHeader } from './WorksheetHeader';
 
 /**
@@ -22,13 +21,12 @@ import { WorksheetHeader } from './WorksheetHeader';
 const FULL_BLEED_TABS = new Set([
   'overview', 'replanning', 'maintenance-blocks', 'block-planning', 'train-impact',
   'teams', 'performance', 'evaluation', 'decision-trace', 'system-verification',
-  'live-ops', 'demand', 'analytics', 'general-verify', 'simulator',
+  'live-ops', 'demand', 'analytics', 'general-verify',
 ]);
 
 const AuthorityShell = ({ activeTab, onTabChange, children }) => (
   <div className="min-h-screen bg-surface-base flex flex-col">
     {activeTab !== 'overview' && <WorksheetHeader activeTab={activeTab} onNavigate={onTabChange} />}
-    <DemoGuideBar onNavigate={onTabChange} />
     <main className={FULL_BLEED_TABS.has(activeTab) ? 'flex-1 min-w-0' : 'flex-1 p-5 space-y-4 min-w-0'}>
       {children}
     </main>
@@ -94,7 +92,6 @@ const GroundShell = ({ activeTab, onTabChange, children }) => {
         </div>
       </div>
 
-      <DemoGuideBar onNavigate={onTabChange} />
       <main className="flex-1 px-5 py-4 space-y-4 max-w-[1400px] w-full mx-auto">{children}</main>
     </div>
   );

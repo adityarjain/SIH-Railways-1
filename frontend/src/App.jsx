@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { AuthProvider, useAuth, ROLES } from './context/AuthContext';
 import { I18nProvider } from './i18n';
 import { PlanContext_Provider } from './context/PlanContext';
-import { DemoGuideProvider } from './context/DemoGuideContext';
 
 import { AppLayout } from './components/layout/AppLayout';
 import { NAV_ITEMS_BY_ROLE } from './components/layout/Sidebar';
@@ -17,7 +16,6 @@ import { BlockPlanning } from './pages/occ/BlockPlanning';
 import { LiveOps } from './pages/occ/LiveOps';
 import { Replanning } from './pages/occ/Replanning';
 import { Analytics } from './pages/occ/Analytics';
-import { Simulator } from './pages/occ/Simulator';
 import { TeamAvailability } from './pages/maintenance/TeamAvailability';
 import { GeneralPortal } from './pages/general/GeneralPortal';
 import { TrainImpact } from './pages/authority/TrainImpact';
@@ -58,7 +56,6 @@ const PAGES = {
   'decision-trace': DecisionTrace,
   'general-verify': GeneralPortal,
   'system-verification': SystemVerification,
-  simulator: Simulator,
 
   // Ground Operations
   'maint-dashboard': MaintDashboard,
@@ -86,9 +83,8 @@ function AppShell() {
   }
 
   /**
-   * The single navigation entry point. The guided demo crosses roles (step 13
-   * hands off to the crew, step 14 returns to Authority), so a navigation
-   * request carries the role its page belongs to.
+   * The single navigation entry point. A request can carry the role its page
+   * belongs to, so `RoleSwitch` and cross-role links land on the right shell.
    */
   const handleNavigate = (page, role) => {
     if (role && role !== currentUser.role) {
@@ -126,9 +122,7 @@ export default function App() {
     <I18nProvider>
       <AuthProvider>
         <PlanContext_Provider>
-          <DemoGuideProvider>
-            <AppShell />
-          </DemoGuideProvider>
+          <AppShell />
         </PlanContext_Provider>
       </AuthProvider>
     </I18nProvider>
