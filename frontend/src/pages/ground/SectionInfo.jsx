@@ -70,7 +70,7 @@ export const SectionInfo = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 border border-ws-rule bg-ws-surface p-3.5">
             <StatFigure value={sec.maximum_speed_kmph} label={`${t('ground.lineSpeed')} · kmph`} />
             <StatFigure value={sec.section_length_km} label={`${t('ground.length')} · km`} />
-            <StatFigure value={sec.electrified} label={t('ground.electrified')} />
+            <StatFigure value={sec.electrified ? 'Yes' : 'No'} label={t('ground.electrified')} />
             <StatFigure value={tasksHere.length} label={t('ground.yourTasksHere')} />
           </div>
 
@@ -84,7 +84,7 @@ export const SectionInfo = () => {
               <FieldRow label={t('common.corridor')} value={`${sec.corridor_id} · ${sec.corridor_name}`} />
               <FieldRow label={t('ground.region')} value={sec.region} />
               <FieldRow label={t('ground.trackType')} value={sec.track_type} />
-              <FieldRow label={t('ground.electrified')} value={sec.electrified} />
+              <FieldRow label={t('ground.electrified')} value={sec.electrified ? 'Yes' : 'No'} />
               <FieldRow label={t('ground.maximumSpeed')} value={`${sec.maximum_speed_kmph} kmph`} />
               <FieldRow label={t('ground.length')} value={`${sec.section_length_km} km`} />
             </div>

@@ -80,7 +80,7 @@ export const SectionContext = ({ task }) => {
   const adjacent = traceMatches ? (decisionTrace.train_impact?.adjacent || []).length : null;
 
   const rows = [
-    sec && { label: 'Electrified', value: sec.electrified, source: 'electrified' },
+    sec && { label: 'Electrified', value: sec.electrified ? 'Yes' : 'No', source: 'electrified' },
     sec && { label: 'Track type', value: sec.track_type, source: 'track_type' },
     sec && { label: 'Line speed', value: `${sec.maximum_speed_kmph} kmph`, source: 'maximum_speed_kmph' },
     sec && { label: 'Section length', value: `${sec.section_length_km} km`, source: 'section_length_km' },
