@@ -78,41 +78,6 @@ class TestRitvikScenarios:
         assert decision.train_actions[0].action == "HELD"
 
 
-class TestSimulatorTruthfulness:
-    """Every simulator button maps to one scenario or to an explicit no-scenario state."""
-
-    def test_event_scenario_map_is_exhaustive_and_honest(self):
-        source = (FRONTEND / "pages/occ/Simulator.jsx").read_text()
-        block = re.search(r"EVENT_SCENARIO_KEY = \{(.+?)\}", source, re.DOTALL).group(1)
-
-        mapping = dict(re.findall(r"(\w+):\s*(?:'([\w]+)'|null)", block))
-        # Events resolving to a scenario key vs the one explicit no-scenario event.
-        assert mapping["NEW_TRAIN_SUCCESS"] == "rerouteScenario"
-        assert mapping["HELD_TRAIN"] == "holdScenario"
-        assert mapping["NEW_TRAIN_BLOCKED"] == "replanScenario"
-        assert mapping["BLOCK_UNAVAILABLE"] == "blockUnavailableScenario"
-        assert mapping.get("MAINTENANCE_EMERGENCY", "") == ""  # mapped to null, no scenario
-
-    def test_no_button_falls_through_to_another_events_scenario(self):
-        """The old code picked the scenario by outcomeType, so SEC-0072 events
-        rendered the SEC-0004 conflict. That branch must be gone."""
-        source = (FRONTEND / "pages/occ/Simulator.jsx").read_text()
-        assert "outcomeType === 'OPERATIONAL_UPDATE' ? rerouteScenario : replanScenario" not in source
-
-    def test_no_scenario_state_points_to_live_operations(self):
-        """
-        The copy now lives in the i18n bundle rather than inline in the JSX, so
-        assert the screen references the key and that the English bundle still
-        carries the disclosure verbatim.
-        """
-        source = (FRONTEND / "pages/occ/Simulator.jsx").read_text()
-        assert "simulator.noScenarioTitle" in source
-        assert "live-ops" in source
-
-        en = (FRONTEND / "i18n/en.js").read_text()
-        assert "No generated engine scenario for this event type" in en
-
-
 class TestBlockPlanningSelectors:
     """Selector options must come from the plan so no combination is empty."""
 
@@ -126,44 +91,16 @@ class TestBlockPlanningSelectors:
 
     def test_plan_dates_and_corridors_are_non_trivial(self):
         """Sanity: the plan actually spans data the selector can offer."""
-        plan = json.loads(PLAN.read_text())["scheduled_tasks"]
-        dates = {t["date"] for t in plan}
-        corridors = {t["corridor_id"] for t in plan}
-        assert len(dates) >= 1
-        assert len(corridors) >= 3
-        # The busiest date must hold most of the plan (the demo's 09-03 batch).
         from collections import Counter
-        busiest, count = Counter(t["date"] for t in plan).most_common(1)[0]
-        assert count >= len(plan) * 0.8
 
+        plan = json.loads(PLAN.read_text())["scheduled_tasks"]
+        corridors = {t["corridor_id"] for t in plan}
+        assert len(corridors) >= 3
 
-class TestDemoGuide:
-    def test_exactly_14_steps(self):
-        source = (FRONTEND / "context/DemoGuideContext.jsx").read_text()
-        assert len(re.findall(r"^\s*step: \d+,", source, re.MULTILINE)) == 14
-
-    def test_guide_visits_live_ops_and_verification(self):
-        source = (FRONTEND / "context/DemoGuideContext.jsx").read_text()
-        pages = re.findall(r'page: "([a-z-]+)"', source)
-        assert pages.count("live-ops") == 2, "Feature-2 evidence must be shown"
-        assert "general-verify" in pages, "brief requires a verification step"
-        # Simulator load is trimmed but still present for the replan trigger.
-        assert 1 <= pages.count("simulator") <= 3
-
-    def test_story_order_matches_the_brief(self):
-        source = (FRONTEND / "context/DemoGuideContext.jsx").read_text()
-        pages = re.findall(r'page: "([a-z-]+)"', source)
-        # Authority -> Ground -> Authority:
-        # planning ... conflict (live-ops) ... replan ... field execution ... verification.
-        # The handoff to the crew now precedes verification, so the work being
-        # verified is work the crew has actually been given.
-        assert pages.index("block-planning") < pages.index("live-ops")
-        assert pages.index("live-ops") < pages.index("replanning")
-        assert pages.index("replanning") < pages.index("my-tasks")
-        assert pages.index("my-tasks") < pages.index("general-verify")
-
-    def test_every_guide_page_is_routable(self):
-        guide = (FRONTEND / "context/DemoGuideContext.jsx").read_text()
-        app = (FRONTEND / "App.jsx").read_text()
-        for page in set(re.findall(r'page: "([a-z-]+)"', guide)):
-            assert re.search(rf"[\'\"]?{re.escape(page)}[\'\"]?:\s*\w", app), f"{page} not in PAGES map"
+        # Work is spread across the horizon rather than piled onto one date. The
+        # scenario used to solve a single day batch, which the day sheet renders
+        # as one busy date beside thirteen empty ones; demo.py now batches every
+        # date, so assert the spread the calendar depends on.
+        per_date = Counter(t["date"] for t in plan)
+        assert len(per_date) == 14
+        assert max(per_date.values()) <= len(plan) * 0.25

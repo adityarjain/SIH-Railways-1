@@ -407,12 +407,12 @@
     "selected_crew": [
       "TEAM-015"
     ],
-    "replan_runtime_seconds": 0.142,
+    "replan_runtime_seconds": 0.242,
     "replan_artifacts_directory": "replan_output",
     "unaffected_plan_retention": {
-      "tasks_in_plan": 53,
+      "tasks_in_plan": 165,
       "tasks_re_solved": 1,
-      "tasks_unchanged": 52,
+      "tasks_unchanged": 164,
       "retention_percent": 100.0,
       "basis": "by_construction",
       "caveat": "The replan scope is a single task; every other record is copied unchanged. 100% retention follows from that scope and is not a measurement of plan stability under broader re-optimization."

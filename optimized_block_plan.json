@@ -3,30 +3,30 @@
     "generated_by": "Arnav Railway Maintenance Optimizer",
     "version": "1.0.0",
     "summary": {
-      "total_tasks_considered": 62,
-      "total_scheduled": 53,
-      "total_deferred": 9,
-      "scheduled_percentage": 85.48,
+      "total_tasks_considered": 179,
+      "total_scheduled": 165,
+      "total_deferred": 14,
+      "scheduled_percentage": 92.18,
       "solver_status": "FEASIBLE",
-      "runtime_seconds": 1.3,
-      "objective_value": 4286887.0
+      "runtime_seconds": 1.62,
+      "objective_value": 13340243.0
     },
     "operational_metrics": {
-      "unique_blocks_utilized": 78,
-      "bundled_tasks_count": 4,
-      "concurrent_bundles_count": 2,
+      "unique_blocks_utilized": 266,
+      "bundled_tasks_count": 2,
+      "concurrent_bundles_count": 1,
       "serial_shared_possessions_count": 0,
       "total_batch_excluded_instances": 0,
-      "night_maintenance_tasks": 44,
-      "teams_utilized": 27,
-      "total_team_maintenance_hours": 113.3
+      "night_maintenance_tasks": 148,
+      "teams_utilized": 32,
+      "total_team_maintenance_hours": 391.9
     },
     "provenance": {
       "scope": "DEMO_SCENARIO_SUBSET",
-      "description": "Scenario subset solved by demo.py: the 2026-09-03 day batch plus all SEC-0073 tasks on that date (to exercise cross-department bundling), plus TASK-000005 on 2026-09-07. This is the plan the guided demo, the Ritvik scenarios and the frontend render.",
+      "description": "Scenario subset solved by demo.py: a 12-task batch on each of the 14 horizon dates (2026-09-03 .. 2026-09-16), plus every SEC-0073 task on 2026-09-03 to exercise cross-department bundling, plus TASK-000005 on 2026-09-07. This is the plan the Ritvik scenarios and the frontend render.",
       "command": "PYTHONPATH=. python demo.py",
       "dataset": "Arnav_Optimizer_Clean_Dataset",
-      "subset_tasks_considered": 62,
+      "subset_tasks_considered": 179,
       "full_dataset_tasks": 30000,
       "not_evaluated_here": "Tasks outside the subset appear in deferred_tasks.csv as 'not_in_demo_subset' so the inventory check stays complete; they are not solver deferrals.",
       "full_run_baseline": "benchmarks/full_run_metrics.json",
@@ -51,13 +51,11 @@
         "BLK-001094"
       ],
       "assigned_teams": [
-        "TEAM-007"
+        "TEAM-010"
       ],
-      "is_bundled": true,
-      "sharing_type": "concurrent",
-      "bundled_with": [
-        "TASK-000421"
-      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
       "is_night": true,
       "risk_score": 7.3,
       "priority_score": 267.5
@@ -78,7 +76,7 @@
         "BLK-000863"
       ],
       "assigned_teams": [
-        "TEAM-021"
+        "TEAM-015"
       ],
       "is_bundled": false,
       "sharing_type": "single",
@@ -95,11 +93,11 @@
       "corridor_id": "COR-003",
       "section_id": "SEC-0028",
       "date": "2026-09-03",
-      "start_minute": 17,
-      "end_minute": 120,
+      "start_minute": 240,
+      "end_minute": 343,
       "duration_minutes": 103,
       "block_ids": [
-        "BLK-000325"
+        "BLK-000327"
       ],
       "assigned_teams": [
         "TEAM-001"
@@ -119,15 +117,15 @@
       "corridor_id": "COR-011",
       "section_id": "SEC-0102",
       "date": "2026-09-03",
-      "start_minute": 557,
-      "end_minute": 720,
+      "start_minute": 540,
+      "end_minute": 703,
       "duration_minutes": 163,
       "block_ids": [
         "BLK-001217",
         "BLK-001218"
       ],
       "assigned_teams": [
-        "TEAM-017"
+        "TEAM-020"
       ],
       "is_bundled": false,
       "sharing_type": "single",
@@ -151,7 +149,7 @@
         "BLK-002267"
       ],
       "assigned_teams": [
-        "TEAM-024"
+        "TEAM-027"
       ],
       "is_bundled": false,
       "sharing_type": "single",
@@ -168,8 +166,8 @@
       "corridor_id": "COR-020",
       "section_id": "SEC-0194",
       "date": "2026-09-03",
-      "start_minute": 290,
-      "end_minute": 480,
+      "start_minute": 240,
+      "end_minute": 430,
       "duration_minutes": 190,
       "block_ids": [
         "BLK-002319",
@@ -193,15 +191,15 @@
       "corridor_id": "COR-003",
       "section_id": "SEC-0025",
       "date": "2026-09-03",
-      "start_minute": 780,
-      "end_minute": 901,
+      "start_minute": 600,
+      "end_minute": 721,
       "duration_minutes": 121,
       "block_ids": [
-        "BLK-000295",
-        "BLK-000296"
+        "BLK-000294",
+        "BLK-000295"
       ],
       "assigned_teams": [
-        "TEAM-008"
+        "TEAM-002"
       ],
       "is_bundled": false,
       "sharing_type": "single",
@@ -218,15 +216,15 @@
       "corridor_id": "COR-013",
       "section_id": "SEC-0130",
       "date": "2026-09-03",
-      "start_minute": 150,
-      "end_minute": 293,
+      "start_minute": 0,
+      "end_minute": 143,
       "duration_minutes": 143,
       "block_ids": [
-        "BLK-001550",
-        "BLK-001551"
+        "BLK-001549",
+        "BLK-001550"
       ],
       "assigned_teams": [
-        "TEAM-007"
+        "TEAM-004"
       ],
       "is_bundled": false,
       "sharing_type": "single",
@@ -275,7 +273,7 @@
         "BLK-000434"
       ],
       "assigned_teams": [
-        "TEAM-010"
+        "TEAM-007"
       ],
       "is_bundled": false,
       "sharing_type": "single",
@@ -292,8 +290,8 @@
       "corridor_id": "COR-012",
       "section_id": "SEC-0117",
       "date": "2026-09-03",
-      "start_minute": 960,
-      "end_minute": 1197,
+      "start_minute": 963,
+      "end_minute": 1200,
       "duration_minutes": 237,
       "block_ids": [
         "BLK-001401",
@@ -335,815 +333,6 @@
       "priority_score": 612.25
     },
     {
-      "task_id": "TASK-000169",
-      "asset_id": "AST-120169",
-      "department": "Mechanical / Rolling Stock",
-      "maintenance_type": "Point Machine Maintenance",
-      "corridor_id": "COR-006",
-      "section_id": "SEC-0054",
-      "date": "2026-09-03",
-      "start_minute": 803,
-      "end_minute": 960,
-      "duration_minutes": 157,
-      "block_ids": [
-        "BLK-000643",
-        "BLK-000644"
-      ],
-      "assigned_teams": [
-        "TEAM-032"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": false,
-      "risk_score": 86.9,
-      "priority_score": 1860.25
-    },
-    {
-      "task_id": "TASK-000183",
-      "asset_id": "AST-120183",
-      "department": "Mechanical / Rolling Stock",
-      "maintenance_type": "Bearing Inspection",
-      "corridor_id": "COR-005",
-      "section_id": "SEC-0045",
-      "date": "2026-09-03",
-      "start_minute": 1320,
-      "end_minute": 1429,
-      "duration_minutes": 109,
-      "block_ids": [
-        "BLK-000540"
-      ],
-      "assigned_teams": [
-        "TEAM-036"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 9.6,
-      "priority_score": 244.25
-    },
-    {
-      "task_id": "TASK-000197",
-      "asset_id": "AST-120197",
-      "department": "Track / Civil Engineering",
-      "maintenance_type": "Coach Equipment Maintenance",
-      "corridor_id": "COR-018",
-      "section_id": "SEC-0179",
-      "date": "2026-09-03",
-      "start_minute": 1348,
-      "end_minute": 1440,
-      "duration_minutes": 92,
-      "block_ids": [
-        "BLK-002148"
-      ],
-      "assigned_teams": [
-        "TEAM-006"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 4.8,
-      "priority_score": 178.25
-    },
-    {
-      "task_id": "TASK-000211",
-      "asset_id": "AST-120211",
-      "department": "Signal & Telecommunications (S&T)",
-      "maintenance_type": "Switchgear Inspection",
-      "corridor_id": "COR-017",
-      "section_id": "SEC-0167",
-      "date": "2026-09-03",
-      "start_minute": 60,
-      "end_minute": 195,
-      "duration_minutes": 135,
-      "block_ids": [
-        "BLK-001993",
-        "BLK-001994"
-      ],
-      "assigned_teams": [
-        "TEAM-022"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 67.2,
-      "priority_score": 1444.0
-    },
-    {
-      "task_id": "TASK-000225",
-      "asset_id": "AST-120225",
-      "department": "Electrical / TRD",
-      "maintenance_type": "Sleeper Replacement",
-      "corridor_id": "COR-004",
-      "section_id": "SEC-0038",
-      "date": "2026-09-03",
-      "start_minute": 1207,
-      "end_minute": 1320,
-      "duration_minutes": 113,
-      "block_ids": [
-        "BLK-000455"
-      ],
-      "assigned_teams": [
-        "TEAM-018"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 20.8,
-      "priority_score": 558.25
-    },
-    {
-      "task_id": "TASK-000239",
-      "asset_id": "AST-120239",
-      "department": "Track / Civil Engineering",
-      "maintenance_type": "Bridge Inspection",
-      "corridor_id": "COR-012",
-      "section_id": "SEC-0120",
-      "date": "2026-09-03",
-      "start_minute": 1294,
-      "end_minute": 1440,
-      "duration_minutes": 146,
-      "block_ids": [
-        "BLK-001439",
-        "BLK-001440"
-      ],
-      "assigned_teams": [
-        "TEAM-012"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 52.5,
-      "priority_score": 1192.25
-    },
-    {
-      "task_id": "TASK-000253",
-      "asset_id": "AST-120253",
-      "department": "Electrical / TRD",
-      "maintenance_type": "Rail Inspection",
-      "corridor_id": "COR-001",
-      "section_id": "SEC-0007",
-      "date": "2026-09-03",
-      "start_minute": 1320,
-      "end_minute": 1428,
-      "duration_minutes": 108,
-      "block_ids": [
-        "BLK-000084"
-      ],
-      "assigned_teams": [
-        "TEAM-021"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 29.0,
-      "priority_score": 720.0
-    },
-    {
-      "task_id": "TASK-000267",
-      "asset_id": "AST-120267",
-      "department": "Track / Civil Engineering",
-      "maintenance_type": "Axle Counter Inspection",
-      "corridor_id": "COR-002",
-      "section_id": "SEC-0018",
-      "date": "2026-09-03",
-      "start_minute": 1200,
-      "end_minute": 1268,
-      "duration_minutes": 68,
-      "block_ids": [
-        "BLK-000215"
-      ],
-      "assigned_teams": [
-        "TEAM-012"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 87.6,
-      "priority_score": 1853.5
-    },
-    {
-      "task_id": "TASK-000281",
-      "asset_id": "AST-120281",
-      "department": "Mechanical / Rolling Stock",
-      "maintenance_type": "Turnout Maintenance",
-      "corridor_id": "COR-015",
-      "section_id": "SEC-0141",
-      "date": "2026-09-03",
-      "start_minute": 316,
-      "end_minute": 480,
-      "duration_minutes": 164,
-      "block_ids": [
-        "BLK-001683",
-        "BLK-001684"
-      ],
-      "assigned_teams": [
-        "TEAM-034"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 32.2,
-      "priority_score": 776.25
-    },
-    {
-      "task_id": "TASK-000295",
-      "asset_id": "AST-120295",
-      "department": "Electrical / TRD",
-      "maintenance_type": "Point Machine Maintenance",
-      "corridor_id": "COR-007",
-      "section_id": "SEC-0069",
-      "date": "2026-09-03",
-      "start_minute": 580,
-      "end_minute": 720,
-      "duration_minutes": 140,
-      "block_ids": [
-        "BLK-000821",
-        "BLK-000822"
-      ],
-      "assigned_teams": [
-        "TEAM-014"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": false,
-      "risk_score": 66.0,
-      "priority_score": 1451.5
-    },
-    {
-      "task_id": "TASK-000309",
-      "asset_id": "AST-120309",
-      "department": "Mechanical / Rolling Stock",
-      "maintenance_type": "Axle Inspection",
-      "corridor_id": "COR-006",
-      "section_id": "SEC-0052",
-      "date": "2026-09-03",
-      "start_minute": 1235,
-      "end_minute": 1320,
-      "duration_minutes": 85,
-      "block_ids": [
-        "BLK-000623"
-      ],
-      "assigned_teams": [
-        "TEAM-036"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 9.7,
-      "priority_score": 294.0
-    },
-    {
-      "task_id": "TASK-000323",
-      "asset_id": "AST-120323",
-      "department": "Track / Civil Engineering",
-      "maintenance_type": "Switchgear Inspection",
-      "corridor_id": "COR-010",
-      "section_id": "SEC-0100",
-      "date": "2026-09-03",
-      "start_minute": 300,
-      "end_minute": 478,
-      "duration_minutes": 178,
-      "block_ids": [
-        "BLK-001191",
-        "BLK-001192"
-      ],
-      "assigned_teams": [
-        "TEAM-007"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 23.4,
-      "priority_score": 519.5
-    },
-    {
-      "task_id": "TASK-000337",
-      "asset_id": "AST-120337",
-      "department": "Track / Civil Engineering",
-      "maintenance_type": "Feeder Maintenance",
-      "corridor_id": "COR-019",
-      "section_id": "SEC-0182",
-      "date": "2026-09-03",
-      "start_minute": 1200,
-      "end_minute": 1305,
-      "duration_minutes": 105,
-      "block_ids": [
-        "BLK-002183"
-      ],
-      "assigned_teams": [
-        "TEAM-003"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 80.7,
-      "priority_score": 1634.0
-    },
-    {
-      "task_id": "TASK-000351",
-      "asset_id": "AST-120351",
-      "department": "Mechanical / Rolling Stock",
-      "maintenance_type": "Feeder Maintenance",
-      "corridor_id": "COR-003",
-      "section_id": "SEC-0024",
-      "date": "2026-09-03",
-      "start_minute": 777,
-      "end_minute": 960,
-      "duration_minutes": 183,
-      "block_ids": [
-        "BLK-000283",
-        "BLK-000284"
-      ],
-      "assigned_teams": [
-        "TEAM-035"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": false,
-      "risk_score": 27.8,
-      "priority_score": 656.0
-    },
-    {
-      "task_id": "TASK-000365",
-      "asset_id": "AST-120365",
-      "department": "Signal & Telecommunications (S&T)",
-      "maintenance_type": "Relay Testing",
-      "corridor_id": "COR-005",
-      "section_id": "SEC-0044",
-      "date": "2026-09-03",
-      "start_minute": 0,
-      "end_minute": 91,
-      "duration_minutes": 91,
-      "block_ids": [
-        "BLK-000517"
-      ],
-      "assigned_teams": [
-        "TEAM-025"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 2.1,
-      "priority_score": 92.0
-    },
-    {
-      "task_id": "TASK-000379",
-      "asset_id": "AST-120379",
-      "department": "Track / Civil Engineering",
-      "maintenance_type": "Turnout Maintenance",
-      "corridor_id": "COR-011",
-      "section_id": "SEC-0108",
-      "date": "2026-09-03",
-      "start_minute": 1204,
-      "end_minute": 1316,
-      "duration_minutes": 112,
-      "block_ids": [
-        "BLK-001295"
-      ],
-      "assigned_teams": [
-        "TEAM-009"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 77.7,
-      "priority_score": 1604.0
-    },
-    {
-      "task_id": "TASK-000393",
-      "asset_id": "AST-120393",
-      "department": "Electrical / TRD",
-      "maintenance_type": "Bridge Inspection",
-      "corridor_id": "COR-010",
-      "section_id": "SEC-0098",
-      "date": "2026-09-03",
-      "start_minute": 352,
-      "end_minute": 480,
-      "duration_minutes": 128,
-      "block_ids": [
-        "BLK-001167",
-        "BLK-001168"
-      ],
-      "assigned_teams": [
-        "TEAM-016"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 12.8,
-      "priority_score": 336.0
-    },
-    {
-      "task_id": "TASK-000407",
-      "asset_id": "AST-120407",
-      "department": "Electrical / TRD",
-      "maintenance_type": "Bridge Inspection",
-      "corridor_id": "COR-016",
-      "section_id": "SEC-0152",
-      "date": "2026-09-03",
-      "start_minute": 240,
-      "end_minute": 350,
-      "duration_minutes": 110,
-      "block_ids": [
-        "BLK-001815"
-      ],
-      "assigned_teams": [
-        "TEAM-016"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 38.1,
-      "priority_score": 885.0
-    },
-    {
-      "task_id": "TASK-000421",
-      "asset_id": "AST-120421",
-      "department": "Mechanical / Rolling Stock",
-      "maintenance_type": "Switchgear Inspection",
-      "corridor_id": "COR-010",
-      "section_id": "SEC-0092",
-      "date": "2026-09-03",
-      "start_minute": 0,
-      "end_minute": 150,
-      "duration_minutes": 150,
-      "block_ids": [
-        "BLK-001093",
-        "BLK-001094"
-      ],
-      "assigned_teams": [
-        "TEAM-031"
-      ],
-      "is_bundled": true,
-      "sharing_type": "concurrent",
-      "bundled_with": [
-        "TASK-000001"
-      ],
-      "is_night": true,
-      "risk_score": 11.6,
-      "priority_score": 374.25
-    },
-    {
-      "task_id": "TASK-000435",
-      "asset_id": "AST-120435",
-      "department": "Electrical / TRD",
-      "maintenance_type": "Turnout Maintenance",
-      "corridor_id": "COR-016",
-      "section_id": "SEC-0155",
-      "date": "2026-09-03",
-      "start_minute": 254,
-      "end_minute": 360,
-      "duration_minutes": 106,
-      "block_ids": [
-        "BLK-001851"
-      ],
-      "assigned_teams": [
-        "TEAM-019"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 46.6,
-      "priority_score": 1075.0
-    },
-    {
-      "task_id": "TASK-000463",
-      "asset_id": "AST-120463",
-      "department": "Track / Civil Engineering",
-      "maintenance_type": "Sleeper Replacement",
-      "corridor_id": "COR-007",
-      "section_id": "SEC-0065",
-      "date": "2026-09-03",
-      "start_minute": 120,
-      "end_minute": 291,
-      "duration_minutes": 171,
-      "block_ids": [
-        "BLK-000770",
-        "BLK-000771"
-      ],
-      "assigned_teams": [
-        "TEAM-004"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 88.9,
-      "priority_score": 1901.0
-    },
-    {
-      "task_id": "TASK-000491",
-      "asset_id": "AST-120491",
-      "department": "Electrical / TRD",
-      "maintenance_type": "Ballast Tamping",
-      "corridor_id": "COR-002",
-      "section_id": "SEC-0019",
-      "date": "2026-09-03",
-      "start_minute": 141,
-      "end_minute": 240,
-      "duration_minutes": 99,
-      "block_ids": [
-        "BLK-000218"
-      ],
-      "assigned_teams": [
-        "TEAM-019"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 33.3,
-      "priority_score": 806.0
-    },
-    {
-      "task_id": "TASK-000505",
-      "asset_id": "AST-120505",
-      "department": "Track / Civil Engineering",
-      "maintenance_type": "Traction Motor Inspection",
-      "corridor_id": "COR-002",
-      "section_id": "SEC-0012",
-      "date": "2026-09-03",
-      "start_minute": 1320,
-      "end_minute": 1365,
-      "duration_minutes": 45,
-      "block_ids": [
-        "BLK-000144"
-      ],
-      "assigned_teams": [
-        "TEAM-009"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 7.4,
-      "priority_score": 280.25
-    },
-    {
-      "task_id": "TASK-000519",
-      "asset_id": "AST-120519",
-      "department": "Track / Civil Engineering",
-      "maintenance_type": "Axle Inspection",
-      "corridor_id": "COR-014",
-      "section_id": "SEC-0135",
-      "date": "2026-09-03",
-      "start_minute": 120,
-      "end_minute": 227,
-      "duration_minutes": 107,
-      "block_ids": [
-        "BLK-001610"
-      ],
-      "assigned_teams": [
-        "TEAM-001"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 33.3,
-      "priority_score": 806.0
-    },
-    {
-      "task_id": "TASK-000533",
-      "asset_id": "AST-120533",
-      "department": "Signal & Telecommunications (S&T)",
-      "maintenance_type": "Signal Inspection",
-      "corridor_id": "COR-009",
-      "section_id": "SEC-0088",
-      "date": "2026-09-03",
-      "start_minute": 241,
-      "end_minute": 353,
-      "duration_minutes": 112,
-      "block_ids": [
-        "BLK-001047"
-      ],
-      "assigned_teams": [
-        "TEAM-022"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 3.8,
-      "priority_score": 216.0
-    },
-    {
-      "task_id": "TASK-000547",
-      "asset_id": "AST-120547",
-      "department": "Electrical / TRD",
-      "maintenance_type": "Bridge Inspection",
-      "corridor_id": "COR-019",
-      "section_id": "SEC-0188",
-      "date": "2026-09-03",
-      "start_minute": 60,
-      "end_minute": 203,
-      "duration_minutes": 143,
-      "block_ids": [
-        "BLK-002245",
-        "BLK-002246"
-      ],
-      "assigned_teams": [
-        "TEAM-016"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 36.8,
-      "priority_score": 788.25
-    },
-    {
-      "task_id": "TASK-000561",
-      "asset_id": "AST-120561",
-      "department": "Track / Civil Engineering",
-      "maintenance_type": "Axle Inspection",
-      "corridor_id": "COR-010",
-      "section_id": "SEC-0098",
-      "date": "2026-09-03",
-      "start_minute": 1370,
-      "end_minute": 1440,
-      "duration_minutes": 70,
-      "block_ids": [
-        "BLK-001176"
-      ],
-      "assigned_teams": [
-        "TEAM-009"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 42.8,
-      "priority_score": 876.0
-    },
-    {
-      "task_id": "TASK-000589",
-      "asset_id": "AST-120589",
-      "department": "Signal & Telecommunications (S&T)",
-      "maintenance_type": "Sleeper Replacement",
-      "corridor_id": "COR-004",
-      "section_id": "SEC-0036",
-      "date": "2026-09-03",
-      "start_minute": 1316,
-      "end_minute": 1440,
-      "duration_minutes": 124,
-      "block_ids": [
-        "BLK-000431",
-        "BLK-000432"
-      ],
-      "assigned_teams": [
-        "TEAM-024"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 91.2,
-      "priority_score": 1954.0
-    },
-    {
-      "task_id": "TASK-000617",
-      "asset_id": "AST-120617",
-      "department": "Track / Civil Engineering",
-      "maintenance_type": "Traction Motor Inspection",
-      "corridor_id": "COR-012",
-      "section_id": "SEC-0120",
-      "date": "2026-09-03",
-      "start_minute": 3,
-      "end_minute": 120,
-      "duration_minutes": 117,
-      "block_ids": [
-        "BLK-001429"
-      ],
-      "assigned_teams": [
-        "TEAM-004"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 55.5,
-      "priority_score": 1212.25
-    },
-    {
-      "task_id": "TASK-000631",
-      "asset_id": "AST-120631",
-      "department": "Mechanical / Rolling Stock",
-      "maintenance_type": "Brake Inspection",
-      "corridor_id": "COR-003",
-      "section_id": "SEC-0022",
-      "date": "2026-09-03",
-      "start_minute": 1369,
-      "end_minute": 1440,
-      "duration_minutes": 71,
-      "block_ids": [
-        "BLK-000264"
-      ],
-      "assigned_teams": [
-        "TEAM-033"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 96.3,
-      "priority_score": 2046.0
-    },
-    {
-      "task_id": "TASK-000645",
-      "asset_id": "AST-120645",
-      "department": "Track / Civil Engineering",
-      "maintenance_type": "Turnout Maintenance",
-      "corridor_id": "COR-002",
-      "section_id": "SEC-0014",
-      "date": "2026-09-03",
-      "start_minute": 319,
-      "end_minute": 480,
-      "duration_minutes": 161,
-      "block_ids": [
-        "BLK-000159",
-        "BLK-000160"
-      ],
-      "assigned_teams": [
-        "TEAM-004"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 71.0,
-      "priority_score": 1523.0
-    },
-    {
-      "task_id": "TASK-000673",
-      "asset_id": "AST-120673",
-      "department": "Track / Civil Engineering",
-      "maintenance_type": "Bearing Inspection",
-      "corridor_id": "COR-005",
-      "section_id": "SEC-0042",
-      "date": "2026-09-03",
-      "start_minute": 1200,
-      "end_minute": 1347,
-      "duration_minutes": 147,
-      "block_ids": [
-        "BLK-000503",
-        "BLK-000504"
-      ],
-      "assigned_teams": [
-        "TEAM-006"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 44.6,
-      "priority_score": 943.5
-    },
-    {
-      "task_id": "TASK-000687",
-      "asset_id": "AST-120687",
-      "department": "Electrical / TRD",
-      "maintenance_type": "Substation Maintenance",
-      "corridor_id": "COR-007",
-      "section_id": "SEC-0067",
-      "date": "2026-09-03",
-      "start_minute": 1140,
-      "end_minute": 1285,
-      "duration_minutes": 145,
-      "block_ids": [
-        "BLK-000802",
-        "BLK-000803"
-      ],
-      "assigned_teams": [
-        "TEAM-015"
-      ],
-      "is_bundled": false,
-      "sharing_type": "single",
-      "bundled_with": [],
-      "is_night": true,
-      "risk_score": 7.2,
-      "priority_score": 265.5
-    },
-    {
       "task_id": "TASK-007057",
       "asset_id": "AST-127057",
       "department": "Electrical / TRD",
@@ -1175,14 +364,14 @@
       "corridor_id": "COR-008",
       "section_id": "SEC-0073",
       "date": "2026-09-03",
-      "start_minute": 487,
-      "end_minute": 600,
+      "start_minute": 480,
+      "end_minute": 593,
       "duration_minutes": 113,
       "block_ids": [
         "BLK-000869"
       ],
       "assigned_teams": [
-        "TEAM-020"
+        "TEAM-014"
       ],
       "is_bundled": false,
       "sharing_type": "single",
@@ -1226,12 +415,12 @@
       "corridor_id": "COR-008",
       "section_id": "SEC-0073",
       "date": "2026-09-03",
-      "start_minute": 960,
-      "end_minute": 1114,
+      "start_minute": 1286,
+      "end_minute": 1440,
       "duration_minutes": 154,
       "block_ids": [
-        "BLK-000873",
-        "BLK-000874"
+        "BLK-000875",
+        "BLK-000876"
       ],
       "assigned_teams": [
         "TEAM-003"
@@ -1239,7 +428,7 @@
       "is_bundled": false,
       "sharing_type": "single",
       "bundled_with": [],
-      "is_night": false,
+      "is_night": true,
       "risk_score": 82.0,
       "priority_score": 1770.0
     },
@@ -1258,7 +447,7 @@
         "BLK-000867"
       ],
       "assigned_teams": [
-        "TEAM-001"
+        "TEAM-004"
       ],
       "is_bundled": true,
       "sharing_type": "concurrent",
@@ -1277,20 +466,20 @@
       "corridor_id": "COR-008",
       "section_id": "SEC-0073",
       "date": "2026-09-03",
-      "start_minute": 1305,
-      "end_minute": 1440,
+      "start_minute": 1065,
+      "end_minute": 1200,
       "duration_minutes": 135,
       "block_ids": [
-        "BLK-000875",
-        "BLK-000876"
+        "BLK-000873",
+        "BLK-000874"
       ],
       "assigned_teams": [
-        "TEAM-003"
+        "TEAM-009"
       ],
       "is_bundled": false,
       "sharing_type": "single",
       "bundled_with": [],
-      "is_night": true,
+      "is_night": false,
       "risk_score": 95.4,
       "priority_score": 1931.0
     },
@@ -1309,7 +498,7 @@
         "BLK-000871"
       ],
       "assigned_teams": [
-        "TEAM-017"
+        "TEAM-020"
       ],
       "is_bundled": false,
       "sharing_type": "single",
@@ -1317,6 +506,820 @@
       "is_night": false,
       "risk_score": 12.9,
       "priority_score": 281.0
+    },
+    {
+      "task_id": "TASK-000002",
+      "asset_id": "AST-120002",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Bearing Inspection",
+      "corridor_id": "COR-003",
+      "section_id": "SEC-0028",
+      "date": "2026-09-04",
+      "start_minute": 128,
+      "end_minute": 240,
+      "duration_minutes": 112,
+      "block_ids": [
+        "BLK-002726"
+      ],
+      "assigned_teams": [
+        "TEAM-013"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 1.7,
+      "priority_score": 86.25
+    },
+    {
+      "task_id": "TASK-000030",
+      "asset_id": "AST-120030",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Brake Inspection",
+      "corridor_id": "COR-004",
+      "section_id": "SEC-0034",
+      "date": "2026-09-04",
+      "start_minute": 1080,
+      "end_minute": 1242,
+      "duration_minutes": 162,
+      "block_ids": [
+        "BLK-002806",
+        "BLK-002807"
+      ],
+      "assigned_teams": [
+        "TEAM-033"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 6.9,
+      "priority_score": 279.5
+    },
+    {
+      "task_id": "TASK-000044",
+      "asset_id": "AST-120044",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Transformer Inspection",
+      "corridor_id": "COR-014",
+      "section_id": "SEC-0140",
+      "date": "2026-09-04",
+      "start_minute": 5,
+      "end_minute": 120,
+      "duration_minutes": 115,
+      "block_ids": [
+        "BLK-004069"
+      ],
+      "assigned_teams": [
+        "TEAM-022"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 2.8,
+      "priority_score": 199.0
+    },
+    {
+      "task_id": "TASK-000058",
+      "asset_id": "AST-120058",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Catenary Repair",
+      "corridor_id": "COR-020",
+      "section_id": "SEC-0196",
+      "date": "2026-09-04",
+      "start_minute": 1080,
+      "end_minute": 1230,
+      "duration_minutes": 150,
+      "block_ids": [
+        "BLK-004750",
+        "BLK-004751"
+      ],
+      "assigned_teams": [
+        "TEAM-036"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 3.7,
+      "priority_score": 215.5
+    },
+    {
+      "task_id": "TASK-000072",
+      "asset_id": "AST-120072",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Turnout Maintenance",
+      "corridor_id": "COR-011",
+      "section_id": "SEC-0109",
+      "date": "2026-09-04",
+      "start_minute": 31,
+      "end_minute": 120,
+      "duration_minutes": 89,
+      "block_ids": [
+        "BLK-003697"
+      ],
+      "assigned_teams": [
+        "TEAM-007"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 67.2,
+      "priority_score": 1477.0
+    },
+    {
+      "task_id": "TASK-000086",
+      "asset_id": "AST-120086",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Turnout Maintenance",
+      "corridor_id": "COR-018",
+      "section_id": "SEC-0174",
+      "date": "2026-09-04",
+      "start_minute": 0,
+      "end_minute": 99,
+      "duration_minutes": 99,
+      "block_ids": [
+        "BLK-004477"
+      ],
+      "assigned_teams": [
+        "TEAM-013"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 60.3,
+      "priority_score": 1259.0
+    },
+    {
+      "task_id": "TASK-000100",
+      "asset_id": "AST-120100",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Relay Testing",
+      "corridor_id": "COR-014",
+      "section_id": "SEC-0134",
+      "date": "2026-09-04",
+      "start_minute": 1260,
+      "end_minute": 1309,
+      "duration_minutes": 49,
+      "block_ids": [
+        "BLK-004007"
+      ],
+      "assigned_teams": [
+        "TEAM-021"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 82.5,
+      "priority_score": 1681.5
+    },
+    {
+      "task_id": "TASK-000128",
+      "asset_id": "AST-120128",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Axle Inspection",
+      "corridor_id": "COR-004",
+      "section_id": "SEC-0038",
+      "date": "2026-09-04",
+      "start_minute": 360,
+      "end_minute": 465,
+      "duration_minutes": 105,
+      "block_ids": [
+        "BLK-002848"
+      ],
+      "assigned_teams": [
+        "TEAM-001"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": false,
+      "risk_score": 41.0,
+      "priority_score": 852.25
+    },
+    {
+      "task_id": "TASK-000142",
+      "asset_id": "AST-120142",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Bearing Inspection",
+      "corridor_id": "COR-005",
+      "section_id": "SEC-0043",
+      "date": "2026-09-04",
+      "start_minute": 0,
+      "end_minute": 189,
+      "duration_minutes": 189,
+      "block_ids": [
+        "BLK-002905",
+        "BLK-002906"
+      ],
+      "assigned_teams": [
+        "TEAM-004"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 55.7,
+      "priority_score": 1234.0
+    },
+    {
+      "task_id": "TASK-000156",
+      "asset_id": "AST-120156",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Catenary Repair",
+      "corridor_id": "COR-017",
+      "section_id": "SEC-0170",
+      "date": "2026-09-04",
+      "start_minute": 600,
+      "end_minute": 729,
+      "duration_minutes": 129,
+      "block_ids": [
+        "BLK-004434",
+        "BLK-004435"
+      ],
+      "assigned_teams": [
+        "TEAM-035"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": false,
+      "risk_score": 5.6,
+      "priority_score": 144.25
+    },
+    {
+      "task_id": "TASK-000017",
+      "asset_id": "AST-120017",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Ballast Tamping",
+      "corridor_id": "COR-013",
+      "section_id": "SEC-0129",
+      "date": "2026-09-05",
+      "start_minute": 180,
+      "end_minute": 349,
+      "duration_minutes": 169,
+      "block_ids": [
+        "BLK-006338",
+        "BLK-006339"
+      ],
+      "assigned_teams": [
+        "TEAM-022"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 4.6,
+      "priority_score": 193.5
+    },
+    {
+      "task_id": "TASK-000031",
+      "asset_id": "AST-120031",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Rail Grinding",
+      "corridor_id": "COR-004",
+      "section_id": "SEC-0036",
+      "date": "2026-09-05",
+      "start_minute": 240,
+      "end_minute": 411,
+      "duration_minutes": 171,
+      "block_ids": [
+        "BLK-005223",
+        "BLK-005224"
+      ],
+      "assigned_teams": [
+        "TEAM-004"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 69.3,
+      "priority_score": 1486.0
+    },
+    {
+      "task_id": "TASK-000045",
+      "asset_id": "AST-120045",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Bridge Inspection",
+      "corridor_id": "COR-009",
+      "section_id": "SEC-0087",
+      "date": "2026-09-05",
+      "start_minute": 240,
+      "end_minute": 382,
+      "duration_minutes": 142,
+      "block_ids": [
+        "BLK-005835",
+        "BLK-005836"
+      ],
+      "assigned_teams": [
+        "TEAM-001"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 28.8,
+      "priority_score": 678.25
+    },
+    {
+      "task_id": "TASK-000059",
+      "asset_id": "AST-120059",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Axle Counter Inspection",
+      "corridor_id": "COR-016",
+      "section_id": "SEC-0153",
+      "date": "2026-09-05",
+      "start_minute": 1080,
+      "end_minute": 1228,
+      "duration_minutes": 148,
+      "block_ids": [
+        "BLK-006634",
+        "BLK-006635"
+      ],
+      "assigned_teams": [
+        "TEAM-021"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 3.5,
+      "priority_score": 213.0
+    },
+    {
+      "task_id": "TASK-000073",
+      "asset_id": "AST-120073",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Brake Inspection",
+      "corridor_id": "COR-013",
+      "section_id": "SEC-0130",
+      "date": "2026-09-05",
+      "start_minute": 1080,
+      "end_minute": 1261,
+      "duration_minutes": 181,
+      "block_ids": [
+        "BLK-006358",
+        "BLK-006359"
+      ],
+      "assigned_teams": [
+        "TEAM-015"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 28.9,
+      "priority_score": 680.25
+    },
+    {
+      "task_id": "TASK-000087",
+      "asset_id": "AST-120087",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Bridge Inspection",
+      "corridor_id": "COR-004",
+      "section_id": "SEC-0035",
+      "date": "2026-09-05",
+      "start_minute": 0,
+      "end_minute": 114,
+      "duration_minutes": 114,
+      "block_ids": [
+        "BLK-005209"
+      ],
+      "assigned_teams": [
+        "TEAM-001"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 69.5,
+      "priority_score": 1491.5
+    },
+    {
+      "task_id": "TASK-000101",
+      "asset_id": "AST-120101",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "OHE Inspection",
+      "corridor_id": "COR-014",
+      "section_id": "SEC-0138",
+      "date": "2026-09-05",
+      "start_minute": 1080,
+      "end_minute": 1214,
+      "duration_minutes": 134,
+      "block_ids": [
+        "BLK-006454",
+        "BLK-006455"
+      ],
+      "assigned_teams": [
+        "TEAM-033"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 90.6,
+      "priority_score": 1862.0
+    },
+    {
+      "task_id": "TASK-000115",
+      "asset_id": "AST-120115",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Rail Inspection",
+      "corridor_id": "COR-002",
+      "section_id": "SEC-0012",
+      "date": "2026-09-05",
+      "start_minute": 0,
+      "end_minute": 160,
+      "duration_minutes": 160,
+      "block_ids": [
+        "BLK-004933",
+        "BLK-004934"
+      ],
+      "assigned_teams": [
+        "TEAM-004"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 32.4,
+      "priority_score": 788.0
+    },
+    {
+      "task_id": "TASK-000129",
+      "asset_id": "AST-120129",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Traction Motor Inspection",
+      "corridor_id": "COR-001",
+      "section_id": "SEC-0002",
+      "date": "2026-09-05",
+      "start_minute": 600,
+      "end_minute": 746,
+      "duration_minutes": 146,
+      "block_ids": [
+        "BLK-004818",
+        "BLK-004819"
+      ],
+      "assigned_teams": [
+        "TEAM-026"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": false,
+      "risk_score": 9.0,
+      "priority_score": 311.5
+    },
+    {
+      "task_id": "TASK-000143",
+      "asset_id": "AST-120143",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Ballast Tamping",
+      "corridor_id": "COR-006",
+      "section_id": "SEC-0054",
+      "date": "2026-09-05",
+      "start_minute": 240,
+      "end_minute": 360,
+      "duration_minutes": 120,
+      "block_ids": [
+        "BLK-005439"
+      ],
+      "assigned_teams": [
+        "TEAM-013"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 3.1,
+      "priority_score": 194.25
+    },
+    {
+      "task_id": "TASK-000157",
+      "asset_id": "AST-120157",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Sleeper Replacement",
+      "corridor_id": "COR-003",
+      "section_id": "SEC-0027",
+      "date": "2026-09-05",
+      "start_minute": 302,
+      "end_minute": 474,
+      "duration_minutes": 172,
+      "block_ids": [
+        "BLK-005115",
+        "BLK-005116"
+      ],
+      "assigned_teams": [
+        "TEAM-037"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 3.5,
+      "priority_score": 110.0
+    },
+    {
+      "task_id": "TASK-000004",
+      "asset_id": "AST-120004",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Bridge Inspection",
+      "corridor_id": "COR-017",
+      "section_id": "SEC-0168",
+      "date": "2026-09-06",
+      "start_minute": 1200,
+      "end_minute": 1402,
+      "duration_minutes": 202,
+      "block_ids": [
+        "BLK-009215",
+        "BLK-009216"
+      ],
+      "assigned_teams": [
+        "TEAM-006"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 19.6,
+      "priority_score": 473.5
+    },
+    {
+      "task_id": "TASK-000018",
+      "asset_id": "AST-120018",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Bridge Inspection",
+      "corridor_id": "COR-007",
+      "section_id": "SEC-0064",
+      "date": "2026-09-06",
+      "start_minute": 0,
+      "end_minute": 147,
+      "duration_minutes": 147,
+      "block_ids": [
+        "BLK-007957",
+        "BLK-007958"
+      ],
+      "assigned_teams": [
+        "TEAM-022",
+        "TEAM-028"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 48.7,
+      "priority_score": 1114.0
+    },
+    {
+      "task_id": "TASK-000032",
+      "asset_id": "AST-120032",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "OHE Inspection",
+      "corridor_id": "COR-017",
+      "section_id": "SEC-0162",
+      "date": "2026-09-06",
+      "start_minute": 0,
+      "end_minute": 112,
+      "duration_minutes": 112,
+      "block_ids": [
+        "BLK-009133"
+      ],
+      "assigned_teams": [
+        "TEAM-004"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 62.0,
+      "priority_score": 1290.0
+    },
+    {
+      "task_id": "TASK-000046",
+      "asset_id": "AST-120046",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Signal Inspection",
+      "corridor_id": "COR-010",
+      "section_id": "SEC-0093",
+      "date": "2026-09-06",
+      "start_minute": 17,
+      "end_minute": 120,
+      "duration_minutes": 103,
+      "block_ids": [
+        "BLK-008305"
+      ],
+      "assigned_teams": [
+        "TEAM-001"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 59.1,
+      "priority_score": 1233.5
+    },
+    {
+      "task_id": "TASK-000060",
+      "asset_id": "AST-120060",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Telecom Inspection",
+      "corridor_id": "COR-019",
+      "section_id": "SEC-0189",
+      "date": "2026-09-06",
+      "start_minute": 1080,
+      "end_minute": 1215,
+      "duration_minutes": 135,
+      "block_ids": [
+        "BLK-009466",
+        "BLK-009467"
+      ],
+      "assigned_teams": [
+        "TEAM-003"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 52.3,
+      "priority_score": 1178.25
+    },
+    {
+      "task_id": "TASK-000074",
+      "asset_id": "AST-120074",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Traction Motor Inspection",
+      "corridor_id": "COR-010",
+      "section_id": "SEC-0093",
+      "date": "2026-09-06",
+      "start_minute": 150,
+      "end_minute": 304,
+      "duration_minutes": 154,
+      "block_ids": [
+        "BLK-008306",
+        "BLK-008307"
+      ],
+      "assigned_teams": [
+        "TEAM-028"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 15.1,
+      "priority_score": 382.0
+    },
+    {
+      "task_id": "TASK-000088",
+      "asset_id": "AST-120088",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Sleeper Replacement",
+      "corridor_id": "COR-002",
+      "section_id": "SEC-0019",
+      "date": "2026-09-06",
+      "start_minute": 60,
+      "end_minute": 219,
+      "duration_minutes": 159,
+      "block_ids": [
+        "BLK-007417",
+        "BLK-007418"
+      ],
+      "assigned_teams": [
+        "TEAM-010"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 48.2,
+      "priority_score": 1086.25
+    },
+    {
+      "task_id": "TASK-000102",
+      "asset_id": "AST-120102",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Interlocking Maintenance",
+      "corridor_id": "COR-010",
+      "section_id": "SEC-0096",
+      "date": "2026-09-06",
+      "start_minute": 120,
+      "end_minute": 247,
+      "duration_minutes": 127,
+      "block_ids": [
+        "BLK-008342",
+        "BLK-008343"
+      ],
+      "assigned_teams": [
+        "TEAM-025"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 14.9,
+      "priority_score": 430.25
+    },
+    {
+      "task_id": "TASK-000116",
+      "asset_id": "AST-120116",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Ballast Tamping",
+      "corridor_id": "COR-011",
+      "section_id": "SEC-0101",
+      "date": "2026-09-06",
+      "start_minute": 240,
+      "end_minute": 359,
+      "duration_minutes": 119,
+      "block_ids": [
+        "BLK-008403"
+      ],
+      "assigned_teams": [
+        "TEAM-034"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 17.5,
+      "priority_score": 402.25
+    },
+    {
+      "task_id": "TASK-000130",
+      "asset_id": "AST-120130",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Switchgear Inspection",
+      "corridor_id": "COR-011",
+      "section_id": "SEC-0101",
+      "date": "2026-09-06",
+      "start_minute": 1110,
+      "end_minute": 1285,
+      "duration_minutes": 175,
+      "block_ids": [
+        "BLK-008410",
+        "BLK-008411"
+      ],
+      "assigned_teams": [
+        "TEAM-039"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 13.9,
+      "priority_score": 329.5
+    },
+    {
+      "task_id": "TASK-000144",
+      "asset_id": "AST-120144",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Bearing Inspection",
+      "corridor_id": "COR-005",
+      "section_id": "SEC-0043",
+      "date": "2026-09-06",
+      "start_minute": 1367,
+      "end_minute": 1440,
+      "duration_minutes": 73,
+      "block_ids": [
+        "BLK-007716"
+      ],
+      "assigned_teams": [
+        "TEAM-033"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 1.6,
+      "priority_score": 82.0
+    },
+    {
+      "task_id": "TASK-000158",
+      "asset_id": "AST-120158",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Ballast Tamping",
+      "corridor_id": "COR-011",
+      "section_id": "SEC-0105",
+      "date": "2026-09-06",
+      "start_minute": 83,
+      "end_minute": 240,
+      "duration_minutes": 157,
+      "block_ids": [
+        "BLK-008449",
+        "BLK-008450"
+      ],
+      "assigned_teams": [
+        "TEAM-013"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 16.3,
+      "priority_score": 426.0
     },
     {
       "task_id": "TASK-000005",
@@ -1342,6 +1345,2769 @@
       "is_night": true,
       "risk_score": 81.0,
       "priority_score": 1762.25
+    },
+    {
+      "task_id": "TASK-000019",
+      "asset_id": "AST-120019",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Point Machine Maintenance",
+      "corridor_id": "COR-018",
+      "section_id": "SEC-0171",
+      "date": "2026-09-07",
+      "start_minute": 136,
+      "end_minute": 240,
+      "duration_minutes": 104,
+      "block_ids": [
+        "BLK-011642"
+      ],
+      "assigned_teams": [
+        "TEAM-022"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 91.5,
+      "priority_score": 1930.0
+    },
+    {
+      "task_id": "TASK-000033",
+      "asset_id": "AST-120033",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Switchgear Inspection",
+      "corridor_id": "COR-020",
+      "section_id": "SEC-0196",
+      "date": "2026-09-07",
+      "start_minute": 338,
+      "end_minute": 480,
+      "duration_minutes": 142,
+      "block_ids": [
+        "BLK-011943",
+        "BLK-011944"
+      ],
+      "assigned_teams": [
+        "TEAM-031"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 4.8,
+      "priority_score": 219.0
+    },
+    {
+      "task_id": "TASK-000047",
+      "asset_id": "AST-120047",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Sleeper Replacement",
+      "corridor_id": "COR-014",
+      "section_id": "SEC-0139",
+      "date": "2026-09-07",
+      "start_minute": 1140,
+      "end_minute": 1303,
+      "duration_minutes": 163,
+      "block_ids": [
+        "BLK-011266",
+        "BLK-011267"
+      ],
+      "assigned_teams": [
+        "TEAM-009"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 97.2,
+      "priority_score": 2005.5
+    },
+    {
+      "task_id": "TASK-000061",
+      "asset_id": "AST-120061",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Sleeper Replacement",
+      "corridor_id": "COR-013",
+      "section_id": "SEC-0123",
+      "date": "2026-09-07",
+      "start_minute": 1214,
+      "end_minute": 1320,
+      "duration_minutes": 106,
+      "block_ids": [
+        "BLK-011075"
+      ],
+      "assigned_teams": [
+        "TEAM-003"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 15.3,
+      "priority_score": 407.5
+    },
+    {
+      "task_id": "TASK-000075",
+      "asset_id": "AST-120075",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Ballast Tamping",
+      "corridor_id": "COR-003",
+      "section_id": "SEC-0028",
+      "date": "2026-09-07",
+      "start_minute": 16,
+      "end_minute": 120,
+      "duration_minutes": 104,
+      "block_ids": [
+        "BLK-009925"
+      ],
+      "assigned_teams": [
+        "TEAM-016"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 10.0,
+      "priority_score": 300.0
+    },
+    {
+      "task_id": "TASK-000089",
+      "asset_id": "AST-120089",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Relay Testing",
+      "corridor_id": "COR-019",
+      "section_id": "SEC-0186",
+      "date": "2026-09-07",
+      "start_minute": 1263,
+      "end_minute": 1440,
+      "duration_minutes": 177,
+      "block_ids": [
+        "BLK-011831",
+        "BLK-011832"
+      ],
+      "assigned_teams": [
+        "TEAM-021"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 21.5,
+      "priority_score": 530.0
+    },
+    {
+      "task_id": "TASK-000131",
+      "asset_id": "AST-120131",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Rail Inspection",
+      "corridor_id": "COR-009",
+      "section_id": "SEC-0083",
+      "date": "2026-09-07",
+      "start_minute": 120,
+      "end_minute": 302,
+      "duration_minutes": 182,
+      "block_ids": [
+        "BLK-010586",
+        "BLK-010587"
+      ],
+      "assigned_teams": [
+        "TEAM-007"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 8.5,
+      "priority_score": 302.25
+    },
+    {
+      "task_id": "TASK-000145",
+      "asset_id": "AST-120145",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Rail Inspection",
+      "corridor_id": "COR-015",
+      "section_id": "SEC-0148",
+      "date": "2026-09-07",
+      "start_minute": 60,
+      "end_minute": 234,
+      "duration_minutes": 174,
+      "block_ids": [
+        "BLK-011365",
+        "BLK-011366"
+      ],
+      "assigned_teams": [
+        "TEAM-001"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 2.6,
+      "priority_score": 112.0
+    },
+    {
+      "task_id": "TASK-000159",
+      "asset_id": "AST-120159",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Rail Inspection",
+      "corridor_id": "COR-012",
+      "section_id": "SEC-0114",
+      "date": "2026-09-07",
+      "start_minute": 294,
+      "end_minute": 480,
+      "duration_minutes": 186,
+      "block_ids": [
+        "BLK-010959",
+        "BLK-010960"
+      ],
+      "assigned_teams": [
+        "TEAM-022"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 20.4,
+      "priority_score": 510.25
+    },
+    {
+      "task_id": "TASK-000006",
+      "asset_id": "AST-120006",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Substation Maintenance",
+      "corridor_id": "COR-002",
+      "section_id": "SEC-0016",
+      "date": "2026-09-08",
+      "start_minute": 12,
+      "end_minute": 120,
+      "duration_minutes": 108,
+      "block_ids": [
+        "BLK-012181"
+      ],
+      "assigned_teams": [
+        "TEAM-016"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 88.4,
+      "priority_score": 1849.5
+    },
+    {
+      "task_id": "TASK-000020",
+      "asset_id": "AST-120020",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Bearing Inspection",
+      "corridor_id": "COR-017",
+      "section_id": "SEC-0163",
+      "date": "2026-09-08",
+      "start_minute": 1080,
+      "end_minute": 1230,
+      "duration_minutes": 150,
+      "block_ids": [
+        "BLK-013954",
+        "BLK-013955"
+      ],
+      "assigned_teams": [
+        "TEAM-024",
+        "TEAM-027"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 4.4,
+      "priority_score": 161.0
+    },
+    {
+      "task_id": "TASK-000034",
+      "asset_id": "AST-120034",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Rail Inspection",
+      "corridor_id": "COR-016",
+      "section_id": "SEC-0155",
+      "date": "2026-09-08",
+      "start_minute": 0,
+      "end_minute": 109,
+      "duration_minutes": 109,
+      "block_ids": [
+        "BLK-013849"
+      ],
+      "assigned_teams": [
+        "TEAM-007"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 98.1,
+      "priority_score": 2082.0
+    },
+    {
+      "task_id": "TASK-000048",
+      "asset_id": "AST-120048",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Bearing Inspection",
+      "corridor_id": "COR-006",
+      "section_id": "SEC-0055",
+      "date": "2026-09-08",
+      "start_minute": 360,
+      "end_minute": 436,
+      "duration_minutes": 76,
+      "block_ids": [
+        "BLK-012652"
+      ],
+      "assigned_teams": [
+        "TEAM-001"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": false,
+      "risk_score": 43.4,
+      "priority_score": 939.5
+    },
+    {
+      "task_id": "TASK-000062",
+      "asset_id": "AST-120062",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Feeder Maintenance",
+      "corridor_id": "COR-003",
+      "section_id": "SEC-0028",
+      "date": "2026-09-08",
+      "start_minute": 1249,
+      "end_minute": 1440,
+      "duration_minutes": 191,
+      "block_ids": [
+        "BLK-012335",
+        "BLK-012336"
+      ],
+      "assigned_teams": [
+        "TEAM-039"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 12.8,
+      "priority_score": 326.0
+    },
+    {
+      "task_id": "TASK-000076",
+      "asset_id": "AST-120076",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Signal Inspection",
+      "corridor_id": "COR-012",
+      "section_id": "SEC-0113",
+      "date": "2026-09-08",
+      "start_minute": 18,
+      "end_minute": 120,
+      "duration_minutes": 102,
+      "block_ids": [
+        "BLK-013345"
+      ],
+      "assigned_teams": [
+        "TEAM-013"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 12.5,
+      "priority_score": 333.0
+    },
+    {
+      "task_id": "TASK-000090",
+      "asset_id": "AST-120090",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Rail Inspection",
+      "corridor_id": "COR-008",
+      "section_id": "SEC-0080",
+      "date": "2026-09-08",
+      "start_minute": 120,
+      "end_minute": 336,
+      "duration_minutes": 216,
+      "block_ids": [
+        "BLK-012950",
+        "BLK-012951"
+      ],
+      "assigned_teams": [
+        "TEAM-013"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 74.4,
+      "priority_score": 1591.0
+    },
+    {
+      "task_id": "TASK-000104",
+      "asset_id": "AST-120104",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Rail Inspection",
+      "corridor_id": "COR-006",
+      "section_id": "SEC-0052",
+      "date": "2026-09-08",
+      "start_minute": 1200,
+      "end_minute": 1337,
+      "duration_minutes": 137,
+      "block_ids": [
+        "BLK-012623",
+        "BLK-012624"
+      ],
+      "assigned_teams": [
+        "TEAM-009"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 39.3,
+      "priority_score": 869.0
+    },
+    {
+      "task_id": "TASK-000118",
+      "asset_id": "AST-120118",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Ballast Tamping",
+      "corridor_id": "COR-009",
+      "section_id": "SEC-0089",
+      "date": "2026-09-08",
+      "start_minute": 0,
+      "end_minute": 142,
+      "duration_minutes": 142,
+      "block_ids": [
+        "BLK-013057",
+        "BLK-013058"
+      ],
+      "assigned_teams": [
+        "TEAM-019"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 11.7,
+      "priority_score": 375.5
+    },
+    {
+      "task_id": "TASK-000132",
+      "asset_id": "AST-120132",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Ballast Tamping",
+      "corridor_id": "COR-019",
+      "section_id": "SEC-0190",
+      "date": "2026-09-08",
+      "start_minute": 35,
+      "end_minute": 240,
+      "duration_minutes": 205,
+      "block_ids": [
+        "BLK-014269",
+        "BLK-014270"
+      ],
+      "assigned_teams": [
+        "TEAM-001"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 91.8,
+      "priority_score": 1968.25
+    },
+    {
+      "task_id": "TASK-000146",
+      "asset_id": "AST-120146",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Sleeper Replacement",
+      "corridor_id": "COR-010",
+      "section_id": "SEC-0093",
+      "date": "2026-09-08",
+      "start_minute": 111,
+      "end_minute": 240,
+      "duration_minutes": 129,
+      "block_ids": [
+        "BLK-013105",
+        "BLK-013106"
+      ],
+      "assigned_teams": [
+        "TEAM-022",
+        "TEAM-025"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 6.7,
+      "priority_score": 216.25
+    },
+    {
+      "task_id": "TASK-000160",
+      "asset_id": "AST-120160",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Bridge Inspection",
+      "corridor_id": "COR-019",
+      "section_id": "SEC-0184",
+      "date": "2026-09-08",
+      "start_minute": 960,
+      "end_minute": 1087,
+      "duration_minutes": 127,
+      "block_ids": [
+        "BLK-014205",
+        "BLK-014206"
+      ],
+      "assigned_teams": [
+        "TEAM-015"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": false,
+      "risk_score": 24.5,
+      "priority_score": 563.0
+    },
+    {
+      "task_id": "TASK-000021",
+      "asset_id": "AST-120021",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Axle Inspection",
+      "corridor_id": "COR-003",
+      "section_id": "SEC-0022",
+      "date": "2026-09-09",
+      "start_minute": 1349,
+      "end_minute": 1440,
+      "duration_minutes": 91,
+      "block_ids": [
+        "BLK-014664"
+      ],
+      "assigned_teams": [
+        "TEAM-003"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 63.0,
+      "priority_score": 1343.0
+    },
+    {
+      "task_id": "TASK-000035",
+      "asset_id": "AST-120035",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Point Machine Maintenance",
+      "corridor_id": "COR-014",
+      "section_id": "SEC-0138",
+      "date": "2026-09-09",
+      "start_minute": 60,
+      "end_minute": 190,
+      "duration_minutes": 130,
+      "block_ids": [
+        "BLK-016045",
+        "BLK-016046"
+      ],
+      "assigned_teams": [
+        "TEAM-022",
+        "TEAM-025"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 48.1,
+      "priority_score": 1043.5
+    },
+    {
+      "task_id": "TASK-000049",
+      "asset_id": "AST-120049",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Rail Grinding",
+      "corridor_id": "COR-016",
+      "section_id": "SEC-0160",
+      "date": "2026-09-09",
+      "start_minute": 1311,
+      "end_minute": 1440,
+      "duration_minutes": 129,
+      "block_ids": [
+        "BLK-016319",
+        "BLK-016320"
+      ],
+      "assigned_teams": [
+        "TEAM-039"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 55.1,
+      "priority_score": 1243.5
+    },
+    {
+      "task_id": "TASK-000063",
+      "asset_id": "AST-120063",
+      "department": "Electrical / TRD",
+      "maintenance_type": "OHE Inspection",
+      "corridor_id": "COR-014",
+      "section_id": "SEC-0133",
+      "date": "2026-09-09",
+      "start_minute": 351,
+      "end_minute": 480,
+      "duration_minutes": 129,
+      "block_ids": [
+        "BLK-015987",
+        "BLK-015988"
+      ],
+      "assigned_teams": [
+        "TEAM-013"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 93.9,
+      "priority_score": 1958.0
+    },
+    {
+      "task_id": "TASK-000077",
+      "asset_id": "AST-120077",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Rail Inspection",
+      "corridor_id": "COR-014",
+      "section_id": "SEC-0139",
+      "date": "2026-09-09",
+      "start_minute": 180,
+      "end_minute": 353,
+      "duration_minutes": 173,
+      "block_ids": [
+        "BLK-016058",
+        "BLK-016059"
+      ],
+      "assigned_teams": [
+        "TEAM-007"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 64.6,
+      "priority_score": 1414.25
+    },
+    {
+      "task_id": "TASK-000091",
+      "asset_id": "AST-120091",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Rail Grinding",
+      "corridor_id": "COR-004",
+      "section_id": "SEC-0040",
+      "date": "2026-09-09",
+      "start_minute": 240,
+      "end_minute": 403,
+      "duration_minutes": 163,
+      "block_ids": [
+        "BLK-014871",
+        "BLK-014872"
+      ],
+      "assigned_teams": [
+        "TEAM-019"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 77.0,
+      "priority_score": 1681.5
+    },
+    {
+      "task_id": "TASK-000105",
+      "asset_id": "AST-120105",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Bridge Inspection",
+      "corridor_id": "COR-007",
+      "section_id": "SEC-0063",
+      "date": "2026-09-09",
+      "start_minute": 960,
+      "end_minute": 1151,
+      "duration_minutes": 191,
+      "block_ids": [
+        "BLK-015153",
+        "BLK-015154"
+      ],
+      "assigned_teams": [
+        "TEAM-021"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": false,
+      "risk_score": 4.0,
+      "priority_score": 202.25
+    },
+    {
+      "task_id": "TASK-000119",
+      "asset_id": "AST-120119",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Brake Inspection",
+      "corridor_id": "COR-011",
+      "section_id": "SEC-0102",
+      "date": "2026-09-09",
+      "start_minute": 1333,
+      "end_minute": 1440,
+      "duration_minutes": 107,
+      "block_ids": [
+        "BLK-015624"
+      ],
+      "assigned_teams": [
+        "TEAM-036"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 94.9,
+      "priority_score": 1978.0
+    },
+    {
+      "task_id": "TASK-000147",
+      "asset_id": "AST-120147",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Switchgear Inspection",
+      "corridor_id": "COR-003",
+      "section_id": "SEC-0021",
+      "date": "2026-09-09",
+      "start_minute": 57,
+      "end_minute": 240,
+      "duration_minutes": 183,
+      "block_ids": [
+        "BLK-014641",
+        "BLK-014642"
+      ],
+      "assigned_teams": [
+        "TEAM-028"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 52.0,
+      "priority_score": 1121.5
+    },
+    {
+      "task_id": "TASK-000161",
+      "asset_id": "AST-120161",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Ballast Tamping",
+      "corridor_id": "COR-012",
+      "section_id": "SEC-0120",
+      "date": "2026-09-09",
+      "start_minute": 120,
+      "end_minute": 264,
+      "duration_minutes": 144,
+      "block_ids": [
+        "BLK-015830",
+        "BLK-015831"
+      ],
+      "assigned_teams": [
+        "TEAM-013"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 4.9,
+      "priority_score": 228.0
+    },
+    {
+      "task_id": "TASK-000008",
+      "asset_id": "AST-120008",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Wheelset Inspection",
+      "corridor_id": "COR-017",
+      "section_id": "SEC-0163",
+      "date": "2026-09-10",
+      "start_minute": 120,
+      "end_minute": 196,
+      "duration_minutes": 76,
+      "block_ids": [
+        "BLK-018746"
+      ],
+      "assigned_teams": [
+        "TEAM-031"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 71.1,
+      "priority_score": 1544.25
+    },
+    {
+      "task_id": "TASK-000022",
+      "asset_id": "AST-120022",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Bearing Inspection",
+      "corridor_id": "COR-003",
+      "section_id": "SEC-0026",
+      "date": "2026-09-10",
+      "start_minute": 120,
+      "end_minute": 230,
+      "duration_minutes": 110,
+      "block_ids": [
+        "BLK-017102"
+      ],
+      "assigned_teams": [
+        "TEAM-004"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 18.8,
+      "priority_score": 506.0
+    },
+    {
+      "task_id": "TASK-000036",
+      "asset_id": "AST-120036",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Signal Inspection",
+      "corridor_id": "COR-013",
+      "section_id": "SEC-0122",
+      "date": "2026-09-10",
+      "start_minute": 1320,
+      "end_minute": 1423,
+      "duration_minutes": 103,
+      "block_ids": [
+        "BLK-018264"
+      ],
+      "assigned_teams": [
+        "TEAM-003"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 37.7,
+      "priority_score": 844.0
+    },
+    {
+      "task_id": "TASK-000050",
+      "asset_id": "AST-120050",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Brake Inspection",
+      "corridor_id": "COR-007",
+      "section_id": "SEC-0065",
+      "date": "2026-09-10",
+      "start_minute": 1220,
+      "end_minute": 1320,
+      "duration_minutes": 100,
+      "block_ids": [
+        "BLK-017579"
+      ],
+      "assigned_teams": [
+        "TEAM-027"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 6.6,
+      "priority_score": 264.25
+    },
+    {
+      "task_id": "TASK-000064",
+      "asset_id": "AST-120064",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Coach Equipment Maintenance",
+      "corridor_id": "COR-012",
+      "section_id": "SEC-0111",
+      "date": "2026-09-10",
+      "start_minute": 1320,
+      "end_minute": 1418,
+      "duration_minutes": 98,
+      "block_ids": [
+        "BLK-018132"
+      ],
+      "assigned_teams": [
+        "TEAM-015"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 5.1,
+      "priority_score": 193.5
+    },
+    {
+      "task_id": "TASK-000078",
+      "asset_id": "AST-120078",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Ballast Tamping",
+      "corridor_id": "COR-004",
+      "section_id": "SEC-0031",
+      "date": "2026-09-10",
+      "start_minute": 289,
+      "end_minute": 473,
+      "duration_minutes": 184,
+      "block_ids": [
+        "BLK-017163",
+        "BLK-017164"
+      ],
+      "assigned_teams": [
+        "TEAM-031"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 49.2,
+      "priority_score": 1074.0
+    },
+    {
+      "task_id": "TASK-000092",
+      "asset_id": "AST-120092",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Transformer Inspection",
+      "corridor_id": "COR-011",
+      "section_id": "SEC-0110",
+      "date": "2026-09-10",
+      "start_minute": 60,
+      "end_minute": 111,
+      "duration_minutes": 51,
+      "block_ids": [
+        "BLK-018109"
+      ],
+      "assigned_teams": [
+        "TEAM-031"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 27.6,
+      "priority_score": 643.5
+    },
+    {
+      "task_id": "TASK-000106",
+      "asset_id": "AST-120106",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Rail Inspection",
+      "corridor_id": "COR-006",
+      "section_id": "SEC-0052",
+      "date": "2026-09-10",
+      "start_minute": 0,
+      "end_minute": 139,
+      "duration_minutes": 139,
+      "block_ids": [
+        "BLK-017413",
+        "BLK-017414"
+      ],
+      "assigned_teams": [
+        "TEAM-001"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 39.7,
+      "priority_score": 884.0
+    },
+    {
+      "task_id": "TASK-000120",
+      "asset_id": "AST-120120",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Axle Inspection",
+      "corridor_id": "COR-003",
+      "section_id": "SEC-0028",
+      "date": "2026-09-10",
+      "start_minute": 1267,
+      "end_minute": 1320,
+      "duration_minutes": 53,
+      "block_ids": [
+        "BLK-017135"
+      ],
+      "assigned_teams": [
+        "TEAM-015"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 91.9,
+      "priority_score": 1929.5
+    },
+    {
+      "task_id": "TASK-000134",
+      "asset_id": "AST-120134",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Sleeper Replacement",
+      "corridor_id": "COR-019",
+      "section_id": "SEC-0186",
+      "date": "2026-09-10",
+      "start_minute": 1238,
+      "end_minute": 1440,
+      "duration_minutes": 202,
+      "block_ids": [
+        "BLK-019031",
+        "BLK-019032"
+      ],
+      "assigned_teams": [
+        "TEAM-021"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 32.2,
+      "priority_score": 744.0
+    },
+    {
+      "task_id": "TASK-000148",
+      "asset_id": "AST-120148",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Bridge Inspection",
+      "corridor_id": "COR-001",
+      "section_id": "SEC-0010",
+      "date": "2026-09-10",
+      "start_minute": 180,
+      "end_minute": 326,
+      "duration_minutes": 146,
+      "block_ids": [
+        "BLK-016910",
+        "BLK-016911"
+      ],
+      "assigned_teams": [
+        "TEAM-022"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 20.0,
+      "priority_score": 491.5
+    },
+    {
+      "task_id": "TASK-000162",
+      "asset_id": "AST-120162",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Telecom Inspection",
+      "corridor_id": "COR-001",
+      "section_id": "SEC-0001",
+      "date": "2026-09-10",
+      "start_minute": 0,
+      "end_minute": 185,
+      "duration_minutes": 185,
+      "block_ids": [
+        "BLK-016801",
+        "BLK-016802"
+      ],
+      "assigned_teams": [
+        "TEAM-007"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 51.7,
+      "priority_score": 1157.0
+    },
+    {
+      "task_id": "TASK-000009",
+      "asset_id": "AST-120009",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Turnout Maintenance",
+      "corridor_id": "COR-015",
+      "section_id": "SEC-0141",
+      "date": "2026-09-11",
+      "start_minute": 245,
+      "end_minute": 401,
+      "duration_minutes": 156,
+      "block_ids": [
+        "BLK-020883",
+        "BLK-020884"
+      ],
+      "assigned_teams": [
+        "TEAM-004"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 76.1,
+      "priority_score": 1625.0
+    },
+    {
+      "task_id": "TASK-000023",
+      "asset_id": "AST-120023",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Bridge Inspection",
+      "corridor_id": "COR-005",
+      "section_id": "SEC-0042",
+      "date": "2026-09-11",
+      "start_minute": 1268,
+      "end_minute": 1440,
+      "duration_minutes": 172,
+      "block_ids": [
+        "BLK-019703",
+        "BLK-019704"
+      ],
+      "assigned_teams": [
+        "TEAM-039"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 68.7,
+      "priority_score": 1506.25
+    },
+    {
+      "task_id": "TASK-000037",
+      "asset_id": "AST-120037",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Wheelset Inspection",
+      "corridor_id": "COR-005",
+      "section_id": "SEC-0041",
+      "date": "2026-09-11",
+      "start_minute": 240,
+      "end_minute": 317,
+      "duration_minutes": 77,
+      "block_ids": [
+        "BLK-019683"
+      ],
+      "assigned_teams": [
+        "TEAM-001"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 93.1,
+      "priority_score": 1964.25
+    },
+    {
+      "task_id": "TASK-000051",
+      "asset_id": "AST-120051",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Substation Maintenance",
+      "corridor_id": "COR-003",
+      "section_id": "SEC-0023",
+      "date": "2026-09-11",
+      "start_minute": 1320,
+      "end_minute": 1440,
+      "duration_minutes": 120,
+      "block_ids": [
+        "BLK-019476"
+      ],
+      "assigned_teams": [
+        "TEAM-024"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 95.3,
+      "priority_score": 2006.0
+    },
+    {
+      "task_id": "TASK-000065",
+      "asset_id": "AST-120065",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Turnout Maintenance",
+      "corridor_id": "COR-018",
+      "section_id": "SEC-0171",
+      "date": "2026-09-11",
+      "start_minute": 1209,
+      "end_minute": 1383,
+      "duration_minutes": 174,
+      "block_ids": [
+        "BLK-021251",
+        "BLK-021252"
+      ],
+      "assigned_teams": [
+        "TEAM-021"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 59.1,
+      "priority_score": 1282.0
+    },
+    {
+      "task_id": "TASK-000079",
+      "asset_id": "AST-120079",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Rail Inspection",
+      "corridor_id": "COR-008",
+      "section_id": "SEC-0074",
+      "date": "2026-09-11",
+      "start_minute": 1200,
+      "end_minute": 1368,
+      "duration_minutes": 168,
+      "block_ids": [
+        "BLK-020087",
+        "BLK-020088"
+      ],
+      "assigned_teams": [
+        "TEAM-033"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 7.1,
+      "priority_score": 284.25
+    },
+    {
+      "task_id": "TASK-000093",
+      "asset_id": "AST-120093",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Sleeper Replacement",
+      "corridor_id": "COR-003",
+      "section_id": "SEC-0021",
+      "date": "2026-09-11",
+      "start_minute": 0,
+      "end_minute": 135,
+      "duration_minutes": 135,
+      "block_ids": [
+        "BLK-019441",
+        "BLK-019442"
+      ],
+      "assigned_teams": [
+        "TEAM-025",
+        "TEAM-028"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 59.0,
+      "priority_score": 1310.0
+    },
+    {
+      "task_id": "TASK-000107",
+      "asset_id": "AST-120107",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Coach Equipment Maintenance",
+      "corridor_id": "COR-006",
+      "section_id": "SEC-0057",
+      "date": "2026-09-11",
+      "start_minute": 240,
+      "end_minute": 374,
+      "duration_minutes": 134,
+      "block_ids": [
+        "BLK-019875",
+        "BLK-019876"
+      ],
+      "assigned_teams": [
+        "TEAM-022"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 19.2,
+      "priority_score": 507.0
+    },
+    {
+      "task_id": "TASK-000121",
+      "asset_id": "AST-120121",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Ballast Tamping",
+      "corridor_id": "COR-016",
+      "section_id": "SEC-0160",
+      "date": "2026-09-11",
+      "start_minute": 1306,
+      "end_minute": 1440,
+      "duration_minutes": 134,
+      "block_ids": [
+        "BLK-021119",
+        "BLK-021120"
+      ],
+      "assigned_teams": [
+        "TEAM-015"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 7.9,
+      "priority_score": 258.0
+    },
+    {
+      "task_id": "TASK-000135",
+      "asset_id": "AST-120135",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Telecom Inspection",
+      "corridor_id": "COR-006",
+      "section_id": "SEC-0053",
+      "date": "2026-09-11",
+      "start_minute": 1320,
+      "end_minute": 1406,
+      "duration_minutes": 86,
+      "block_ids": [
+        "BLK-019836"
+      ],
+      "assigned_teams": [
+        "TEAM-018"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 96.3,
+      "priority_score": 2048.25
+    },
+    {
+      "task_id": "TASK-000149",
+      "asset_id": "AST-120149",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Rail Inspection",
+      "corridor_id": "COR-015",
+      "section_id": "SEC-0144",
+      "date": "2026-09-11",
+      "start_minute": 960,
+      "end_minute": 1153,
+      "duration_minutes": 193,
+      "block_ids": [
+        "BLK-020925",
+        "BLK-020926"
+      ],
+      "assigned_teams": [
+        "TEAM-006"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": false,
+      "risk_score": 40.2,
+      "priority_score": 946.25
+    },
+    {
+      "task_id": "TASK-000163",
+      "asset_id": "AST-120163",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Catenary Repair",
+      "corridor_id": "COR-006",
+      "section_id": "SEC-0057",
+      "date": "2026-09-11",
+      "start_minute": 8,
+      "end_minute": 167,
+      "duration_minutes": 159,
+      "block_ids": [
+        "BLK-019873",
+        "BLK-019874"
+      ],
+      "assigned_teams": [
+        "TEAM-031"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 49.6,
+      "priority_score": 1092.0
+    },
+    {
+      "task_id": "TASK-000010",
+      "asset_id": "AST-120010",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Point Machine Maintenance",
+      "corridor_id": "COR-012",
+      "section_id": "SEC-0114",
+      "date": "2026-09-12",
+      "start_minute": 161,
+      "end_minute": 240,
+      "duration_minutes": 79,
+      "block_ids": [
+        "BLK-022958"
+      ],
+      "assigned_teams": [
+        "TEAM-001"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 61.1,
+      "priority_score": 1332.0
+    },
+    {
+      "task_id": "TASK-000024",
+      "asset_id": "AST-120024",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Point Machine Maintenance",
+      "corridor_id": "COR-003",
+      "section_id": "SEC-0028",
+      "date": "2026-09-12",
+      "start_minute": 240,
+      "end_minute": 439,
+      "duration_minutes": 199,
+      "block_ids": [
+        "BLK-021927",
+        "BLK-021928"
+      ],
+      "assigned_teams": [
+        "TEAM-016"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 95.5,
+      "priority_score": 2020.0
+    },
+    {
+      "task_id": "TASK-000038",
+      "asset_id": "AST-120038",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Feeder Maintenance",
+      "corridor_id": "COR-010",
+      "section_id": "SEC-0094",
+      "date": "2026-09-12",
+      "start_minute": 180,
+      "end_minute": 314,
+      "duration_minutes": 134,
+      "block_ids": [
+        "BLK-022718",
+        "BLK-022719"
+      ],
+      "assigned_teams": [
+        "TEAM-034"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 2.5,
+      "priority_score": 162.25
+    },
+    {
+      "task_id": "TASK-000066",
+      "asset_id": "AST-120066",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Rail Grinding",
+      "corridor_id": "COR-007",
+      "section_id": "SEC-0070",
+      "date": "2026-09-12",
+      "start_minute": 0,
+      "end_minute": 112,
+      "duration_minutes": 112,
+      "block_ids": [
+        "BLK-022429"
+      ],
+      "assigned_teams": [
+        "TEAM-013"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 2.1,
+      "priority_score": 184.25
+    },
+    {
+      "task_id": "TASK-000080",
+      "asset_id": "AST-120080",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Rail Inspection",
+      "corridor_id": "COR-013",
+      "section_id": "SEC-0124",
+      "date": "2026-09-12",
+      "start_minute": 1080,
+      "end_minute": 1210,
+      "duration_minutes": 130,
+      "block_ids": [
+        "BLK-023086",
+        "BLK-023087"
+      ],
+      "assigned_teams": [
+        "TEAM-024"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 46.5,
+      "priority_score": 1072.25
+    },
+    {
+      "task_id": "TASK-000108",
+      "asset_id": "AST-120108",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Relay Testing",
+      "corridor_id": "COR-016",
+      "section_id": "SEC-0153",
+      "date": "2026-09-12",
+      "start_minute": 240,
+      "end_minute": 351,
+      "duration_minutes": 111,
+      "block_ids": [
+        "BLK-023427"
+      ],
+      "assigned_teams": [
+        "TEAM-013"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 8.0,
+      "priority_score": 290.0
+    },
+    {
+      "task_id": "TASK-000122",
+      "asset_id": "AST-120122",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Coach Equipment Maintenance",
+      "corridor_id": "COR-019",
+      "section_id": "SEC-0181",
+      "date": "2026-09-12",
+      "start_minute": 240,
+      "end_minute": 397,
+      "duration_minutes": 157,
+      "block_ids": [
+        "BLK-023763",
+        "BLK-023764"
+      ],
+      "assigned_teams": [
+        "TEAM-019"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 1.8,
+      "priority_score": 148.25
+    },
+    {
+      "task_id": "TASK-000136",
+      "asset_id": "AST-120136",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Catenary Repair",
+      "corridor_id": "COR-001",
+      "section_id": "SEC-0008",
+      "date": "2026-09-12",
+      "start_minute": 1320,
+      "end_minute": 1402,
+      "duration_minutes": 82,
+      "block_ids": [
+        "BLK-021696"
+      ],
+      "assigned_teams": [
+        "TEAM-024"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 30.2,
+      "priority_score": 725.5
+    },
+    {
+      "task_id": "TASK-000150",
+      "asset_id": "AST-120150",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Interlocking Maintenance",
+      "corridor_id": "COR-014",
+      "section_id": "SEC-0134",
+      "date": "2026-09-12",
+      "start_minute": 1223,
+      "end_minute": 1320,
+      "duration_minutes": 97,
+      "block_ids": [
+        "BLK-023207"
+      ],
+      "assigned_teams": [
+        "TEAM-003"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 33.4,
+      "priority_score": 800.25
+    },
+    {
+      "task_id": "TASK-000164",
+      "asset_id": "AST-120164",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Sleeper Replacement",
+      "corridor_id": "COR-012",
+      "section_id": "SEC-0117",
+      "date": "2026-09-12",
+      "start_minute": 1305,
+      "end_minute": 1440,
+      "duration_minutes": 135,
+      "block_ids": [
+        "BLK-023003",
+        "BLK-023004"
+      ],
+      "assigned_teams": [
+        "TEAM-033"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 3.2,
+      "priority_score": 196.25
+    },
+    {
+      "task_id": "TASK-000011",
+      "asset_id": "AST-120011",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Turnout Maintenance",
+      "corridor_id": "COR-013",
+      "section_id": "SEC-0125",
+      "date": "2026-09-13",
+      "start_minute": 120,
+      "end_minute": 229,
+      "duration_minutes": 109,
+      "block_ids": [
+        "BLK-025490"
+      ],
+      "assigned_teams": [
+        "TEAM-034"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 4.5,
+      "priority_score": 211.5
+    },
+    {
+      "task_id": "TASK-000025",
+      "asset_id": "AST-120025",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Bearing Inspection",
+      "corridor_id": "COR-011",
+      "section_id": "SEC-0110",
+      "date": "2026-09-13",
+      "start_minute": 1186,
+      "end_minute": 1320,
+      "duration_minutes": 134,
+      "block_ids": [
+        "BLK-025318",
+        "BLK-025319"
+      ],
+      "assigned_teams": [
+        "TEAM-003"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 49.1,
+      "priority_score": 1105.0
+    },
+    {
+      "task_id": "TASK-000039",
+      "asset_id": "AST-120039",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Interlocking Maintenance",
+      "corridor_id": "COR-019",
+      "section_id": "SEC-0183",
+      "date": "2026-09-13",
+      "start_minute": 240,
+      "end_minute": 412,
+      "duration_minutes": 172,
+      "block_ids": [
+        "BLK-026187",
+        "BLK-026188"
+      ],
+      "assigned_teams": [
+        "TEAM-001"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 88.6,
+      "priority_score": 1894.25
+    },
+    {
+      "task_id": "TASK-000053",
+      "asset_id": "AST-120053",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Substation Maintenance",
+      "corridor_id": "COR-008",
+      "section_id": "SEC-0073",
+      "date": "2026-09-13",
+      "start_minute": 18,
+      "end_minute": 120,
+      "duration_minutes": 102,
+      "block_ids": [
+        "BLK-024865"
+      ],
+      "assigned_teams": [
+        "TEAM-031"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 79.0,
+      "priority_score": 1702.25
+    },
+    {
+      "task_id": "TASK-000067",
+      "asset_id": "AST-120067",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Transformer Inspection",
+      "corridor_id": "COR-017",
+      "section_id": "SEC-0165",
+      "date": "2026-09-13",
+      "start_minute": 0,
+      "end_minute": 116,
+      "duration_minutes": 116,
+      "block_ids": [
+        "BLK-025969"
+      ],
+      "assigned_teams": [
+        "TEAM-010"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 37.4,
+      "priority_score": 869.5
+    },
+    {
+      "task_id": "TASK-000081",
+      "asset_id": "AST-120081",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Feeder Maintenance",
+      "corridor_id": "COR-006",
+      "section_id": "SEC-0058",
+      "date": "2026-09-13",
+      "start_minute": 1289,
+      "end_minute": 1440,
+      "duration_minutes": 151,
+      "block_ids": [
+        "BLK-024695",
+        "BLK-024696"
+      ],
+      "assigned_teams": [
+        "TEAM-024"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 37.9,
+      "priority_score": 881.0
+    },
+    {
+      "task_id": "TASK-000095",
+      "asset_id": "AST-120095",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Coach Equipment Maintenance",
+      "corridor_id": "COR-014",
+      "section_id": "SEC-0132",
+      "date": "2026-09-13",
+      "start_minute": 52,
+      "end_minute": 120,
+      "duration_minutes": 68,
+      "block_ids": [
+        "BLK-025573"
+      ],
+      "assigned_teams": [
+        "TEAM-022"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 71.2,
+      "priority_score": 1554.0
+    },
+    {
+      "task_id": "TASK-000109",
+      "asset_id": "AST-120109",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Transformer Inspection",
+      "corridor_id": "COR-019",
+      "section_id": "SEC-0189",
+      "date": "2026-09-13",
+      "start_minute": 40,
+      "end_minute": 120,
+      "duration_minutes": 80,
+      "block_ids": [
+        "BLK-026257"
+      ],
+      "assigned_teams": [
+        "TEAM-037"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 18.0,
+      "priority_score": 482.25
+    },
+    {
+      "task_id": "TASK-000123",
+      "asset_id": "AST-120123",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Rail Grinding",
+      "corridor_id": "COR-003",
+      "section_id": "SEC-0022",
+      "date": "2026-09-13",
+      "start_minute": 120,
+      "end_minute": 319,
+      "duration_minutes": 199,
+      "block_ids": [
+        "BLK-024254",
+        "BLK-024255"
+      ],
+      "assigned_teams": [
+        "TEAM-022"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 89.0,
+      "priority_score": 1902.25
+    },
+    {
+      "task_id": "TASK-000137",
+      "asset_id": "AST-120137",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Bridge Inspection",
+      "corridor_id": "COR-017",
+      "section_id": "SEC-0167",
+      "date": "2026-09-13",
+      "start_minute": 11,
+      "end_minute": 120,
+      "duration_minutes": 109,
+      "block_ids": [
+        "BLK-025993"
+      ],
+      "assigned_teams": [
+        "TEAM-034"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 5.1,
+      "priority_score": 223.5
+    },
+    {
+      "task_id": "TASK-000151",
+      "asset_id": "AST-120151",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Wheelset Inspection",
+      "corridor_id": "COR-007",
+      "section_id": "SEC-0064",
+      "date": "2026-09-13",
+      "start_minute": 1215,
+      "end_minute": 1320,
+      "duration_minutes": 105,
+      "block_ids": [
+        "BLK-024767"
+      ],
+      "assigned_teams": [
+        "TEAM-015"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 6.1,
+      "priority_score": 244.25
+    },
+    {
+      "task_id": "TASK-000165",
+      "asset_id": "AST-120165",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Substation Maintenance",
+      "corridor_id": "COR-008",
+      "section_id": "SEC-0075",
+      "date": "2026-09-13",
+      "start_minute": 1080,
+      "end_minute": 1235,
+      "duration_minutes": 155,
+      "block_ids": [
+        "BLK-024898",
+        "BLK-024899"
+      ],
+      "assigned_teams": [
+        "TEAM-033"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 11.7,
+      "priority_score": 355.5
+    },
+    {
+      "task_id": "TASK-000012",
+      "asset_id": "AST-120012",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Turnout Maintenance",
+      "corridor_id": "COR-004",
+      "section_id": "SEC-0031",
+      "date": "2026-09-14",
+      "start_minute": 120,
+      "end_minute": 245,
+      "duration_minutes": 125,
+      "block_ids": [
+        "BLK-026762",
+        "BLK-026763"
+      ],
+      "assigned_teams": [
+        "TEAM-004"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 96.7,
+      "priority_score": 2064.0
+    },
+    {
+      "task_id": "TASK-000026",
+      "asset_id": "AST-120026",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Catenary Repair",
+      "corridor_id": "COR-005",
+      "section_id": "SEC-0049",
+      "date": "2026-09-14",
+      "start_minute": 240,
+      "end_minute": 346,
+      "duration_minutes": 106,
+      "block_ids": [
+        "BLK-026979"
+      ],
+      "assigned_teams": [
+        "TEAM-022"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 21.3,
+      "priority_score": 556.0
+    },
+    {
+      "task_id": "TASK-000040",
+      "asset_id": "AST-120040",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Relay Testing",
+      "corridor_id": "COR-008",
+      "section_id": "SEC-0072",
+      "date": "2026-09-14",
+      "start_minute": 1345,
+      "end_minute": 1440,
+      "duration_minutes": 95,
+      "block_ids": [
+        "BLK-027264"
+      ],
+      "assigned_teams": [
+        "TEAM-006"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 58.8,
+      "priority_score": 1306.0
+    },
+    {
+      "task_id": "TASK-000054",
+      "asset_id": "AST-120054",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Switchgear Inspection",
+      "corridor_id": "COR-001",
+      "section_id": "SEC-0009",
+      "date": "2026-09-14",
+      "start_minute": 1266,
+      "end_minute": 1440,
+      "duration_minutes": 174,
+      "block_ids": [
+        "BLK-026507",
+        "BLK-026508"
+      ],
+      "assigned_teams": [
+        "TEAM-015"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 27.3,
+      "priority_score": 678.25
+    },
+    {
+      "task_id": "TASK-000068",
+      "asset_id": "AST-120068",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Point Machine Maintenance",
+      "corridor_id": "COR-013",
+      "section_id": "SEC-0130",
+      "date": "2026-09-14",
+      "start_minute": 1320,
+      "end_minute": 1409,
+      "duration_minutes": 89,
+      "block_ids": [
+        "BLK-027960"
+      ],
+      "assigned_teams": [
+        "TEAM-009"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 20.9,
+      "priority_score": 549.5
+    },
+    {
+      "task_id": "TASK-000082",
+      "asset_id": "AST-120082",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Sleeper Replacement",
+      "corridor_id": "COR-006",
+      "section_id": "SEC-0060",
+      "date": "2026-09-14",
+      "start_minute": 60,
+      "end_minute": 191,
+      "duration_minutes": 131,
+      "block_ids": [
+        "BLK-027109",
+        "BLK-027110"
+      ],
+      "assigned_teams": [
+        "TEAM-034"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 44.8,
+      "priority_score": 1027.5
+    },
+    {
+      "task_id": "TASK-000096",
+      "asset_id": "AST-120096",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Feeder Maintenance",
+      "corridor_id": "COR-010",
+      "section_id": "SEC-0096",
+      "date": "2026-09-14",
+      "start_minute": 0,
+      "end_minute": 114,
+      "duration_minutes": 114,
+      "block_ids": [
+        "BLK-027541"
+      ],
+      "assigned_teams": [
+        "TEAM-004"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 71.1,
+      "priority_score": 1552.0
+    },
+    {
+      "task_id": "TASK-000110",
+      "asset_id": "AST-120110",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Rail Grinding",
+      "corridor_id": "COR-010",
+      "section_id": "SEC-0091",
+      "date": "2026-09-14",
+      "start_minute": 1320,
+      "end_minute": 1422,
+      "duration_minutes": 102,
+      "block_ids": [
+        "BLK-027492"
+      ],
+      "assigned_teams": [
+        "TEAM-039"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 23.4,
+      "priority_score": 600.25
+    },
+    {
+      "task_id": "TASK-000124",
+      "asset_id": "AST-120124",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Sleeper Replacement",
+      "corridor_id": "COR-017",
+      "section_id": "SEC-0167",
+      "date": "2026-09-14",
+      "start_minute": 1327,
+      "end_minute": 1440,
+      "duration_minutes": 113,
+      "block_ids": [
+        "BLK-028404"
+      ],
+      "assigned_teams": [
+        "TEAM-024",
+        "TEAM-027"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 19.7,
+      "priority_score": 526.25
+    },
+    {
+      "task_id": "TASK-000138",
+      "asset_id": "AST-120138",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Axle Inspection",
+      "corridor_id": "COR-001",
+      "section_id": "SEC-0002",
+      "date": "2026-09-14",
+      "start_minute": 1080,
+      "end_minute": 1234,
+      "duration_minutes": 154,
+      "block_ids": [
+        "BLK-026422",
+        "BLK-026423"
+      ],
+      "assigned_teams": [
+        "TEAM-033"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 3.5,
+      "priority_score": 212.25
+    },
+    {
+      "task_id": "TASK-000152",
+      "asset_id": "AST-120152",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Sleeper Replacement",
+      "corridor_id": "COR-008",
+      "section_id": "SEC-0071",
+      "date": "2026-09-14",
+      "start_minute": 140,
+      "end_minute": 240,
+      "duration_minutes": 100,
+      "block_ids": [
+        "BLK-027242"
+      ],
+      "assigned_teams": [
+        "TEAM-001"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 64.4,
+      "priority_score": 1420.25
+    },
+    {
+      "task_id": "TASK-000013",
+      "asset_id": "AST-120013",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Substation Maintenance",
+      "corridor_id": "COR-004",
+      "section_id": "SEC-0032",
+      "date": "2026-09-15",
+      "start_minute": 240,
+      "end_minute": 428,
+      "duration_minutes": 188,
+      "block_ids": [
+        "BLK-029175",
+        "BLK-029176"
+      ],
+      "assigned_teams": [
+        "TEAM-022"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 5.0,
+      "priority_score": 240.0
+    },
+    {
+      "task_id": "TASK-000027",
+      "asset_id": "AST-120027",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Rail Grinding",
+      "corridor_id": "COR-013",
+      "section_id": "SEC-0130",
+      "date": "2026-09-15",
+      "start_minute": 240,
+      "end_minute": 442,
+      "duration_minutes": 202,
+      "block_ids": [
+        "BLK-030351",
+        "BLK-030352"
+      ],
+      "assigned_teams": [
+        "TEAM-028"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 82.3,
+      "priority_score": 1787.5
+    },
+    {
+      "task_id": "TASK-000041",
+      "asset_id": "AST-120041",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Bridge Inspection",
+      "corridor_id": "COR-001",
+      "section_id": "SEC-0006",
+      "date": "2026-09-15",
+      "start_minute": 119,
+      "end_minute": 240,
+      "duration_minutes": 121,
+      "block_ids": [
+        "BLK-028861",
+        "BLK-028862"
+      ],
+      "assigned_teams": [
+        "TEAM-037"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 15.2,
+      "priority_score": 445.5
+    },
+    {
+      "task_id": "TASK-000055",
+      "asset_id": "AST-120055",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Axle Inspection",
+      "corridor_id": "COR-004",
+      "section_id": "SEC-0038",
+      "date": "2026-09-15",
+      "start_minute": 63,
+      "end_minute": 120,
+      "duration_minutes": 57,
+      "block_ids": [
+        "BLK-029245"
+      ],
+      "assigned_teams": [
+        "TEAM-004"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 86.9,
+      "priority_score": 1879.5
+    },
+    {
+      "task_id": "TASK-000069",
+      "asset_id": "AST-120069",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Catenary Repair",
+      "corridor_id": "COR-015",
+      "section_id": "SEC-0148",
+      "date": "2026-09-15",
+      "start_minute": 120,
+      "end_minute": 346,
+      "duration_minutes": 226,
+      "block_ids": [
+        "BLK-030566",
+        "BLK-030567"
+      ],
+      "assigned_teams": [
+        "TEAM-031"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 11.3,
+      "priority_score": 368.25
+    },
+    {
+      "task_id": "TASK-000083",
+      "asset_id": "AST-120083",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Point Machine Maintenance",
+      "corridor_id": "COR-003",
+      "section_id": "SEC-0023",
+      "date": "2026-09-15",
+      "start_minute": 142,
+      "end_minute": 240,
+      "duration_minutes": 98,
+      "block_ids": [
+        "BLK-029066"
+      ],
+      "assigned_teams": [
+        "TEAM-034"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 4.1,
+      "priority_score": 222.0
+    },
+    {
+      "task_id": "TASK-000097",
+      "asset_id": "AST-120097",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Bridge Inspection",
+      "corridor_id": "COR-019",
+      "section_id": "SEC-0186",
+      "date": "2026-09-15",
+      "start_minute": 0,
+      "end_minute": 116,
+      "duration_minutes": 116,
+      "block_ids": [
+        "BLK-031021"
+      ],
+      "assigned_teams": [
+        "TEAM-022"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 96.4,
+      "priority_score": 2069.5
+    },
+    {
+      "task_id": "TASK-000111",
+      "asset_id": "AST-120111",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Bridge Inspection",
+      "corridor_id": "COR-010",
+      "section_id": "SEC-0098",
+      "date": "2026-09-15",
+      "start_minute": 240,
+      "end_minute": 387,
+      "duration_minutes": 147,
+      "block_ids": [
+        "BLK-029967",
+        "BLK-029968"
+      ],
+      "assigned_teams": [
+        "TEAM-004"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 98.4,
+      "priority_score": 2108.0
+    },
+    {
+      "task_id": "TASK-000125",
+      "asset_id": "AST-120125",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Axle Counter Inspection",
+      "corridor_id": "COR-012",
+      "section_id": "SEC-0113",
+      "date": "2026-09-15",
+      "start_minute": 263,
+      "end_minute": 360,
+      "duration_minutes": 97,
+      "block_ids": [
+        "BLK-030147"
+      ],
+      "assigned_teams": [
+        "TEAM-001"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 90.8,
+      "priority_score": 1959.0
+    },
+    {
+      "task_id": "TASK-000139",
+      "asset_id": "AST-120139",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Transformer Inspection",
+      "corridor_id": "COR-017",
+      "section_id": "SEC-0170",
+      "date": "2026-09-15",
+      "start_minute": 1080,
+      "end_minute": 1237,
+      "duration_minutes": 157,
+      "block_ids": [
+        "BLK-030838",
+        "BLK-030839"
+      ],
+      "assigned_teams": [
+        "TEAM-033"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 3.9,
+      "priority_score": 220.25
+    },
+    {
+      "task_id": "TASK-000153",
+      "asset_id": "AST-120153",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Ballast Tamping",
+      "corridor_id": "COR-017",
+      "section_id": "SEC-0161",
+      "date": "2026-09-15",
+      "start_minute": 0,
+      "end_minute": 179,
+      "duration_minutes": 179,
+      "block_ids": [
+        "BLK-030721",
+        "BLK-030722"
+      ],
+      "assigned_teams": [
+        "TEAM-013"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 33.8,
+      "priority_score": 818.25
+    },
+    {
+      "task_id": "TASK-000167",
+      "asset_id": "AST-120167",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Substation Maintenance",
+      "corridor_id": "COR-019",
+      "section_id": "SEC-0189",
+      "date": "2026-09-15",
+      "start_minute": 630,
+      "end_minute": 764,
+      "duration_minutes": 134,
+      "block_ids": [
+        "BLK-031062",
+        "BLK-031063"
+      ],
+      "assigned_teams": [
+        "TEAM-002"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": false,
+      "risk_score": 85.4,
+      "priority_score": 1849.5
+    },
+    {
+      "task_id": "TASK-000014",
+      "asset_id": "AST-120014",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Substation Maintenance",
+      "corridor_id": "COR-012",
+      "section_id": "SEC-0119",
+      "date": "2026-09-16",
+      "start_minute": 960,
+      "end_minute": 1096,
+      "duration_minutes": 136,
+      "block_ids": [
+        "BLK-032625",
+        "BLK-032626"
+      ],
+      "assigned_teams": [
+        "TEAM-003"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": false,
+      "risk_score": 28.4,
+      "priority_score": 719.5
+    },
+    {
+      "task_id": "TASK-000028",
+      "asset_id": "AST-120028",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Rail Inspection",
+      "corridor_id": "COR-018",
+      "section_id": "SEC-0174",
+      "date": "2026-09-16",
+      "start_minute": 752,
+      "end_minute": 960,
+      "duration_minutes": 208,
+      "block_ids": [
+        "BLK-033283",
+        "BLK-033284"
+      ],
+      "assigned_teams": [
+        "TEAM-029"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": false,
+      "risk_score": 2.0,
+      "priority_score": 190.0
+    },
+    {
+      "task_id": "TASK-000042",
+      "asset_id": "AST-120042",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Ballast Tamping",
+      "corridor_id": "COR-005",
+      "section_id": "SEC-0044",
+      "date": "2026-09-16",
+      "start_minute": 1240,
+      "end_minute": 1320,
+      "duration_minutes": 80,
+      "block_ids": [
+        "BLK-031727"
+      ],
+      "assigned_teams": [
+        "TEAM-009"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 51.6,
+      "priority_score": 1184.25
+    },
+    {
+      "task_id": "TASK-000056",
+      "asset_id": "AST-120056",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Switchgear Inspection",
+      "corridor_id": "COR-009",
+      "section_id": "SEC-0088",
+      "date": "2026-09-16",
+      "start_minute": 60,
+      "end_minute": 197,
+      "duration_minutes": 137,
+      "block_ids": [
+        "BLK-032245",
+        "BLK-032246"
+      ],
+      "assigned_teams": [
+        "TEAM-001"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 20.7,
+      "priority_score": 564.0
+    },
+    {
+      "task_id": "TASK-000070",
+      "asset_id": "AST-120070",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Bridge Inspection",
+      "corridor_id": "COR-001",
+      "section_id": "SEC-0006",
+      "date": "2026-09-16",
+      "start_minute": 720,
+      "end_minute": 868,
+      "duration_minutes": 148,
+      "block_ids": [
+        "BLK-031267",
+        "BLK-031268"
+      ],
+      "assigned_teams": [
+        "TEAM-023",
+        "TEAM-026"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": false,
+      "risk_score": 70.7,
+      "priority_score": 1565.5
+    },
+    {
+      "task_id": "TASK-000084",
+      "asset_id": "AST-120084",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Wheelset Inspection",
+      "corridor_id": "COR-011",
+      "section_id": "SEC-0102",
+      "date": "2026-09-16",
+      "start_minute": 230,
+      "end_minute": 360,
+      "duration_minutes": 130,
+      "block_ids": [
+        "BLK-032414",
+        "BLK-032415"
+      ],
+      "assigned_teams": [
+        "TEAM-001"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 79.8,
+      "priority_score": 1748.25
+    },
+    {
+      "task_id": "TASK-000098",
+      "asset_id": "AST-120098",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Turnout Maintenance",
+      "corridor_id": "COR-015",
+      "section_id": "SEC-0145",
+      "date": "2026-09-16",
+      "start_minute": 1335,
+      "end_minute": 1440,
+      "duration_minutes": 105,
+      "block_ids": [
+        "BLK-032940"
+      ],
+      "assigned_teams": [
+        "TEAM-003"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 99.2,
+      "priority_score": 2134.0
+    },
+    {
+      "task_id": "TASK-000112",
+      "asset_id": "AST-120112",
+      "department": "Electrical / TRD",
+      "maintenance_type": "Sleeper Replacement",
+      "corridor_id": "COR-007",
+      "section_id": "SEC-0066",
+      "date": "2026-09-16",
+      "start_minute": 1297,
+      "end_minute": 1440,
+      "duration_minutes": 143,
+      "block_ids": [
+        "BLK-031991",
+        "BLK-031992"
+      ],
+      "assigned_teams": [
+        "TEAM-015"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 10.7,
+      "priority_score": 366.25
+    },
+    {
+      "task_id": "TASK-000126",
+      "asset_id": "AST-120126",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Sleeper Replacement",
+      "corridor_id": "COR-017",
+      "section_id": "SEC-0168",
+      "date": "2026-09-16",
+      "start_minute": 1200,
+      "end_minute": 1383,
+      "duration_minutes": 183,
+      "block_ids": [
+        "BLK-033215",
+        "BLK-033216"
+      ],
+      "assigned_teams": [
+        "TEAM-012"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 97.1,
+      "priority_score": 2092.0
+    },
+    {
+      "task_id": "TASK-000140",
+      "asset_id": "AST-120140",
+      "department": "Signal & Telecommunications (S&T)",
+      "maintenance_type": "Turnout Maintenance",
+      "corridor_id": "COR-011",
+      "section_id": "SEC-0103",
+      "date": "2026-09-16",
+      "start_minute": 0,
+      "end_minute": 144,
+      "duration_minutes": 144,
+      "block_ids": [
+        "BLK-032425",
+        "BLK-032426"
+      ],
+      "assigned_teams": [
+        "TEAM-022",
+        "TEAM-025"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 36.4,
+      "priority_score": 881.0
+    },
+    {
+      "task_id": "TASK-000154",
+      "asset_id": "AST-120154",
+      "department": "Track / Civil Engineering",
+      "maintenance_type": "Turnout Maintenance",
+      "corridor_id": "COR-002",
+      "section_id": "SEC-0015",
+      "date": "2026-09-16",
+      "start_minute": 1200,
+      "end_minute": 1361,
+      "duration_minutes": 161,
+      "block_ids": [
+        "BLK-031379",
+        "BLK-031380"
+      ],
+      "assigned_teams": [
+        "TEAM-006"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 6.3,
+      "priority_score": 277.5
+    },
+    {
+      "task_id": "TASK-000168",
+      "asset_id": "AST-120168",
+      "department": "Mechanical / Rolling Stock",
+      "maintenance_type": "Brake Inspection",
+      "corridor_id": "COR-019",
+      "section_id": "SEC-0188",
+      "date": "2026-09-16",
+      "start_minute": 0,
+      "end_minute": 131,
+      "duration_minutes": 131,
+      "block_ids": [
+        "BLK-033445",
+        "BLK-033446"
+      ],
+      "assigned_teams": [
+        "TEAM-031"
+      ],
+      "is_bundled": false,
+      "sharing_type": "single",
+      "bundled_with": [],
+      "is_night": true,
+      "risk_score": 3.3,
+      "priority_score": 216.0
     }
   ]
 }

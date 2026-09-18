@@ -53,23 +53,51 @@ def run_smart_blocking_demo():
     bundle = load_dataset(data_dir)
     prep = preprocess_possessions(bundle)
 
-    # Prepare representative benchmark workload
-    # Day 1 batch (including featured cross-department bundled pair)
-    sample_tids = list({tid: t for tid, t in bundle.tasks.items() if t.task_date == "2026-09-03"}.keys())[:50]
-    day1_tasks = {tid: bundle.tasks[tid] for tid in sample_tids}
-    # Add all SEC-0073 tasks on 2026-09-03 to trigger natural CP-SAT bundling under contention
-    for tid, t in bundle.tasks.items():
-        if t.task_date == "2026-09-03" and t.section_id == "SEC-0073":
-            day1_tasks[tid] = t
+    # Prepare representative benchmark workload: one batch per horizon date.
+    #
+    # This previously solved a single 2026-09-03 batch plus one task on
+    # 2026-09-07, which is what it claimed to be -- but the frontend renders the
+    # plan as a 14-day day sheet, so a truthful read of it showed 52 possessions
+    # on one date and nothing on the other thirteen. Batching each date covers
+    # the horizon the plan spans while keeping the scenario small enough to
+    # solve in seconds.
+    TASKS_PER_DAY = 12
+    FEATURED_TASK = "TASK-000005"  # anchors the decision trace and replan narrative
+    BUNDLING_DATE, BUNDLING_SECTION = "2026-09-03", "SEC-0073"
 
-    sched_d1, def_d1, obj1, s1 = solve_day_batch(day1_tasks, "2026-09-03", prep, bundle, config)
+    by_date: dict = {}
+    for tid, task in bundle.tasks.items():
+        by_date.setdefault(task.task_date, {})[tid] = task
 
-    # Day 5 batch (featuring critical task TASK-000005)
-    day5_tasks = {"TASK-000005": bundle.tasks["TASK-000005"]}
-    sched_d5, def_d5, obj5, s5 = solve_day_batch(day5_tasks, "2026-09-07", prep, bundle, config)
+    featured = bundle.tasks[FEATURED_TASK]
+    demo_subset, scheduled, day_deferred = {}, {}, {}
+    objective_total = 0.0
 
-    scheduled = {**sched_d1, **sched_d5}
-    day_deferred = {**def_d1, **def_d5}
+    for day in sorted(by_date):
+        day_pool = by_date[day]
+        # Insertion order is dataset order, so the slice is deterministic.
+        day_tasks = {tid: day_pool[tid] for tid in list(day_pool)[:TASKS_PER_DAY]}
+
+        # Every SEC-0073 task on the bundling date, so cross-department bundling
+        # still arises naturally under contention rather than being staged.
+        if day == BUNDLING_DATE:
+            day_tasks.update(
+                {tid: t for tid, t in day_pool.items() if t.section_id == BUNDLING_SECTION}
+            )
+
+        # The featured task carries the decision trace, the replan scenarios and
+        # the Ground work order, so it is always in its own date's batch.
+        if day == featured.task_date:
+            day_tasks[FEATURED_TASK] = featured
+
+        sched_day, def_day, obj_day, _status = solve_day_batch(
+            day_tasks, day, prep, bundle, config
+        )
+
+        demo_subset.update(day_tasks)
+        scheduled.update(sched_day)
+        day_deferred.update(def_day)
+        objective_total += obj_day
 
     # The post-solve validator checks the full inventory, so every task must
     # appear. Tasks outside the demo subset were never evaluated here and are
@@ -100,15 +128,14 @@ def run_smart_blocking_demo():
     ser_shared = sum(1 for r in scheduled.values() if r.sharing_type == "serial") // 2
 
     # Report the subset this demo actually solved. Counting the untouched
-    # 29,947 tasks as "considered and deferred" made a 53-task scenario read as
-    # a 0.18% success rate on the full workload, which is not what ran here.
-    demo_subset = {**day1_tasks, **day5_tasks}
+    # tasks as "considered and deferred" made the scenario read as a fraction of
+    # a percent success rate on the full workload, which is not what ran here.
     result = OptimizationResult(
         scheduled_tasks=scheduled,
         deferred_tasks=deferred_all,
         solver_status="FEASIBLE",
         wall_time_seconds=time.time() - t0,
-        objective_value=obj1 + obj5,
+        objective_value=objective_total,
         total_tasks_considered=len(demo_subset),
         total_scheduled=len(scheduled),
         total_deferred=len(day_deferred),

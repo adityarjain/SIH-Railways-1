@@ -34,9 +34,20 @@ class TestGeneratedBundling:
     def test_pairs_match_the_committed_plan(self):
         data = json.loads(BUNDLING.read_text())
         pairs = data["concurrent_bundle_pairs"]
-        assert len(pairs) == 2
 
         records = {t["task_id"]: t for t in json.loads(PLAN.read_text())["scheduled_tasks"]}
+
+        # Derived from the plan rather than pinned to a count, so widening the
+        # demo scenario cannot silently drop a pair from the panel or invent one.
+        planned = {
+            frozenset((tid, partner))
+            for tid, rec in records.items()
+            if rec.get("sharing_type") == "concurrent"
+            for partner in rec.get("bundled_with") or []
+        }
+        assert planned, "the scenario must still exercise cross-department bundling"
+        assert {frozenset(t["task_id"] for t in p["tasks"]) for p in pairs} == planned
+
         for pair in pairs:
             ids = [t["task_id"] for t in pair["tasks"]]
             assert len(ids) == 2
