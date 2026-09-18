@@ -1,7 +1,7 @@
 import React from 'react';
 import { useI18n } from '../../i18n';
 import { RegionHeader, FieldRow, StatFigure, Pill, AdvisoryNote } from '../../components/ui/worksheet';
-import trace from '../../data/decision_trace.json';
+import trace from '../../data/live/decisionTrace';
 
 const STATUS_TONE = { SELECTED: 'ok', FEASIBLE: 'info', REJECTED: 'critical' };
 

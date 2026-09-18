@@ -4,7 +4,7 @@ import { Badge } from '../common/Badge';
 // Computed by scripts/generate_decision_trace.py from the dataset. Every
 // rejection reason below cites the row that actually caused it, so the table
 // can be checked against train_block_conflicts.csv / blocks.csv / teams.csv.
-import decisionTrace from '../../data/decision_trace.json';
+import decisionTrace from '../../data/live/decisionTrace';
 import { Award } from 'lucide-react';
 
 const STATUS_STYLES = {

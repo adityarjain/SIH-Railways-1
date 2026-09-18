@@ -5,7 +5,7 @@ import { makeScale, ticksFor, packLanes, DOMAIN_PRESETS, possessionDomain } from
 import { minToHhmm } from '../../utils/time';
 import { bandOf } from '../../utils/risk';
 import { SegmentedControl, wsCase } from '../ui/worksheet';
-import sectionTrains from '../../data/section_trains.json';
+import sectionTrains from '../../data/live/sectionTrains';
 
 /**
  * Block / train / conflict timeline (design 2A idiom) — the Block Planning

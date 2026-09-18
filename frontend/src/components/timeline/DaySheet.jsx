@@ -3,7 +3,7 @@ import { useI18n } from '../../i18n';
 import { makeScale, ticksFor, packLanes, possessionDomain } from '../../utils/timeScale';
 import { minToHhmm } from '../../utils/time';
 import { bandOf } from '../../utils/risk';
-import sectionTrains from '../../data/section_trains.json';
+import sectionTrains from '../../data/live/sectionTrains';
 
 /**
  * Day sheet — the "industrial worksheet" (design 2A) hero timeline for the

@@ -6,7 +6,7 @@ import { StatFigure, FieldRow, AdvisoryNote, WsSelect } from '../../components/u
 import { minToHhmm } from '../../utils/time';
 import corridors from '../../data/corridors_sections.json';
 import sectionTraffic from '../../data/section_traffic.json';
-import sectionTrains from '../../data/section_trains.json';
+import sectionTrains from '../../data/live/sectionTrains';
 
 const SECTION = Object.fromEntries(corridors.sections.map((s) => [s.section_id, s]));
 

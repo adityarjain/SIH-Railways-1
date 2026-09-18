@@ -5,7 +5,7 @@ import { minToHhmm } from '../../utils/time';
 import { bandOf, bandTone } from '../../utils/risk';
 import corridors from '../../data/corridors_sections.json';
 import teamsData from '../../data/teams.json';
-import decisionTrace from '../../data/decision_trace.json';
+import decisionTrace from '../../data/live/decisionTrace';
 
 const SECTION = Object.fromEntries(corridors.sections.map((s) => [s.section_id, s]));
 const TEAM = Object.fromEntries(teamsData.map((t) => [t.team_id, t]));

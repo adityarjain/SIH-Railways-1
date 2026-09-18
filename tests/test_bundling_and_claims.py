@@ -28,8 +28,13 @@ class TestGeneratedBundling:
 
     def test_panel_reads_the_generated_artifact(self):
         source = (FRONTEND_SRC / "components/timeline/BundlingView.jsx").read_text()
-        assert "data/bundling.json" in source
+        assert "data/live/bundling" in source
         assert "simulationData" not in source
+        # The live wrapper only re-anchors dates onto a rolling window (see
+        # utils/dateShift.js); it must still be sourced from the generated
+        # artifact, not a hand-authored example.
+        live_wrapper = (FRONTEND_SRC / "data/live/bundling.js").read_text()
+        assert "../bundling.json" in live_wrapper
 
     def test_pairs_match_the_committed_plan(self):
         data = json.loads(BUNDLING.read_text())

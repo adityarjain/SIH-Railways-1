@@ -5,7 +5,7 @@ import { useI18n } from '../../i18n';
 import { StatFigure, Pill, AdvisoryNote } from '../../components/ui/worksheet';
 import { minToHhmm } from '../../utils/time';
 import { statusTone } from '../../components/ground/WorkOrder';
-import sectionTrains from '../../data/section_trains.json';
+import sectionTrains from '../../data/live/sectionTrains';
 import corridors from '../../data/corridors_sections.json';
 
 const SECTION = Object.fromEntries(corridors.sections.map((s) => [s.section_id, s]));

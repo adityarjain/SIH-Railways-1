@@ -11,6 +11,7 @@ import teamsData from '../../data/teams.json';
 import { usePlan } from '../../context/PlanContext';
 import { useI18n } from '../../i18n';
 import corridorsSectionsData from '../../data/corridors_sections.json';
+import { TODAY } from '../../utils/dateShift';
 
 // Both selectors are derived from the plan the optimizer actually produced, so
 // every option renders a populated timeline.
@@ -48,14 +49,16 @@ export const BlockPlanning = ({ onNavigate }) => {
   const busiestDate =
     dateOptions.reduce((best, o) => (!best || o.count > best.count ? o : best), null)?.date ||
     '2026-09-03';
+  // Land on today, not the busiest day -- an ops screen should open on "now".
+  const initialDate = dateOptions.some((o) => o.date === TODAY) ? TODAY : busiestDate;
   const busiestCorridorOnDate = React.useMemo(() => {
     const counts = {};
     scheduledTasks.forEach((t) => {
-      if (t.date === busiestDate) counts[t.corridor_id] = (counts[t.corridor_id] || 0) + 1;
+      if (t.date === initialDate) counts[t.corridor_id] = (counts[t.corridor_id] || 0) + 1;
     });
     return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'ALL';
-  }, [scheduledTasks, busiestDate]);
-  const [selectedDate, setSelectedDate] = useState(busiestDate);
+  }, [scheduledTasks, initialDate]);
+  const [selectedDate, setSelectedDate] = useState(initialDate);
   const [selectedCorridor, setSelectedCorridor] = useState(busiestCorridorOnDate);
   const [viewMode, setViewMode] = useState('timeline'); // 'timeline', 'weekly', 'monthly'
 

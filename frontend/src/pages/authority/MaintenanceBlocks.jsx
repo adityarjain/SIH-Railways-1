@@ -6,7 +6,7 @@ import { bandOf } from '../../utils/risk';
 import { BundlingView } from '../../components/timeline/BundlingView';
 import { WeeklyViewWorksheet } from '../../components/planning/WeeklyViewWorksheet';
 import { MonthlyHeatmapWorksheet } from '../../components/planning/MonthlyHeatmapWorksheet';
-import bundlingData from '../../data/bundling.json';
+import bundlingData from '../../data/live/bundling';
 
 const FlagPill = ({ tone, children }) => {
   const map = {

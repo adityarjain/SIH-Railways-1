@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Users } from 'lucide-react';
 import { useI18n } from '../../i18n';
-import bundlingData from '../../data/bundling.json';
+import bundlingData from '../../data/live/bundling';
 import { minToHhmm } from '../../utils/time';
 
 /**

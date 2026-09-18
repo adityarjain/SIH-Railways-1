@@ -3,9 +3,9 @@ import { usePlan } from '../../context/PlanContext';
 import { useI18n } from '../../i18n';
 import { RegionHeader, FieldRow, AdvisoryNote, Pill } from '../../components/ui/worksheet';
 import networkStats from '../../data/network_stats.json';
-import sectionTrains from '../../data/section_trains.json';
-import decisionTrace from '../../data/decision_trace.json';
-import bundling from '../../data/bundling.json';
+import sectionTrains from '../../data/live/sectionTrains';
+import decisionTrace from '../../data/live/decisionTrace';
+import bundling from '../../data/live/bundling';
 
 /**
  * What the system checks, what it measures, and what it explicitly does not do.

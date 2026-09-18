@@ -9,6 +9,7 @@ import {
 } from '../../components/ground/WorkOrder';
 import { minToHhmm } from '../../utils/time';
 import { bandOf, bandTone } from '../../utils/risk';
+import { TODAY } from '../../utils/dateShift';
 
 const ACTION_STATUS = {
   in_progress: 'In Progress',
@@ -47,7 +48,10 @@ export const MaintDashboard = ({ onNavigate }) => {
   );
 
   const next = useMemo(
-    () => scheduled.find((t) => t.status === 'In Progress') || scheduled[0] || null,
+    () => scheduled.find((t) => t.status === 'In Progress')
+      || scheduled.find((t) => t.scheduled_date >= TODAY)
+      || scheduled[0]
+      || null,
     [scheduled],
   );
 
@@ -69,7 +73,9 @@ export const MaintDashboard = ({ onNavigate }) => {
     setAction(null);
   };
 
-  const today = next?.scheduled_date;
+  // The real live date, not the date of whichever task happens to be next --
+  // those can differ (e.g. nothing left scheduled today, next is tomorrow).
+  const today = TODAY;
 
   return (
     <div className="space-y-4">
@@ -77,7 +83,7 @@ export const MaintDashboard = ({ onNavigate }) => {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">Today</div>
-          <div className="text-[17px] font-semibold text-ws-ink mt-0.5">{today || 'No possession scheduled'}</div>
+          <div className="text-[17px] font-semibold text-ws-ink mt-0.5">{today}</div>
           <div className="font-ws text-xs text-ws-mid mt-0.5">{selectedDept}</div>
         </div>
         <div className="flex items-center gap-2">

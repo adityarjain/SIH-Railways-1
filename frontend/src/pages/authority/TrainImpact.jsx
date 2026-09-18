@@ -3,8 +3,8 @@ import { usePlan } from '../../context/PlanContext';
 import { useI18n } from '../../i18n';
 import { RegionHeader, FieldRow, StatFigure, AdvisoryNote, WsSelect } from '../../components/ui/worksheet';
 import { minToHhmm } from '../../utils/time';
-import sectionTrains from '../../data/section_trains.json';
-import decisionTrace from '../../data/decision_trace.json';
+import sectionTrains from '../../data/live/sectionTrains';
+import decisionTrace from '../../data/live/decisionTrace';
 import corridors from '../../data/corridors_sections.json';
 
 const SECTION_NAME = Object.fromEntries(

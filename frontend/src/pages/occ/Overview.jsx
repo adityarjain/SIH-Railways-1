@@ -9,7 +9,8 @@ import { RegionHeader, wsCase } from '../../components/ui/worksheet';
 import { bandOf } from '../../utils/risk';
 import corridorsSectionsData from '../../data/corridors_sections.json';
 import teamsData from '../../data/teams.json';
-import decisionTrace from '../../data/decision_trace.json';
+import decisionTrace from '../../data/live/decisionTrace';
+import { LIVE_DATES, TODAY } from '../../utils/dateShift';
 
 /**
  * Authority Overview — "industrial worksheet" (design 2A).
@@ -73,31 +74,20 @@ export const Overview = ({ onNavigate }) => {
     const entries = Object.entries(taskCounts);
     return entries.reduce((best, [date, count]) => (!best || count > best.count ? { date, count } : best), null)?.date;
   }, [taskCounts]);
-  const [selectedDate, setSelectedDate] = useState(busiestDate);
+  // Land on today, not the busiest day -- an ops screen should open on "now".
+  const [selectedDate, setSelectedDate] = useState(TODAY);
   const activeDate = selectedDate || busiestDate;
 
-  // Every calendar date in the run's plan horizon, not just the ones with a
-  // scheduled task — the horizon strip is a 14-day ruler, and a day with no
-  // work still needs its own honest "—" cell.
-  const dateOptions = useMemo(() => {
-    const m = (metrics.provenance?.planning_horizon || '').match(/(\d{4}-\d{2}-\d{2})\s*\.\.\s*(\d{4}-\d{2}-\d{2})/);
-    if (!m) {
-      return Object.keys(taskCounts).sort().map((date) => ({ date, count: taskCounts[date] || 0 }));
-    }
-    // UTC throughout: mixing local-time construction with toISOString() shifts
-    // the date by a day in any timezone behind UTC.
-    const [sy, sm, sd] = m[1].split('-').map(Number);
-    const [ey, em, ed] = m[2].split('-').map(Number);
-    const start = Date.UTC(sy, sm - 1, sd);
-    const end = Date.UTC(ey, em - 1, ed);
-    const out = [];
-    for (let t = start; t <= end; t += 86400000) {
-      const iso = new Date(t).toISOString().slice(0, 10);
-      out.push({ date: iso, count: taskCounts[iso] || 0 });
-    }
-    return out;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [metrics.provenance?.planning_horizon, taskCounts]);
+  // Every calendar date in the run's live plan horizon, not just the ones
+  // with a scheduled task — the horizon strip is a 14-day ruler, and a day
+  // with no work still needs its own honest "—" cell. LIVE_DATES is the
+  // demo scenario's 14-day dataset re-anchored onto a rolling real-calendar
+  // window (utils/dateShift.js), not the frozen 2026-09-03..16 dates baked
+  // into the artifact.
+  const dateOptions = useMemo(
+    () => LIVE_DATES.map((date) => ({ date, count: taskCounts[date] || 0 })),
+    [taskCounts],
+  );
 
   // Busiest day in the horizon — the calendar's load bars are drawn relative to it.
   const maxDayCount = Math.max(1, ...dateOptions.map((o) => o.count));
@@ -234,9 +224,8 @@ export const Overview = ({ onNavigate }) => {
   const conflictingCount = (dImpact.conflicting || []).length;
 
   // Masthead subtitle date range — the shared WorksheetHeader computes its
-  // own run-state line; this is only for the day-sheet-specific line below.
-  const planHorizonMatch = (prov.planning_horizon || '').match(/(\d{4})-(\d{2})-(\d{2})\s*\.\.\s*(\d{4})-(\d{2})-(\d{2})/);
-
+  // own run-state line (full-run scope, static); this is the day-sheet's
+  // own live horizon and must track the rolling window, not that one.
   const horizonStart = dateOptions[0]?.date;
   const horizonEnd = dateOptions[dateOptions.length - 1]?.date;
 
@@ -245,9 +234,7 @@ export const Overview = ({ onNavigate }) => {
       {t('overview.daySheetWord')}{' '}
       <span className="font-mono text-xs text-ws-body">{activeDate}</span>
       {' · '}{t('header.planHorizon').toLowerCase()}{' '}
-      <span className="font-mono text-xs text-ws-body">
-        {planHorizonMatch ? `${planHorizonMatch[3]} → ${planHorizonMatch[6]}` : `${horizonStart} → ${horizonEnd}`}
-      </span>
+      <span className="font-mono text-xs text-ws-body">{horizonStart} → {horizonEnd}</span>
       {' · '}<span className="font-mono text-xs text-ws-body">{scenario.summary.total_scheduled}</span> {t('status.scheduled').toLowerCase()},{' '}
       <span className="font-mono text-xs text-ws-body">{scenario.summary.total_deferred}</span> {t('status.deferred').toLowerCase()} {t('scope.demoScenario').toLowerCase()}
     </>

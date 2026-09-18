@@ -6,7 +6,7 @@ import { Button } from '../../components/ui';
 import { Modal } from '../../components/common/Modal';
 import { minToHhmm } from '../../utils/time';
 import { bandOf, bandTone } from '../../utils/risk';
-import completedWorkJson from '../../data/completed_work.json';
+import completedWorkJson from '../../data/live/completedWork';
 
 /**
  * Work Verification (Authority).

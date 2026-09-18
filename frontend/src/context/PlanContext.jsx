@@ -1,24 +1,35 @@
 import React, { createContext, useContext, useState, useMemo } from 'react';
-import initialPlanJson from '../data/optimized_block_plan.json';
+import initialPlanRaw from '../data/optimized_block_plan.json';
 // Two distinct optimizer runs, deliberately kept separate. `metrics` describes
 // the scenario subset this UI actually renders; `baselineMetrics` describes the
 // full 30,000-task run. Mixing them is what previously produced contradictory
 // KPI figures, so each screen must state which one it is showing.
 import metricsJson from '../data/optimization_metrics.json';
 import fullRunMetricsJson from '../data/full_run_metrics.json';
-import initialTasks from '../data/tasks_inventory.json';
-import completedWorkJson from '../data/completed_work.json';
+import initialTasksRaw from '../data/tasks_inventory.json';
+import completedWorkJson from '../data/live/completedWork';
 // Ritvik's actual outputs. These are produced by demo_closed_loop.py and were
 // previously shipped but never read, so the operational screens retyped their
 // contents as prose. Every conflict, route rejection and delay figure the UI
 // shows must come from here.
 import operationalDecisionJson from '../data/ritvik_operational_decision.json';
 import replanRequestJson from '../data/replan_request.json';
-import demoEventsJson from '../data/ritvik_demo_events.json';
+import demoEventsRaw from '../data/ritvik_demo_events.json';
 // Both operational scenarios, each produced by an actual Ritvik engine run
 // (scripts/generate_ritvik_scenarios.py).
-import ritvikScenariosJson from '../data/ritvik_scenarios.json';
+import ritvikScenariosRaw from '../data/ritvik_scenarios.json';
 import { SIMULATION_EVENTS } from '../data/simulationData';
+import { shiftDatesDeep } from '../utils/dateShift';
+
+// The demo scenario's own artifacts are date-shifted onto a live rolling
+// window (see utils/dateShift.js) so the 14-day dataset keeps re-presenting
+// itself on today's real dates instead of drifting stale. The full
+// 30,000-task run (fullRunMetricsJson) is a real historical run and stays
+// untouched.
+const initialPlanJson = shiftDatesDeep(initialPlanRaw);
+const initialTasks = shiftDatesDeep(initialTasksRaw);
+const demoEventsJson = shiftDatesDeep(demoEventsRaw);
+const ritvikScenariosJson = shiftDatesDeep(ritvikScenariosRaw);
 
 const PlanContext = createContext();
 
