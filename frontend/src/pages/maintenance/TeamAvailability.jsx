@@ -105,7 +105,7 @@ export const TeamAvailability = ({ onNavigate }) => {
           <thead className="border-b border-ws-rule bg-ws-tick">
             <tr>
               {[t('common.crew'), t('common.department'), t('resources.shift'), t('resources.size'), t('resources.availability'), t('resources.assignedPossessions')].map((h, i) => (
-                <th key={h} className={`px-3.5 py-2 font-display text-[10px] font-semibold uppercase tracking-wide text-ws-light whitespace-nowrap ${i >= 3 && i <= 4 ? 'text-right' : ''}`}>{h}</th>
+                <th key={h} className={`px-3.5 py-2 font-display text-[10px] font-semibold text-ws-light whitespace-nowrap ${i >= 3 && i <= 4 ? 'text-right' : ''}`}>{h}</th>
               ))}
             </tr>
           </thead>

@@ -17,8 +17,11 @@
   /* --- Typographic roles -------------------------------------------------
      Mono is reserved for IDs, timestamps, minutes and counts. Never prose. */
 
+  /* Labels lost their forced uppercase: at 11px, caps plus letter-tracking is
+     harder to scan than sentence case, and nearly every row on every screen
+     carried one, so it was a large share of the visual noise. */
   .t-label {
-    @apply font-display text-[11px] font-semibold uppercase tracking-wide text-rail-500;
+    @apply font-display text-[11px] font-semibold text-rail-500;
   }
 
   .t-value {
@@ -50,7 +53,7 @@
   /* Scope caption. Every figure carries the artifact scope it came from, so a
      62-task demo number can never be read as the 30,000-task run. */
   .t-scope {
-    @apply text-[10px] font-medium uppercase tracking-wide text-rail-400;
+    @apply text-[10px] font-medium text-rail-400;
   }
 }
 
@@ -58,22 +61,25 @@
    never actually defined until now. */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(106, 98, 85, 0.32) transparent;
+  scrollbar-color: rgba(98, 107, 123, 0.30) transparent;
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(106, 98, 85, 0.28);
-  border-radius: 0;
+  background: rgba(98, 107, 123, 0.26);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(106, 98, 85, 0.48);
+  background: rgba(98, 107, 123, 0.44);
+  background-clip: content-box;
 }
 
 /* Conflict hatch. Drawn only where an artifact establishes a conflict, never
@@ -81,22 +87,22 @@
 .conflict-hatch {
   background-image: repeating-linear-gradient(
     45deg,
-    rgba(178, 42, 34, 0.9) 0,
-    rgba(178, 42, 34, 0.9) 3px,
-    rgba(178, 42, 34, 0.35) 3px,
-    rgba(178, 42, 34, 0.35) 6px
+    rgba(196, 61, 48, 0.9) 0,
+    rgba(196, 61, 48, 0.9) 3px,
+    rgba(196, 61, 48, 0.32) 3px,
+    rgba(196, 61, 48, 0.32) 6px
   );
 }
 
-/* Same hatch, at the "industrial worksheet" (design 2A) critical hex — used
-   only by the Authority Overview day sheet. */
+/* Same hatch at the day sheet's critical hex, kept as its own class so the
+   Overview timeline can diverge from the shared one without a repaint. */
 .ws-conflict-hatch {
   background-image: repeating-linear-gradient(
     45deg,
-    rgba(178, 42, 34, 0.9) 0,
-    rgba(178, 42, 34, 0.9) 3px,
-    rgba(178, 42, 34, 0.35) 3px,
-    rgba(178, 42, 34, 0.35) 6px
+    rgba(196, 61, 48, 0.9) 0,
+    rgba(196, 61, 48, 0.9) 3px,
+    rgba(196, 61, 48, 0.32) 3px,
+    rgba(196, 61, 48, 0.32) 6px
   );
 }
 

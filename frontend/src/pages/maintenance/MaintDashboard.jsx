@@ -82,7 +82,7 @@ export const MaintDashboard = ({ onNavigate }) => {
       {/* today line */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <div className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">Today</div>
+          <div className="font-display text-[11px] font-semibold text-ws-light">Today</div>
           <div className="text-[17px] font-semibold text-ws-ink mt-0.5">{today}</div>
           <div className="font-ws text-xs text-ws-mid mt-0.5">{selectedDept}</div>
         </div>
@@ -100,7 +100,7 @@ export const MaintDashboard = ({ onNavigate }) => {
       {!next ? (
         <div className="border border-ws-rule bg-ws-surface">
           <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
-            <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">Next task</span>
+            <span className="font-display text-[11px] font-semibold text-ws-light">Next task</span>
             <span className="font-mono text-[10px] text-ws-light block mt-0.5">{selectedDept}</span>
           </div>
           <div className="px-4 py-6 text-center">
@@ -133,7 +133,7 @@ export const MaintDashboard = ({ onNavigate }) => {
             onClick={() => onNavigate && onNavigate(go)}
             className="bg-ws-surface border border-ws-rule px-3 py-3 text-left hover:border-ws-mid hover:bg-ws-paper transition-colors min-h-touch"
           >
-            <div className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{label}</div>
+            <div className="font-display text-[11px] font-semibold text-ws-light">{label}</div>
             <div className={`font-mono text-2xl font-semibold mt-1 ${
               tone === 'warn' ? 'text-ws-warn' : tone === 'info' ? 'text-ws-info' : tone === 'ok' ? 'text-ws-ok' : 'text-ws-ink'
             }`}>
@@ -153,7 +153,7 @@ export const MaintDashboard = ({ onNavigate }) => {
       {/* later today */}
       <div className="border border-ws-rule bg-ws-surface">
         <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
-          <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">Later</span>
+          <span className="font-display text-[11px] font-semibold text-ws-light">Later</span>
           <span className="font-mono text-[10px] text-ws-light block mt-0.5">{later.length} further possession{later.length === 1 ? '' : 's'}</span>
         </div>
         {later.length === 0 ? (
@@ -188,10 +188,10 @@ export const MaintDashboard = ({ onNavigate }) => {
 
       <div className="border-l-[3px] border-l-ws-idle bg-ws-paper px-3 py-2.5 flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <div className="font-display text-[11px] font-bold uppercase tracking-wide text-ws-idle">Session state only</div>
+          <div className="font-display text-[11px] font-bold text-ws-idle">Session state only</div>
           <div className="font-ws text-xs text-ws-body leading-relaxed mt-1">Status changes are held in the browser for this session. Nothing is written to an external register and no notification is sent.</div>
         </div>
-        <button onClick={() => onNavigate && onNavigate('my-tasks')} className="font-display text-[11px] font-bold uppercase tracking-wide text-ws-mid hover:text-ws-ink shrink-0">
+        <button onClick={() => onNavigate && onNavigate('my-tasks')} className="font-display text-[11px] font-bold text-ws-mid hover:text-ws-ink shrink-0">
           View all assigned work
         </button>
       </div>

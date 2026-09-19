@@ -244,21 +244,22 @@ export const Overview = ({ onNavigate }) => {
     <div className="bg-ws-band min-h-full">
       <WorksheetHeader activeTab="overview" onNavigate={onNavigate} subtitle={overviewSubtitle} />
 
-      {/* horizon calendar */}
-      <div className="bg-ws-band border-b border-ws-rule px-4 md:px-5 xl:px-6 pt-3.5 pb-4">
-        <div className="flex items-baseline gap-2.5 pb-2 flex-wrap">
-          <span className={`font-display text-xs font-semibold ${uc} tracking-[0.12em] text-ws-mid`}>
+      {/* Horizon calendar. Separate cards rather than a single ruled grid:
+          each day is a target, and the grid lines were doing no work that the
+          gaps don't. The active day is a filled accent chip, not a black block. */}
+      <div className="bg-ws-paper px-4 md:px-5 xl:px-6 pt-4 pb-5">
+        <div className="flex items-baseline gap-3 pb-2.5 flex-wrap">
+          <span className="font-display text-[13px] font-semibold text-ws-body">
             {t('overview.planHorizonTasks')}
           </span>
-          <span className="flex-1 min-w-6 h-px bg-ws-rule" />
-          <span className="font-mono text-[10px] text-ws-light">
-            {t('scope.demoScenarioTasks', { count: scenario.summary.total_tasks_considered }).toUpperCase()}
+          <span className="font-mono text-[10px] text-ws-light ml-auto">
+            {t('scope.demoScenarioTasks', { count: scenario.summary.total_tasks_considered })}
           </span>
         </div>
-        <div className="flex gap-px bg-ws-rule border border-ws-rule overflow-x-auto custom-scrollbar">
+        <div className="flex gap-1.5 overflow-x-auto custom-scrollbar pb-1">
           {dateOptions.map((o) => {
             const d = new Date(`${o.date}T00:00:00`);
-            const weekday = d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+            const weekday = d.toLocaleDateString('en-US', { weekday: 'short' });
             const weekend = d.getDay() === 0 || d.getDay() === 6;
             const day = o.date.slice(8, 10);
             const active = o.date === activeDate;
@@ -266,26 +267,31 @@ export const Overview = ({ onNavigate }) => {
               <button
                 key={o.date}
                 onClick={() => setSelectedDate(o.date)}
-                className={`flex-1 min-w-[54px] px-1.5 pt-2 pb-2.5 text-center transition-colors ${
-                  active ? 'bg-ws-ink' : weekend ? 'bg-ws-paper hover:bg-ws-surface' : 'bg-ws-surface hover:bg-ws-paper'
+                aria-pressed={active}
+                className={`flex-1 min-w-[58px] rounded-lg px-1.5 pt-2.5 pb-3 text-center transition-colors ${
+                  active
+                    ? 'bg-ws-info text-white'
+                    : weekend
+                    ? 'bg-ws-tick hover:bg-ws-band'
+                    : 'bg-ws-surface shadow-soft hover:bg-ws-tick'
                 }`}
               >
-                <span className={`block font-display text-[10px] font-semibold tracking-[0.1em] ${active ? 'text-[#A79F90]' : 'text-ws-light'}`}>
+                <span className={`block font-display text-[10px] font-semibold ${active ? 'text-white/70' : 'text-ws-light'}`}>
                   {weekday}
                 </span>
-                <span className={`block font-mono text-[19px] font-bold leading-none mt-1 ${active ? 'text-white' : 'text-ws-ink'}`}>
+                <span className={`block font-mono text-[20px] font-semibold leading-none mt-1 tracking-[-0.02em] ${active ? 'text-white' : 'text-ws-ink'}`}>
                   {day}
                 </span>
-                <span className={`block h-[3px] mt-2.5 ${active ? 'bg-[#4A4338]' : 'bg-ws-hairline'}`}>
+                <span className={`block h-[3px] rounded-full mt-2.5 ${active ? 'bg-white/25' : 'bg-ws-hairline'}`}>
                   {o.count > 0 && (
                     <span
-                      className={`block h-full ${active ? 'bg-white' : 'bg-ws-ink'}`}
+                      className={`block h-full rounded-full ${active ? 'bg-white' : 'bg-ws-info/45'}`}
                       style={{ width: `${Math.max(10, (o.count / maxDayCount) * 100)}%` }}
                     />
                   )}
                 </span>
-                <span className={`block font-mono text-[11px] mt-1.5 ${active ? 'text-white' : o.count ? 'text-ws-mid' : 'text-ws-disabled'}`}>
-                  {o.count || '—'}
+                <span className={`block font-mono text-[11px] mt-1.5 ${active ? 'text-white/85' : o.count ? 'text-ws-mid' : 'text-ws-disabled'}`}>
+                  {o.count || '0'}
                 </span>
               </button>
             );
@@ -305,14 +311,14 @@ export const Overview = ({ onNavigate }) => {
         onSelectTask={() => onNavigate && onNavigate('block-planning')}
       />
 
-      {/* 02 — recommendation headline + 03 — attention ledger */}
-      <div className="grid grid-cols-1 lg:grid-cols-[60fr_40fr] xl:grid-cols-[64fr_36fr] bg-ws-rule gap-px">
-        <div className="bg-ws-dossier border-t-[3px] border-ws-ink px-4 md:px-5 xl:px-6 pt-5 pb-6 min-w-0">
+      {/* Recommendation + attention ledger. Two cards side by side rather than
+          two panes divided by a rule: the 3px ink band that used to cap this
+          row was the heaviest line on the page. */}
+      <div className="grid grid-cols-1 lg:grid-cols-[60fr_40fr] xl:grid-cols-[64fr_36fr] gap-4 px-4 md:px-5 xl:px-6 pt-4">
+        <div className="bg-ws-surface rounded-lg shadow-soft px-5 pt-5 pb-6 min-w-0">
           <RegionHeader
-            number="02"
             title={t('overview.recommendation')}
-            isHindi={isHindi}
-            meta={`${dReq.task_id} · ${dReq.section_id} · ${t('overview.pendingAuthorityDecision').toUpperCase()}`}
+            meta={`${dReq.task_id} · ${dReq.section_id} · ${t('overview.pendingAuthorityDecision')}`}
           />
 
           <div className="flex items-end gap-5 pt-0.5 pb-3 border-b border-ws-rule flex-wrap">
@@ -375,13 +381,13 @@ export const Overview = ({ onNavigate }) => {
           <div className="flex items-center gap-2.5 pt-[15px] flex-wrap">
             <button
               onClick={() => onNavigate && onNavigate('decision-trace')}
-              className={`px-4 py-2 font-display text-sm font-bold ${uc} ${tr} text-white bg-ws-ink border border-ws-ink hover:bg-ws-body transition-colors`}
+              className="px-4 py-2 rounded-md font-display text-[13px] font-semibold text-white bg-ws-info hover:bg-[#2455BE] active:scale-[0.98] transition-all"
             >
               {t('overview.openDecisionTrace')}
             </button>
             <button
               onClick={() => onNavigate && onNavigate('block-planning')}
-              className={`px-4 py-2 font-display text-sm font-bold ${uc} ${tr} text-ws-ink bg-transparent border border-ws-rule hover:bg-ws-paper hover:border-ws-ink transition-colors`}
+              className="px-4 py-2 rounded-md font-display text-[13px] font-semibold text-ws-body bg-ws-tick hover:bg-ws-band active:scale-[0.98] transition-all"
             >
               {t('overview.goToBlockPlanning')}
             </button>
@@ -390,13 +396,11 @@ export const Overview = ({ onNavigate }) => {
           </div>
         </div>
 
-        {/* 03 — attention ledger + 04 — next out */}
-        <div className="bg-ws-surface border-t border-ws-rule px-4 md:px-5 xl:px-6 pt-5 pb-6 min-w-0">
+        {/* Attention ledger + next out */}
+        <div className="bg-ws-surface rounded-lg shadow-soft px-5 pt-5 pb-6 min-w-0">
           <RegionHeader
-            number="03"
             title={t('overview.requiresAttention')}
-            isHindi={isHindi}
-            meta={t('overview.rankedBySeverity', { count: attention.length }).toUpperCase()}
+            meta={t('overview.rankedBySeverity', { count: attention.length })}
           />
 
           {attention.length === 0 ? (
@@ -475,15 +479,13 @@ export const Overview = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* 05 — corridor situation */}
-      <div className="bg-ws-surface px-4 md:px-5 xl:px-6 pt-5 pb-5 border-t border-ws-rule">
+      {/* Corridor situation */}
+      <div className="bg-ws-surface rounded-lg shadow-soft mx-4 md:mx-5 xl:mx-6 mt-4 px-5 pt-5 pb-5">
         <RegionHeader
-          number="05"
           title={t('overview.corridorSituation')}
-          isHindi={isHindi}
           meta={`${activeDate} · ${tasksOnDate.length} / ${corridorStats.length}`}
         />
-        <div className="border-t border-ws-rule max-w-2xl">
+        <div className="max-w-2xl">
           {shownCorridors.map((c) => (
             <button
               key={c.id}
@@ -523,14 +525,14 @@ export const Overview = ({ onNavigate }) => {
       </div>
 
       {/* footer */}
-      <div className="bg-ws-band border-t border-ws-rule px-3.5 md:px-4 xl:px-5 py-2 flex flex-wrap items-center gap-3.5">
+      <div className="px-4 md:px-5 xl:px-6 pt-4 pb-5 mt-2 flex flex-wrap items-center gap-3.5">
         <span className="font-mono text-[10px] text-ws-mid">
           {t('overview.headlineScope', {
             full: metrics.summary.total_tasks_considered.toLocaleString(),
             scheduled: metrics.summary.total_scheduled.toLocaleString(),
             deferred: (risk.critical_risk_deferred ?? 0).toLocaleString(),
             demo: scenario.summary.total_tasks_considered,
-          }).toUpperCase()}
+          })}
         </span>
         <span className="flex-1 min-w-2" />
         <span className="font-mono text-[10px] text-ws-light break-all">

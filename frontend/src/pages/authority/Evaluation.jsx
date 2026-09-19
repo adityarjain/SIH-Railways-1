@@ -57,7 +57,7 @@ export const Evaluation = () => {
               [t('evaluation.truePositive'), cm.true_positive, 'text-ws-ok'],
             ].map(([label, value, tone]) => (
               <div key={label} className="bg-ws-surface px-3 py-2.5">
-                <div className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{label}</div>
+                <div className="font-display text-[11px] font-semibold text-ws-light">{label}</div>
                 <div className={`font-mono text-lg font-semibold mt-0.5 ${tone}`}>{value.toLocaleString()}</div>
               </div>
             ))}
@@ -87,7 +87,7 @@ export const Evaluation = () => {
             const bandKey = { CRITICAL: 'risk.critical', HIGH: 'risk.high', MODERATE: 'risk.moderate', LOW: 'risk.low' }[band];
             return (
               <div key={band} className="flex items-center gap-3">
-                <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light w-20 shrink-0">{t(bandKey)}</span>
+                <span className="font-display text-[11px] font-semibold text-ws-light w-20 shrink-0">{t(bandKey)}</span>
                 <div className="flex-1 h-4 bg-ws-tick border border-ws-hairline relative">
                   <div className={`absolute inset-y-0 left-0 ${tone}`} style={{ width: `${share * 100}%` }} />
                 </div>

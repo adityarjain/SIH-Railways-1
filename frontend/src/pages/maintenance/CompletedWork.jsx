@@ -125,7 +125,7 @@ export const CompletedWork = () => {
                     ['Crew', (j.assigned_teams || []).join(', '), `risk ${j.risk_score?.toFixed?.(1) ?? '—'}`],
                   ].map(([k, val, sub]) => (
                     <div key={k} className="bg-ws-surface px-3 py-2">
-                      <div className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{k}</div>
+                      <div className="font-display text-[11px] font-semibold text-ws-light">{k}</div>
                       <div className="font-mono text-[11px] text-ws-ink mt-0.5">{val}</div>
                       <div className="font-mono text-[9px] text-ws-light mt-0.5">{sub}</div>
                     </div>
@@ -134,7 +134,7 @@ export const CompletedWork = () => {
 
                 {v?.comments && (
                   <div className="px-3.5 py-2 bg-ws-paper">
-                    <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">Verification note</span>
+                    <span className="font-display text-[11px] font-semibold text-ws-light">Verification note</span>
                     <p className="font-ws text-[11px] text-ws-body mt-0.5">{v.comments}</p>
                   </div>
                 )}
@@ -145,7 +145,7 @@ export const CompletedWork = () => {
       )}
 
       <div className="border-l-[3px] border-l-ws-idle bg-ws-paper px-3 py-2.5">
-        <div className="font-display text-[11px] font-bold uppercase tracking-wide text-ws-idle">Verification happens in Authority</div>
+        <div className="font-display text-[11px] font-bold text-ws-idle">Verification happens in Authority</div>
         <div className="font-ws text-xs text-ws-body leading-relaxed mt-1">Completed possessions are verified by the controlling authority, not by the crew that performed the work. Verdicts shown here are session state and are not written to any external register.</div>
       </div>
 

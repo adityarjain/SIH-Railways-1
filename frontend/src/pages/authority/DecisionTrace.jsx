@@ -136,7 +136,7 @@ export const DecisionTrace = ({ onNavigate }) => {
         <span className="font-ws text-xs text-ws-mid">{t('decisionTrace.trainImpactHint')}</span>
         <button
           onClick={() => onNavigate && onNavigate('train-impact')}
-          className="font-display text-[11px] font-bold uppercase tracking-wide text-ws-mid hover:text-ws-ink transition-colors shrink-0"
+          className="font-display text-[11px] font-bold text-ws-mid hover:text-ws-ink transition-colors shrink-0"
         >
           {t('nav.trainImpact')} →
         </button>

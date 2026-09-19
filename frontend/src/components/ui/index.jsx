@@ -23,13 +23,13 @@ const tone = (t) => TONES[t] || TONES.idle;
 /* ------------------------------------------------------------------ Panel */
 
 export const Panel = ({ children, className = '', flush = false }) => (
-  <div className={`bg-surface-panel border border-line rounded-lg ${className}`}>
+  <div className={`bg-surface-panel rounded-lg shadow-soft ${className}`}>
     {flush ? children : children}
   </div>
 );
 
 export const PanelHeader = ({ title, scope, action, children }) => (
-  <div className="px-3 py-2.5 bg-surface-sunken border-b border-line flex items-start justify-between gap-3 rounded-t-lg">
+  <div className="px-3.5 py-3 flex items-start justify-between gap-3 rounded-t-lg">
     <div className="min-w-0">
       <div className="t-label">{title}</div>
       {scope && <div className="t-scope mt-0.5 normal-case tracking-normal">{scope}</div>}
@@ -95,7 +95,7 @@ export const StatusBadge = ({ tone: t = 'idle', children, size = 'md', className
   const c = tone(t);
   return (
     <span
-      className={`inline-flex items-center gap-1 font-semibold uppercase tracking-wide border rounded-sm ${c.bg} ${c.text} ${c.border} ${sizes[size]} ${className}`}
+      className={`inline-flex items-center gap-1 font-semibold border rounded-sm ${c.bg} ${c.text} ${c.border} ${sizes[size]} ${className}`}
     >
       {children}
     </span>
@@ -141,22 +141,24 @@ export const MetricRow = ({ label, value, sub, tone: t, onClick }) => {
 export const Button = ({
   variant = 'secondary', size = 'md', children, className = '', ...props
 }) => {
+  // Filled or tinted, no outline: an outline plus a fill is two edges doing
+  // one job. `active:scale` gives the press a physical acknowledgement.
   const variants = {
-    primary: 'bg-status-info text-white border-status-info hover:bg-[#153c6d]',
-    secondary: 'bg-surface-panel text-rail-700 border-line hover:bg-surface-sunken',
-    danger: 'bg-status-critical text-white border-status-critical hover:bg-[#7e1a14]',
-    warn: 'bg-status-warn-tint text-status-warn border-status-warn hover:bg-[#f0e4c8]',
-    ghost: 'bg-transparent text-rail-500 border-transparent hover:bg-surface-sunken',
+    primary: 'bg-status-info text-white hover:brightness-95',
+    secondary: 'bg-surface-sunken text-rail-700 hover:bg-line-subtle',
+    danger: 'bg-status-critical text-white hover:brightness-95',
+    warn: 'bg-status-warn-tint text-[#8A5A0E] hover:brightness-[0.97]',
+    ghost: 'bg-transparent text-rail-500 hover:bg-surface-sunken',
   };
   const sizes = {
-    sm: 'text-[11px] px-2 py-1',
-    md: 'text-xs px-3 py-1.5',
+    sm: 'text-[12px] px-2.5 py-1.5',
+    md: 'text-[13px] px-3.5 py-2',
     // Ground portal: 44px minimum touch target.
     lg: 'text-sm px-5 py-3 min-h-touch',
   };
   return (
     <button
-      className={`inline-flex items-center justify-center gap-1.5 font-semibold border rounded-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`inline-flex items-center justify-center gap-1.5 font-semibold rounded-md transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 ${variants[variant]} ${sizes[size]} ${className}`}
       {...props}
     >
       {children}
@@ -255,7 +257,7 @@ export const NotAvailable = ({ label, reason }) => (
       <span className="block text-xs font-medium text-status-idle">{label}</span>
       {reason && <span className="block text-[10px] text-rail-400 mt-0.5">{reason}</span>}
     </span>
-    <span className="text-[10px] font-semibold uppercase tracking-wide text-status-idle shrink-0">
+    <span className="text-[10px] font-semibold text-status-idle shrink-0">
       Not available
     </span>
   </div>

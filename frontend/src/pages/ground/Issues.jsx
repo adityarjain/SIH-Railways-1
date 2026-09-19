@@ -62,7 +62,7 @@ export const Issues = ({ onNavigate }) => {
 
       <div className="border border-ws-rule bg-ws-surface overflow-x-auto custom-scrollbar">
         <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
-          <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{t('ground.flaggedWork')}</span>
+          <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.flaggedWork')}</span>
           <span className="font-mono text-[10px] text-ws-light block mt-0.5">
             {flagged.length === 1 ? t('ground.flaggedScope', { count: flagged.length }) : t('ground.flaggedScopePlural', { count: flagged.length })}
           </span>
@@ -77,7 +77,7 @@ export const Issues = ({ onNavigate }) => {
             <thead className="border-b border-ws-rule">
               <tr>
                 {[t('common.task'), t('common.type'), t('common.section'), t('common.window'), t('ground.crewNote'), t('common.status')].map((h, i) => (
-                  <th key={h} className={`px-3.5 py-2 font-display text-[10px] font-semibold uppercase tracking-wide text-ws-light whitespace-nowrap ${i === 5 ? 'text-right' : ''}`}>{h}</th>
+                  <th key={h} className={`px-3.5 py-2 font-display text-[10px] font-semibold text-ws-light whitespace-nowrap ${i === 5 ? 'text-right' : ''}`}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -99,7 +99,7 @@ export const Issues = ({ onNavigate }) => {
 
       <div className="border border-ws-rule bg-ws-surface">
         <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
-          <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{t('ground.reportAnIssue')}</span>
+          <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.reportAnIssue')}</span>
           <span className="font-mono text-[10px] text-ws-light block mt-0.5">{t('ground.reportScope')}</span>
         </div>
         {reportable.length === 0 ? (
@@ -125,7 +125,7 @@ export const Issues = ({ onNavigate }) => {
       <AdvisoryNote
         tone="idle"
         title={t('ground.sessionOnlyTitle')}
-        action={<button onClick={() => onNavigate && onNavigate('my-tasks')} className="font-display text-[11px] font-bold uppercase tracking-wide text-ws-mid hover:text-ws-ink">{t('ground.backToWork')}</button>}
+        action={<button onClick={() => onNavigate && onNavigate('my-tasks')} className="font-display text-[11px] font-bold text-ws-mid hover:text-ws-ink">{t('ground.backToWork')}</button>}
       >
         {t('ground.issuesSessionBody')}
       </AdvisoryNote>

@@ -107,7 +107,7 @@ export const TrainImpact = ({ onNavigate }) => {
                 <thead className="border-b border-ws-rule">
                   <tr>
                     {[t('replanning.train'), t('common.type'), t('trainImpactPage.occupancy'), t('common.priority'), t('trainImpactPage.load')].map((h, i) => (
-                      <th key={h} className={`py-1.5 font-display text-[10px] font-semibold uppercase tracking-wide text-ws-light ${i > 2 ? 'text-right' : ''}`}>{h}</th>
+                      <th key={h} className={`py-1.5 font-display text-[10px] font-semibold text-ws-light ${i > 2 ? 'text-right' : ''}`}>{h}</th>
                     ))}
                   </tr>
                 </thead>

@@ -31,7 +31,7 @@ export const windowText = (task) => {
 
 const Fact = ({ label, value, sub, tone }) => (
   <div className="bg-ws-surface px-4 py-3">
-    <div className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{label}</div>
+    <div className="font-display text-[11px] font-semibold text-ws-light">{label}</div>
     <div className={`font-mono text-[15px] font-bold mt-1 ${tone || 'text-ws-ink'}`}>{value}</div>
     {sub && <div className="font-ws text-[10px] text-ws-light mt-0.5">{sub}</div>}
   </div>
@@ -91,7 +91,7 @@ export const SectionContext = ({ task }) => {
   return (
     <div className="border border-ws-rule bg-ws-surface">
       <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
-        <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">Section context</span>
+        <span className="font-display text-[11px] font-semibold text-ws-light">Section context</span>
         <span className="font-mono text-[10px] text-ws-light block mt-0.5">{sec ? `${sec.section_name} · ${sec.region}` : task.section_id}</span>
       </div>
       {rows.map((r) => (
@@ -111,7 +111,7 @@ export const SectionContext = ({ task }) => {
 export const OperationalGaps = () => (
   <div className="border border-ws-rule bg-ws-surface">
     <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
-      <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">Operational information not available</span>
+      <span className="font-display text-[11px] font-semibold text-ws-light">Operational information not available</span>
       <span className="font-mono text-[10px] text-ws-light block mt-0.5">Absent from the current dataset</span>
     </div>
     {[
@@ -124,7 +124,7 @@ export const OperationalGaps = () => (
           <span className="block font-ws text-xs font-medium text-ws-idle">{label}</span>
           <span className="block font-ws text-[10px] text-ws-light mt-0.5">{reason}</span>
         </span>
-        <span className="font-display text-[10px] font-semibold uppercase tracking-wide text-ws-idle shrink-0">Not available</span>
+        <span className="font-display text-[10px] font-semibold text-ws-idle shrink-0">Not available</span>
       </div>
     ))}
     <p className="px-3 py-2 font-ws text-[10px] text-ws-light leading-relaxed border-t border-ws-hairline">
@@ -180,7 +180,7 @@ export const WorkOrderHeader = ({ task, status, note }) => {
   return (
     <div className="px-4 py-4 flex flex-wrap items-start justify-between gap-3">
       <div className="min-w-0">
-        <div className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">Work order</div>
+        <div className="font-display text-[11px] font-semibold text-ws-light">Work order</div>
         <div className="font-mono text-[22px] font-bold text-ws-ink mt-1 leading-none">{task.task_id}</div>
         <div className="font-ws text-[13px] font-medium text-ws-ink mt-1.5">{task.maintenance_type} · {task.department}</div>
         <div className="font-mono text-[10px] text-ws-light mt-1">asset {task.asset_id}{task.asset_type ? ` · ${task.asset_type}` : ''}</div>
@@ -214,7 +214,7 @@ export const BlockStatusBanner = ({ task, status }) => {
   return (
     <div className={`px-4 py-3 ${bg} border-t border-ws-rule flex items-center gap-2.5 flex-wrap`}>
       <span className={`h-2 w-2 rounded-full ${dot}`} />
-      <span className={`font-display text-[11px] font-bold uppercase tracking-wide ${fg}`}>{label}</span>
+      <span className={`font-display text-[11px] font-bold ${fg}`}>{label}</span>
       <span className="font-ws text-[11px] text-ws-mid">· {detail}</span>
     </div>
   );

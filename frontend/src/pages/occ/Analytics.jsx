@@ -10,17 +10,17 @@ import {
 // Tailwind classes), so the charts read as one system with the rest of the
 // interface. Teal stays reserved for bundling.
 const TOKEN = {
-  critical: '#B22A22',
-  warn: '#96660E',
-  info: '#1B4C8C',
-  ok: '#2E6A4A',
-  ink: '#3C372E',
+  critical: '#C43D30',
+  warn: '#B4791A',
+  info: '#2C63D8',
+  ok: '#2F7D5B',
+  ink: '#3B414D',
 };
 
 const TIP_STYLE = {
   fontSize: '11px',
   borderRadius: '0',
-  border: '1px solid #D7D0C2',
+  border: '1px solid #E2E6ED',
   padding: '4px 8px',
   fontFamily: 'Barlow, sans-serif',
 };
@@ -83,7 +83,7 @@ export const Analytics = () => {
               <BarChart data={riskData} margin={{ top: 8, right: 8, left: -20, bottom: 24 }}>
                 <XAxis dataKey="name" tick={{ fontSize: 9, fill: '#7C7466' }} angle={-15} textAnchor="end" />
                 <YAxis tick={{ fontSize: 10, fill: '#7C7466' }} allowDecimals={false} />
-                <Tooltip contentStyle={TIP_STYLE} cursor={{ fill: '#EFEAE0' }} />
+                <Tooltip contentStyle={TIP_STYLE} cursor={{ fill: '#EFF1F5' }} />
                 <Bar dataKey="count" radius={0}>
                   {riskData.map((entry) => <Cell key={entry.name} fill={entry.color} />)}
                 </Bar>
@@ -99,7 +99,7 @@ export const Analytics = () => {
               <BarChart data={departmentData} layout="vertical" margin={{ top: 8, right: 16, left: 16, bottom: 4 }}>
                 <XAxis type="number" tick={{ fontSize: 10, fill: '#7C7466' }} allowDecimals={false} />
                 <YAxis type="category" dataKey="name" tick={{ fontSize: 9, fill: '#7C7466' }} width={88} />
-                <Tooltip contentStyle={TIP_STYLE} cursor={{ fill: '#EFEAE0' }} />
+                <Tooltip contentStyle={TIP_STYLE} cursor={{ fill: '#EFF1F5' }} />
                 <Bar dataKey="count" fill={TOKEN.ink} radius={0} />
               </BarChart>
             </ResponsiveContainer>

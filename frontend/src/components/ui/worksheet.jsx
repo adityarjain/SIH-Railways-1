@@ -1,58 +1,69 @@
 import React from 'react';
 
 /**
- * Shared primitives for the "industrial worksheet" (design 2A) page idiom —
- * extracted after Overview, Replanning and Maintenance Blocks each hand-built
- * the same numbered-region header, field row, pill and segmented-control
- * patterns. Every remaining page reuses these instead of re-deriving them.
+ * Shared page primitives, used by every screen rather than re-derived per
+ * page. Repainted from the original worksheet idiom: the numbered region
+ * prefixes, forced uppercase labels and per-row hairlines that gave every
+ * screen the same dense ledger texture are gone. A heading now carries its
+ * own weight, rows are separated by space, and a rule is drawn only where it
+ * genuinely divides two things.
  */
 
-/** Hindi drops forced uppercase/tracking on display labels (design 2A rule). */
-export const wsCase = (isHindi) => ({
-  uc: isHindi ? '' : 'uppercase',
-  tr: isHindi ? '' : 'tracking-[0.1em]',
-});
+/**
+ * Case helper. Uppercase + letter-tracking is no longer the house style, so
+ * this returns empty strings and stays only because call sites destructure
+ * it. Hindi never took the caps anyway: Devanagari has no case, and the
+ * tracking broke conjuncts.
+ */
+export const wsCase = () => ({ uc: '', tr: '' });
 
-/** Numbered worksheet region header: mono number, display title, rule, meta. */
-export const RegionHeader = ({ number, title, meta, isHindi, className = '' }) => {
-  const { uc, tr } = wsCase(isHindi);
-  return (
-    <div className={`flex items-center gap-2.5 pb-2 flex-wrap ${className}`}>
-      {number && <span className="font-mono text-[11px] font-bold text-ws-light">{number}</span>}
-      <span className={`font-display text-base font-semibold ${uc} ${tr} text-ws-ink`}>{title}</span>
-      <span className="flex-1 min-w-6 h-px bg-ws-rule" />
-      {meta && <span className="font-mono text-[10px] text-ws-light">{meta}</span>}
-    </div>
-  );
-};
+/**
+ * Region header. `number` is accepted and deliberately ignored: ordinal
+ * prefixes ("01", "02") read as filing-cabinet decoration rather than
+ * information, and position on the page already communicates sequence. Kept
+ * in the signature so the 55 existing call sites need no edit.
+ */
+export const RegionHeader = ({ title, meta, className = '' }) => (
+  <div className={`flex items-baseline gap-3 pb-2.5 flex-wrap ${className}`}>
+    <span className="font-display text-[15px] font-semibold tracking-[-0.01em] text-ws-ink">{title}</span>
+    {meta && <span className="font-mono text-[10px] text-ws-light ml-auto">{meta}</span>}
+  </div>
+);
 
-/** Dense label/value row for field-grid dossiers. */
+/** Label/value row. Separated by space; a divider is opt-in, not automatic. */
 export const FieldRow = ({ label, value, tone, onClick }) => {
   const Tag = onClick ? 'button' : 'div';
   return (
     <Tag
       onClick={onClick}
-      className={`w-full flex items-start justify-between gap-3 py-1.5 border-b border-ws-hairline last:border-b-0 text-left ${onClick ? 'hover:bg-ws-paper transition-colors' : ''}`}
+      className={`w-full flex items-baseline justify-between gap-4 py-[7px] px-2 -mx-2 rounded text-left ${
+        onClick ? 'hover:bg-ws-tick transition-colors' : ''
+      }`}
     >
-      <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light shrink-0">{label}</span>
+      <span className="font-display text-[12px] font-medium text-ws-mid shrink-0">{label}</span>
       <span className={`font-mono text-[12px] font-medium text-right ${tone || 'text-ws-ink'}`}>{value}</span>
     </Tag>
   );
 };
 
+/**
+ * Tinted fill carries the status; the hard 1px outline every pill used to
+ * draw is dropped, since a page can hold a dozen of these and the outlines
+ * were what turned a status into a sticker.
+ */
 export const PILL_TONE = {
-  critical: 'text-ws-critical border-ws-critical bg-ws-barCriticalBg',
-  warn: 'text-ws-warn border-ws-warn bg-[#F5ECD6]',
-  ok: 'text-ws-ok border-ws-ok bg-[#E1EDE6]',
-  info: 'text-ws-info border-ws-info bg-ws-barPlannedBg',
-  bundle: 'text-ws-bundle border-ws-bundle bg-ws-barBundledBg',
-  idle: 'text-ws-idle border-ws-rule bg-ws-tick',
+  critical: 'text-ws-barCriticalLabel bg-ws-barCriticalBg',
+  warn: 'text-[#8A5A0E] bg-status-warn-tint',
+  ok: 'text-[#215A41] bg-status-ok-tint',
+  info: 'text-ws-barPlannedLabel bg-ws-barPlannedBg',
+  bundle: 'text-ws-barBundledLabel bg-ws-barBundledBg',
+  idle: 'text-ws-mid bg-ws-tick',
 };
 
 export const Pill = ({ tone = 'idle', size = 'md', children }) => (
   <span
-    className={`inline-flex items-center font-display font-bold uppercase tracking-wide border shrink-0 ${PILL_TONE[tone]} ${
-      size === 'sm' ? 'px-1 py-0.5 text-[8px]' : 'px-1.5 py-0.5 text-[9px]'
+    className={`inline-flex items-center rounded font-display font-semibold shrink-0 ${PILL_TONE[tone]} ${
+      size === 'sm' ? 'px-1.5 py-[2px] text-[10px]' : 'px-2 py-[3px] text-[11px]'
     }`}
   >
     {children}
@@ -60,20 +71,20 @@ export const Pill = ({ tone = 'idle', size = 'md', children }) => (
 );
 
 const ADVISORY_TONE = {
-  info: { bar: 'border-l-ws-info', title: 'text-ws-info' },
-  idle: { bar: 'border-l-ws-idle', title: 'text-ws-idle' },
-  warn: { bar: 'border-l-ws-warn', title: 'text-ws-warn' },
-  critical: { bar: 'border-l-ws-critical', title: 'text-ws-critical' },
-  ok: { bar: 'border-l-ws-ok', title: 'text-ws-ok' },
+  info: { bg: 'bg-status-info-tint', title: 'text-ws-barPlannedLabel' },
+  idle: { bg: 'bg-ws-tick', title: 'text-ws-body' },
+  warn: { bg: 'bg-status-warn-tint', title: 'text-[#8A5A0E]' },
+  critical: { bg: 'bg-status-critical-tint', title: 'text-ws-barCriticalLabel' },
+  ok: { bg: 'bg-status-ok-tint', title: 'text-[#215A41]' },
 };
 
 export const AdvisoryNote = ({ tone = 'info', title, children, action }) => {
   const c = ADVISORY_TONE[tone] || ADVISORY_TONE.info;
   return (
-    <div className={`border-l-[3px] ${c.bar} bg-ws-paper px-3 py-2.5`}>
-      <div className="flex items-start justify-between gap-2 flex-wrap">
+    <div className={`rounded-lg ${c.bg} px-3.5 py-3`}>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
         <div className="min-w-0">
-          {title && <div className={`font-display text-[11px] font-bold uppercase tracking-wide ${c.title}`}>{title}</div>}
+          {title && <div className={`font-display text-[12px] font-semibold ${c.title}`}>{title}</div>}
           <div className="font-ws text-xs text-ws-body leading-relaxed mt-1">{children}</div>
         </div>
         {action && <div className="shrink-0">{action}</div>}
@@ -82,24 +93,26 @@ export const AdvisoryNote = ({ tone = 'info', title, children, action }) => {
   );
 };
 
-/** Segmented button group — the Full day / Night / Possession idiom. */
-export const SegmentedControl = ({ options, value, onChange, isHindi, size = 'md', className = '' }) => {
-  const { uc, tr } = wsCase(isHindi);
-  const sizeCls = size === 'sm' ? 'px-2 py-1 text-[11px]' : 'px-2.5 py-1 text-[13px]';
+/**
+ * Segmented control. A sunken track with one raised active segment, instead
+ * of a hard-bordered row of boxes with a solid black active state.
+ */
+export const SegmentedControl = ({ options, value, onChange, size = 'md', className = '' }) => {
+  const sizeCls = size === 'sm' ? 'px-2.5 py-1 text-[11px]' : 'px-3 py-1.5 text-[12px]';
   return (
-    <div className={`flex border border-ws-rule shrink-0 ${className}`}>
-      {options.map((opt, i) => (
+    <div className={`inline-flex gap-0.5 rounded-md bg-ws-tick p-0.5 shrink-0 ${className}`}>
+      {options.map((opt) => (
         <button
           key={opt.id}
           onClick={() => onChange(opt.id)}
           disabled={opt.disabled}
           title={opt.title}
-          className={`${sizeCls} font-display font-bold ${uc} ${tr} transition-colors ${i > 0 ? 'border-l border-ws-rule' : ''} ${
+          className={`${sizeCls} rounded font-display font-semibold transition-colors ${
             opt.disabled
-              ? 'text-ws-disabled cursor-not-allowed bg-ws-surface'
+              ? 'text-ws-disabled cursor-not-allowed'
               : value === opt.id
-              ? 'bg-ws-ink text-white'
-              : 'bg-ws-surface text-ws-mid hover:bg-ws-paper hover:text-ws-ink'
+              ? 'bg-ws-surface text-ws-ink shadow-soft'
+              : 'text-ws-mid hover:text-ws-ink'
           }`}
         >
           {opt.label}
@@ -109,26 +122,26 @@ export const SegmentedControl = ({ options, value, onChange, isHindi, size = 'md
   );
 };
 
-/** Big mono figure + caption — the Overview "plan state" metric idiom. */
+/** Large figure + caption. The headline number on summary strips. */
 export const StatFigure = ({ value, label, tone = 'text-ws-ink' }) => (
   <div>
-    <div className={`font-mono text-[22px] font-bold leading-none ${tone}`}>{value}</div>
-    <div className="font-ws text-xs text-ws-mid mt-[3px] leading-[1.35]">{label}</div>
+    <div className={`font-mono text-[24px] font-semibold leading-none tracking-[-0.02em] ${tone}`}>{value}</div>
+    <div className="font-ws text-[12px] text-ws-mid mt-1.5 leading-[1.35]">{label}</div>
   </div>
 );
 
-/** Text input / select controls in the worksheet idiom. */
+/** Text input / select controls. Focus is a ring, not a colour swap. */
 export const WsInput = ({ className = '', ...props }) => (
   <input
     {...props}
-    className={`font-ws text-[13px] text-ws-ink bg-ws-surface border border-ws-rule px-2.5 py-1.5 placeholder:text-ws-light focus:outline-none ${className}`}
+    className={`font-ws text-[13px] text-ws-ink bg-ws-surface rounded-md border border-ws-rule px-3 py-2 placeholder:text-ws-light focus:outline-none focus:border-ws-info focus:ring-2 focus:ring-status-info/15 transition-colors ${className}`}
   />
 );
 
 export const WsSelect = ({ className = '', children, ...props }) => (
   <select
     {...props}
-    className={`font-ws text-[13px] text-ws-ink bg-ws-surface border border-ws-rule px-2 py-1.5 ${className}`}
+    className={`font-ws text-[13px] text-ws-ink bg-ws-surface rounded-md border border-ws-rule px-2.5 py-2 focus:outline-none focus:border-ws-info focus:ring-2 focus:ring-status-info/15 transition-colors ${className}`}
   >
     {children}
   </select>

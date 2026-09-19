@@ -113,19 +113,19 @@ export const MyTasks = ({ onNavigate }) => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-ws-rule border-y border-ws-rule">
                   <div className="bg-ws-surface px-3 py-2">
-                    <div className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">Window</div>
+                    <div className="font-display text-[11px] font-semibold text-ws-light">Window</div>
                     <div className={`font-mono text-[11px] mt-0.5 ${scheduled ? 'text-ws-ink' : 'text-ws-warn'}`}>
                       {scheduled ? `${minToHhmm(t.start_minute)}–${minToHhmm(t.end_minute)}` : 'Not scheduled'}
                     </div>
                     <div className="font-mono text-[9px] text-ws-light mt-0.5">{scheduled ? t.scheduled_date : `due ${t.deadline}`}</div>
                   </div>
                   <div className="bg-ws-surface px-3 py-2">
-                    <div className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">Block</div>
+                    <div className="font-display text-[11px] font-semibold text-ws-light">Block</div>
                     <div className="font-mono text-[11px] text-ws-ink mt-0.5">{(t.block_ids || []).join(' + ') || '—'}</div>
                     <div className="font-mono text-[9px] text-ws-light mt-0.5">{t.required_duration_minutes} min</div>
                   </div>
                   <div className="bg-ws-surface px-3 py-2">
-                    <div className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">Crew</div>
+                    <div className="font-display text-[11px] font-semibold text-ws-light">Crew</div>
                     <div className="font-mono text-[11px] text-ws-ink mt-0.5">{(t.assigned_teams || []).join(', ') || '—'}</div>
                     <div className="font-mono text-[9px] text-ws-light mt-0.5">{t.required_team_size} required</div>
                   </div>
@@ -133,7 +133,7 @@ export const MyTasks = ({ onNavigate }) => {
 
                 {t.statusMeta?.reason && (
                   <div className="px-3.5 py-2 bg-[#F5ECD6] border-b border-ws-rule">
-                    <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-warn">Crew note</span>
+                    <span className="font-display text-[11px] font-semibold text-ws-warn">Crew note</span>
                     <p className="font-ws text-[11px] text-ws-body mt-0.5">{t.statusMeta.reason}</p>
                   </div>
                 )}
@@ -167,10 +167,10 @@ export const MyTasks = ({ onNavigate }) => {
 
       <div className="border-l-[3px] border-l-ws-idle bg-ws-paper px-3 py-2.5 flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <div className="font-display text-[11px] font-bold uppercase tracking-wide text-ws-idle">Session state only</div>
+          <div className="font-display text-[11px] font-bold text-ws-idle">Session state only</div>
           <div className="font-ws text-xs text-ws-body leading-relaxed mt-1">Status changes are held in the browser for this session. Nothing is written to an external register and no notification is sent.</div>
         </div>
-        <button onClick={() => onNavigate && onNavigate('completed')} className="font-display text-[11px] font-bold uppercase tracking-wide text-ws-mid hover:text-ws-ink shrink-0">
+        <button onClick={() => onNavigate && onNavigate('completed')} className="font-display text-[11px] font-bold text-ws-mid hover:text-ws-ink shrink-0">
           Completion / handoff
         </button>
       </div>

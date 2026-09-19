@@ -72,7 +72,7 @@ export const DecisionTraceModal = ({ isOpen, onClose, task }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="h-6 w-6 rounded-full bg-status-info-tint text-status-info font-bold text-xs flex items-center justify-center">1</span>
-                <h5 className="text-xs font-bold text-rail-900 uppercase tracking-wide">Step 1 — Maintenance Request</h5>
+                <h5 className="text-xs font-bold text-rail-900 ">Step 1 — Maintenance Request</h5>
               </div>
               <Badge variant="primary" size="sm">{request.required_duration_minutes} MIN</Badge>
             </div>
@@ -105,7 +105,7 @@ export const DecisionTraceModal = ({ isOpen, onClose, task }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="h-6 w-6 rounded-full bg-status-critical-tint text-status-critical font-bold text-xs flex items-center justify-center">2</span>
-                <h5 className="text-xs font-bold text-rail-900 uppercase tracking-wide">Step 2 — Failure Risk Signal</h5>
+                <h5 className="text-xs font-bold text-rail-900 ">Step 2 — Failure Risk Signal</h5>
               </div>
               <Badge variant="CRITICAL" size="sm">{risk.risk_level} RISK</Badge>
             </div>
@@ -136,7 +136,7 @@ export const DecisionTraceModal = ({ isOpen, onClose, task }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="h-6 w-6 rounded-full bg-bundle-tint text-bundle font-bold text-xs flex items-center justify-center">3</span>
-                <h5 className="text-xs font-bold text-rail-900 uppercase tracking-wide">
+                <h5 className="text-xs font-bold text-rail-900 ">
                   Step 3 — Candidate Evaluation &amp; Feasibility Filters
                 </h5>
               </div>
@@ -183,7 +183,7 @@ export const DecisionTraceModal = ({ isOpen, onClose, task }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="h-6 w-6 rounded-full bg-status-ok-tint text-status-ok font-bold text-xs flex items-center justify-center">4</span>
-                <h5 className="text-xs font-bold text-rail-900 uppercase tracking-wide">
+                <h5 className="text-xs font-bold text-rail-900 ">
                   Step 4 — Team Feasibility (S005 / S006)
                 </h5>
               </div>
@@ -208,7 +208,7 @@ export const DecisionTraceModal = ({ isOpen, onClose, task }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="h-6 w-6 rounded-full bg-status-info-tint text-status-info font-bold text-xs flex items-center justify-center">5</span>
-                <h5 className="text-xs font-bold text-rail-900 uppercase tracking-wide">
+                <h5 className="text-xs font-bold text-rail-900 ">
                   Step 5 — Affected Train Services
                 </h5>
               </div>
@@ -268,7 +268,7 @@ export const DecisionTraceModal = ({ isOpen, onClose, task }) => {
           <div className="p-4 rounded-lg border border-status-ok bg-status-ok-tint space-y-2">
             <div className="flex items-center gap-2">
               <Award size={18} className="text-status-ok" />
-              <h5 className="text-xs font-bold text-status-ok uppercase tracking-wide">
+              <h5 className="text-xs font-bold text-status-ok ">
                 Step 6 — Selected Assignment
               </h5>
             </div>

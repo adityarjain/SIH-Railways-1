@@ -53,7 +53,7 @@ export const ActiveBlock = ({ onNavigate }) => {
     return (
       <div className="border border-ws-rule bg-ws-surface">
         <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
-          <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{t('ground.activeBlockTitle')}</span>
+          <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.activeBlockTitle')}</span>
           <span className="font-mono text-[10px] text-ws-light block mt-0.5">{selectedDept}</span>
         </div>
         <div className="px-4 py-6 text-center">
@@ -91,7 +91,7 @@ export const ActiveBlock = ({ onNavigate }) => {
       <AdvisoryNote
         tone="idle"
         title={t('ground.sessionOnlyTitle')}
-        action={<button onClick={() => onNavigate && onNavigate('my-tasks')} className="font-display text-[11px] font-bold uppercase tracking-wide text-ws-mid hover:text-ws-ink">{t('ground.viewAllWork')}</button>}
+        action={<button onClick={() => onNavigate && onNavigate('my-tasks')} className="font-display text-[11px] font-bold text-ws-mid hover:text-ws-ink">{t('ground.viewAllWork')}</button>}
       >
         {t('ground.sessionOnlyBody')}
       </AdvisoryNote>

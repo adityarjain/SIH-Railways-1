@@ -113,7 +113,7 @@ export const Demand = ({ onNavigate }) => {
             {statuses.map((s) => <option key={s} value={s}>{s}</option>)}
           </WsSelect>
           {clearable && (
-            <button onClick={clear} className="font-display text-[11px] font-bold uppercase tracking-wide text-ws-mid hover:text-ws-ink px-2 py-1.5">
+            <button onClick={clear} className="font-display text-[11px] font-bold text-ws-mid hover:text-ws-ink px-2 py-1.5">
               {t('common.clear')}
             </button>
           )}
@@ -126,7 +126,7 @@ export const Demand = ({ onNavigate }) => {
             <thead className="border-b border-ws-rule bg-ws-tick">
               <tr>
                 {[t('common.task'), t('common.type'), t('common.department'), t('common.section'), t('common.earliest'), t('common.deadline'), t('common.risk'), t('common.priority'), t('common.duration'), t('common.status')].map((h, i) => (
-                  <th key={h} className={`px-3.5 py-2 font-display text-[10px] font-semibold uppercase tracking-wide text-ws-light whitespace-nowrap ${i >= 6 ? 'text-right' : ''}`}>{h}</th>
+                  <th key={h} className={`px-3.5 py-2 font-display text-[10px] font-semibold text-ws-light whitespace-nowrap ${i >= 6 ? 'text-right' : ''}`}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -160,7 +160,7 @@ export const Demand = ({ onNavigate }) => {
             <thead className="border-b border-ws-rule bg-ws-tick">
               <tr>
                 {[t('demand.colAsset'), t('common.section'), t('common.department'), t('demand.colRiskScore'), t('common.risk'), t('demand.colFailure30'), t('demand.colDegradation'), t('demand.band')].map((h, i) => (
-                  <th key={h} className={`px-3.5 py-2 font-display text-[10px] font-semibold uppercase tracking-wide text-ws-light whitespace-nowrap ${i >= 3 ? 'text-right' : ''}`}>{h}</th>
+                  <th key={h} className={`px-3.5 py-2 font-display text-[10px] font-semibold text-ws-light whitespace-nowrap ${i >= 3 ? 'text-right' : ''}`}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -220,7 +220,7 @@ export const Demand = ({ onNavigate }) => {
 
             <div className="bg-ws-ink text-white p-4 border border-ws-body space-y-3">
               <div className="flex items-center justify-between">
-                <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{t('demand.predictedRisk')}</span>
+                <span className="font-display text-[11px] font-semibold text-ws-light">{t('demand.predictedRisk')}</span>
                 <Pill tone={PILL_TONE_MAP[bandTone(bandOf(selected))] || 'idle'}>{bandOf(selected) || '—'}</Pill>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-ws-body border border-ws-body">
@@ -230,7 +230,7 @@ export const Demand = ({ onNavigate }) => {
                   [t('demand.colDegradation'), selected.forecast_30d_degradation != null ? selected.forecast_30d_degradation.toFixed(1) : t('demand.notAvailable'), null],
                 ].map(([k, v, sub]) => (
                   <div key={k} className="bg-ws-ink p-2.5">
-                    <span className="font-display text-[9px] uppercase tracking-wide text-ws-light block">{k}</span>
+                    <span className="font-display text-[9px] text-ws-light block">{k}</span>
                     <span className="font-mono text-lg font-semibold text-white">{v}</span>
                     {sub && <span className="font-ws text-[9px] text-ws-light block mt-0.5">{sub}</span>}
                   </div>
@@ -240,7 +240,7 @@ export const Demand = ({ onNavigate }) => {
             </div>
 
             <div className="border border-ws-rule">
-              <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">
+              <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule font-display text-[11px] font-semibold text-ws-light">
                 {t('demand.workOrderRequirement')}
               </div>
               {[
@@ -262,7 +262,7 @@ export const Demand = ({ onNavigate }) => {
 
             {selected.scheduled_date && (
               <div className="border border-ws-rule">
-                <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">
+                <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule font-display text-[11px] font-semibold text-ws-light">
                   {t('demand.scheduledPossession')}
                 </div>
                 {[

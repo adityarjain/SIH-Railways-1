@@ -12,7 +12,7 @@ import { minToHhmm } from '../../utils/time';
 
 const FieldRow = ({ label, value, tone }) => (
   <div className="flex items-start justify-between gap-3 py-1.5 border-b border-ws-hairline last:border-b-0">
-    <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light shrink-0">{label}</span>
+    <span className="font-display text-[11px] font-semibold text-ws-light shrink-0">{label}</span>
     <span className={`font-mono text-[12px] font-medium text-right ${tone || 'text-ws-ink'}`}>{value}</span>
   </div>
 );
@@ -26,7 +26,7 @@ const PILL_TONE = {
 };
 
 const Pill = ({ tone = 'idle', children }) => (
-  <span className={`inline-flex items-center px-1.5 py-0.5 font-display text-[9px] font-bold uppercase tracking-wide border shrink-0 ${PILL_TONE[tone]}`}>
+  <span className={`inline-flex items-center px-1.5 py-0.5 font-display text-[9px] font-bold border shrink-0 ${PILL_TONE[tone]}`}>
     {children}
   </span>
 );
@@ -41,7 +41,7 @@ const AdvisoryNote = ({ tone = 'info', title, children }) => {
   const c = ADVISORY_TONE[tone] || ADVISORY_TONE.info;
   return (
     <div className={`border-l-[3px] ${c.bar} bg-ws-paper px-3 py-2.5`}>
-      {title && <div className={`font-display text-[11px] font-bold uppercase tracking-wide ${c.title}`}>{title}</div>}
+      {title && <div className={`font-display text-[11px] font-bold ${c.title}`}>{title}</div>}
       <div className="font-ws text-xs text-ws-body leading-relaxed mt-1">{children}</div>
     </div>
   );

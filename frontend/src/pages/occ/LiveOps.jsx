@@ -129,7 +129,7 @@ export const LiveOps = ({ onNavigate }) => {
                 {!isReplanned ? (
                   <button
                     onClick={executeReplanFlow}
-                    className="flex items-center gap-2 px-4 py-2 bg-ws-critical text-white font-display text-xs font-bold uppercase tracking-wide hover:brightness-95 transition-[filter]"
+                    className="flex items-center gap-2 px-4 py-2 bg-ws-critical text-white font-display text-xs font-bold hover:brightness-95 transition-[filter]"
                   >
                     <RefreshCw size={14} /> {t('liveOps.requestReplan')}
                   </button>
@@ -154,7 +154,7 @@ export const LiveOps = ({ onNavigate }) => {
             <div className="pt-2">
               <button
                 onClick={() => triggerEvent('NEW_TRAIN_BLOCKED')}
-                className="px-3.5 py-1.5 bg-ws-info text-white font-display text-xs font-bold uppercase tracking-wide hover:brightness-95 transition-[filter]"
+                className="px-3.5 py-1.5 bg-ws-info text-white font-display text-xs font-bold hover:brightness-95 transition-[filter]"
               >
                 {t('liveOps.injectConflict')} (TRN-SIM-002)
               </button>
@@ -186,7 +186,7 @@ export const LiveOps = ({ onNavigate }) => {
             </div>
             <button
               onClick={() => triggerEvent(o.event)}
-              className="w-full mt-2 py-1.5 px-3 bg-ws-paper hover:bg-ws-tick text-ws-ink font-display font-bold text-xs uppercase tracking-wide transition-colors"
+              className="w-full mt-2 py-1.5 px-3 bg-ws-paper hover:bg-ws-tick text-ws-ink font-display font-bold text-xs transition-colors"
             >
               {t('liveOps.loadScenario')}
             </button>

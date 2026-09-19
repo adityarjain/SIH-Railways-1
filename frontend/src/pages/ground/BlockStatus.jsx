@@ -60,7 +60,7 @@ export const BlockStatus = () => {
 
       <div className="border border-ws-rule bg-ws-surface overflow-x-auto custom-scrollbar">
         <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
-          <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{t('ground.allocated')}</span>
+          <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.allocated')}</span>
           <span className="font-mono text-[10px] text-ws-light block mt-0.5">{t('ground.allocatedScope', { count: rows.length })}</span>
         </div>
         {rows.length === 0 ? (
@@ -70,7 +70,7 @@ export const BlockStatus = () => {
             <thead className="border-b border-ws-rule">
               <tr>
                 {[t('common.block'), t('common.date'), t('common.window'), t('common.section'), t('common.task'), t('common.status')].map((h, i) => (
-                  <th key={h} className={`px-3.5 py-2 font-display text-[10px] font-semibold uppercase tracking-wide text-ws-light whitespace-nowrap ${i === 5 ? 'text-right' : ''}`}>{h}</th>
+                  <th key={h} className={`px-3.5 py-2 font-display text-[10px] font-semibold text-ws-light whitespace-nowrap ${i === 5 ? 'text-right' : ''}`}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -95,7 +95,7 @@ export const BlockStatus = () => {
 
       <div className="border border-ws-rule bg-ws-surface">
         <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
-          <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{t('ground.trainMovements')}</span>
+          <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.trainMovements')}</span>
           <span className="font-mono text-[10px] text-ws-light block mt-0.5">{t('ground.trainMovementsScope')}</span>
         </div>
         {sectionDates.length === 0 ? (

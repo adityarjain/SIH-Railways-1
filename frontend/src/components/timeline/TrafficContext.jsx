@@ -28,7 +28,7 @@ export const TrafficContext = ({ sectionId = 'SEC-0004' }) => {
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
       <div className={TILE}>
         <div className={TILE_LABEL}>
-          <span className="flex items-center gap-1 font-display font-semibold uppercase tracking-wide"><Train size={12} className="text-ws-info" />{t('trafficContext.passengerTraffic')}</span>
+          <span className="flex items-center gap-1 font-display font-semibold "><Train size={12} className="text-ws-info" />{t('trafficContext.passengerTraffic')}</span>
           <Pill tone={passengerBand} size="sm">{passengerLabel}</Pill>
         </div>
         <div className="font-mono text-base font-bold text-ws-ink mt-1">{t('trafficContext.trainsCount', { count: traffic.passenger_trains })}</div>
@@ -41,7 +41,7 @@ export const TrafficContext = ({ sectionId = 'SEC-0004' }) => {
 
       <div className={TILE}>
         <div className={TILE_LABEL}>
-          <span className="flex items-center gap-1 font-display font-semibold uppercase tracking-wide"><Package size={12} className="text-ws-warn" />{t('trafficContext.goodsForecast')}</span>
+          <span className="flex items-center gap-1 font-display font-semibold "><Package size={12} className="text-ws-warn" />{t('trafficContext.goodsForecast')}</span>
           <Pill tone={freightBand} size="sm">{freightBand === 'warn' ? t('trafficContext.elevated') : t('trafficContext.normal')}</Pill>
         </div>
         <div className="font-mono text-base font-bold text-ws-ink mt-1">{t('trafficContext.pathsCount', { count: traffic.expected_freight_trains ?? '—' })}</div>
@@ -52,7 +52,7 @@ export const TrafficContext = ({ sectionId = 'SEC-0004' }) => {
 
       <div className={TILE}>
         <div className={TILE_LABEL}>
-          <span className="flex items-center gap-1 font-display font-semibold uppercase tracking-wide"><ShieldCheck size={12} className="text-ws-ok" />{t('trafficContext.trackStatus')}</span>
+          <span className="flex items-center gap-1 font-display font-semibold "><ShieldCheck size={12} className="text-ws-ok" />{t('trafficContext.trackStatus')}</span>
           <Pill tone={traffic.available_block_windows > 0 ? 'ok' : 'critical'} size="sm">
             {traffic.available_block_windows > 0 ? t('trafficContext.available') : t('trafficContext.blocked')}
           </Pill>
@@ -63,7 +63,7 @@ export const TrafficContext = ({ sectionId = 'SEC-0004' }) => {
 
       <div className={`${TILE} bg-[#E1EDE6] border-ws-ok`}>
         <div className="flex items-center justify-between text-[11px] text-ws-ok">
-          <span className="flex items-center gap-1 font-display font-bold uppercase tracking-wide"><CheckCircle2 size={12} />{t('trafficContext.sectionProfile')}</span>
+          <span className="flex items-center gap-1 font-display font-bold "><CheckCircle2 size={12} />{t('trafficContext.sectionProfile')}</span>
           <Pill tone="ok" size="sm">{t('trafficContext.physical')}</Pill>
         </div>
         <div className="font-mono text-sm font-bold text-ws-ok mt-1">{traffic.section_length_km != null ? `${traffic.section_length_km} km` : '—'}</div>

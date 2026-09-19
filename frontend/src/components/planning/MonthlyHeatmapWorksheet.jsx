@@ -59,7 +59,7 @@ export const MonthlyHeatmapWorksheet = ({ onSelectDate }) => {
           >
             <div className="flex justify-between items-center text-xs">
               <span className="font-mono font-bold">{d.day}</span>
-              <span className="text-[8px] font-display font-bold uppercase tracking-wide opacity-70">{t(`maintenanceBlocks.${workloadLabel[d.workload]}`)}</span>
+              <span className="text-[8px] font-display font-bold opacity-70">{t(`maintenanceBlocks.${workloadLabel[d.workload]}`)}</span>
             </div>
             <div className="mt-1 space-y-0.5 text-[10px]">
               <div className="flex justify-between"><span>{t('common.tasks')}</span><span className="font-mono font-bold">{d.tasks}</span></div>

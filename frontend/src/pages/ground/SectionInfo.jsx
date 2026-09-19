@@ -41,7 +41,7 @@ export const SectionInfo = () => {
     return (
       <div className="border border-ws-rule bg-ws-surface">
         <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
-          <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{t('ground.sectionInfoTitle')}</span>
+          <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.sectionInfoTitle')}</span>
           <span className="font-mono text-[10px] text-ws-light block mt-0.5">{selectedDept}</span>
         </div>
         <div className="px-4 py-8 text-center font-ws text-xs font-semibold text-ws-mid">{t('ground.noSectionAssigned')}</div>
@@ -77,7 +77,7 @@ export const SectionInfo = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="border border-ws-rule bg-ws-surface">
               <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
-                <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{t('ground.sectionRecord')}</span>
+                <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.sectionRecord')}</span>
                 <span className="font-mono text-[10px] text-ws-light block mt-0.5">corridors_sections.csv</span>
               </div>
               <FieldRow label={t('common.section')} value={`${sec.section_id} · ${sec.section_name}`} />
@@ -93,7 +93,7 @@ export const SectionInfo = () => {
               {traffic ? (
                 <div className="border border-ws-rule bg-ws-surface">
                   <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
-                    <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{t('ground.trafficProfile')}</span>
+                    <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.trafficProfile')}</span>
                     <span className="font-mono text-[10px] text-ws-light block mt-0.5">section_traffic.json · {traffic.date}</span>
                   </div>
                   <FieldRow label={t('ground.passengerServices')} value={traffic.passenger_trains} />
@@ -105,7 +105,7 @@ export const SectionInfo = () => {
               ) : (
                 <div className="border border-ws-rule bg-ws-surface">
                   <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
-                    <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{t('ground.trafficProfile')}</span>
+                    <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.trafficProfile')}</span>
                   </div>
                   <div className="px-4 py-6 text-center font-ws text-xs text-ws-mid">{t('ground.noTrafficProfile')}</div>
                 </div>
@@ -113,7 +113,7 @@ export const SectionInfo = () => {
 
               <div className="border border-ws-rule bg-ws-surface">
                 <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
-                  <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{t('ground.recordedMovements')}</span>
+                  <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.recordedMovements')}</span>
                   <span className="font-mono text-[10px] text-ws-light block mt-0.5">{t('ground.projectedFrom')}</span>
                 </div>
                 {trainDates.length === 0 ? (
@@ -148,7 +148,7 @@ export const SectionInfo = () => {
 
           <div className="border border-ws-rule bg-ws-surface">
             <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
-              <span className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{t('ground.gapsTitle')}</span>
+              <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.gapsTitle')}</span>
               <span className="font-mono text-[10px] text-ws-light block mt-0.5">{t('ground.gapsScope')}</span>
             </div>
             {[
@@ -162,7 +162,7 @@ export const SectionInfo = () => {
                   <span className="block font-ws text-xs font-medium text-ws-idle">{label}</span>
                   <span className="block font-ws text-[10px] text-ws-light mt-0.5">{reason}</span>
                 </span>
-                <span className="font-display text-[10px] font-semibold uppercase tracking-wide text-ws-idle shrink-0">Not available</span>
+                <span className="font-display text-[10px] font-semibold text-ws-idle shrink-0">Not available</span>
               </div>
             ))}
           </div>

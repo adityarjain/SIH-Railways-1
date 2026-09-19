@@ -191,7 +191,7 @@ export const BlockPlanning = ({ onNavigate }) => {
         <span className="font-ws text-xs text-ws-mid">{t('blockPlanning.bundlingHint')}</span>
         <button
           onClick={() => onNavigate && onNavigate('maintenance-blocks')}
-          className="font-display text-[11px] font-bold uppercase tracking-wide text-ws-mid hover:text-ws-ink transition-colors shrink-0"
+          className="font-display text-[11px] font-bold text-ws-mid hover:text-ws-ink transition-colors shrink-0"
         >
           {t('nav.maintenanceBlocks')} →
         </button>

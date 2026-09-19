@@ -45,7 +45,7 @@ export const RecommendationActions = ({ taskId = 'TASK-000005' }) => {
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <h3 className="font-display text-xs font-bold uppercase tracking-wide text-ws-ink">
+          <h3 className="font-display text-[14px] font-semibold text-ws-ink">
             {t('recommendationActions.title', { taskId })}
           </h3>
           <p className="font-ws text-[11px] text-ws-mid mt-0.5">{t('recommendationActions.subtitle')}</p>
@@ -60,26 +60,26 @@ export const RecommendationActions = ({ taskId = 'TASK-000005' }) => {
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => approveRecommendation(taskId)}
-          className="flex items-center gap-1.5 px-3 py-1.5 font-display text-xs font-bold uppercase tracking-wide bg-ws-ok text-white hover:brightness-95 transition-[filter]"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-ws-ok text-white hover:brightness-95 active:scale-[0.98] transition-all"
         >
           <CheckCircle2 size={14} /> {t('recommendationActions.approve')}
         </button>
         <button
           onClick={() => setNoteFor('MODIFIED')}
-          className="flex items-center gap-1.5 px-3 py-1.5 font-display text-xs font-bold uppercase tracking-wide bg-[#F5ECD6] text-ws-warn border border-ws-warn hover:bg-[#F0E4C8] transition-colors"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-status-warn-tint text-[#8A5A0E] hover:brightness-[0.97] active:scale-[0.98] transition-all"
         >
           <PencilLine size={14} /> {t('recommendationActions.requestModification')}
         </button>
         <button
           onClick={() => setNoteFor('REJECTED')}
-          className="flex items-center gap-1.5 px-3 py-1.5 font-display text-xs font-bold uppercase tracking-wide bg-ws-barCriticalBg text-ws-critical border border-ws-critical hover:brightness-95 transition-[filter]"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-ws-barCriticalBg text-ws-barCriticalLabel hover:brightness-[0.97] active:scale-[0.98] transition-all"
         >
           <XCircle size={14} /> {t('recommendationActions.reject')}
         </button>
         <button
           onClick={() => reoptimize(taskId)}
           disabled={isReplanned}
-          className="flex items-center gap-1.5 px-3 py-1.5 font-display text-xs font-bold uppercase tracking-wide bg-ws-info text-white hover:brightness-95 disabled:bg-ws-tick disabled:text-ws-disabled transition-[filter]"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-ws-info text-white hover:brightness-95 active:scale-[0.98] disabled:bg-ws-tick disabled:text-ws-disabled disabled:active:scale-100 transition-all"
           title={t('recommendationActions.reoptimizeHint')}
         >
           <RefreshCw size={14} /> {isReplanned ? t('recommendationActions.replanApplied') : t('recommendationActions.reoptimize')}
@@ -87,8 +87,8 @@ export const RecommendationActions = ({ taskId = 'TASK-000005' }) => {
       </div>
 
       {noteFor && (
-        <div className="border border-ws-rule p-3 space-y-2 bg-ws-paper">
-          <label className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-mid block">
+        <div className="rounded-lg bg-ws-tick p-3.5 space-y-2.5">
+          <label className="font-display text-[12px] font-medium text-ws-mid block">
             {noteFor === 'MODIFIED' ? t('recommendationActions.reasonModification') : t('recommendationActions.reasonRejection')}
           </label>
           <textarea
@@ -96,19 +96,19 @@ export const RecommendationActions = ({ taskId = 'TASK-000005' }) => {
             onChange={(e) => setNote(e.target.value)}
             rows={2}
             placeholder={t('recommendationActions.notePlaceholder')}
-            className="w-full font-ws text-xs border border-ws-rule bg-ws-surface px-2 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-ws-info"
+            className="w-full font-ws text-[13px] rounded-md border border-ws-rule bg-ws-surface px-3 py-2 placeholder:text-ws-light focus:outline-none focus:border-ws-info focus:ring-2 focus:ring-status-info/15 transition-colors"
           />
           <div className="flex gap-2">
             <button
               onClick={submitNote}
               disabled={!note.trim()}
-              className="px-3 py-1.5 font-display text-xs font-bold uppercase tracking-wide bg-ws-ink text-white hover:bg-ws-body disabled:bg-ws-rule disabled:text-ws-disabled"
+              className="px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-ws-info text-white hover:brightness-95 active:scale-[0.98] disabled:bg-ws-rule disabled:text-ws-disabled disabled:active:scale-100 transition-all"
             >
               {t('common.submit')}
             </button>
             <button
               onClick={() => { setNoteFor(null); setNote(''); }}
-              className="px-3 py-1.5 font-display text-xs font-bold uppercase tracking-wide text-ws-mid hover:bg-ws-paper"
+              className="px-3.5 py-2 rounded-md font-display text-[13px] font-semibold text-ws-mid hover:bg-ws-band transition-colors"
             >
               {t('common.cancel')}
             </button>
@@ -117,7 +117,7 @@ export const RecommendationActions = ({ taskId = 'TASK-000005' }) => {
       )}
 
       {decision?.note && (
-        <p className="font-ws text-[11px] text-ws-mid bg-ws-paper border border-ws-hairline px-2.5 py-1.5">
+        <p className="font-ws text-[12px] text-ws-mid bg-ws-tick rounded-md px-3 py-2">
           <span className="font-display font-semibold text-ws-light">{t('recommendationActions.controllerNote')}:</span> {decision.note}
         </p>
       )}

@@ -9,10 +9,11 @@ export const RoleSwitch = ({ onNavigate, tone = 'dark' }) => {
   const { t } = useI18n();
   const role = currentUser?.role;
 
-  // "Industrial worksheet" (design 2A) masthead — Authority Overview only.
+  // A sunken track with one raised active segment, matching SegmentedControl.
+  // `tone` picks the track for a light page vs the dark Ground header.
   const base = tone === 'ws'
-    ? { wrap: 'border-ws-ink', idle: 'bg-transparent text-ws-mid hover:text-ws-ink', active: 'bg-ws-ink text-white' }
-    : { wrap: 'border-rail-700 bg-rail-950', idle: 'bg-rail-800 text-rail-400 hover:text-white', active: 'bg-status-info text-white' };
+    ? { wrap: 'bg-ws-tick', idle: 'text-ws-mid hover:text-ws-ink', active: 'bg-ws-surface text-ws-ink shadow-soft' }
+    : { wrap: 'bg-rail-800', idle: 'text-rail-300 hover:text-white', active: 'bg-status-info text-white' };
 
   const seg = (target, label) => {
     const active = role === target;
@@ -22,7 +23,7 @@ export const RoleSwitch = ({ onNavigate, tone = 'dark' }) => {
         type="button"
         aria-pressed={active}
         onClick={() => (onNavigate ? onNavigate(null, target) : login(target))}
-        className={`px-3.5 py-1.5 text-[10px] font-semibold tracking-wide transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-status-info ${
+        className={`px-3.5 py-1.5 rounded text-[11px] font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-status-info/40 ${
           active ? base.active : base.idle
         }`}
       >
@@ -35,7 +36,7 @@ export const RoleSwitch = ({ onNavigate, tone = 'dark' }) => {
     <div
       role="group"
       aria-label={t('role.switchLabel')}
-      className={`flex items-stretch border shrink-0 ${base.wrap}`}
+      className={`inline-flex items-stretch gap-0.5 rounded-md p-0.5 shrink-0 ${base.wrap}`}
     >
       {seg(ROLES.AUTHORITY, t('role.authorityShort'))}
       {seg(ROLES.GROUND, t('role.groundShort'))}

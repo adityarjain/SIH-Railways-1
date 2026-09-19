@@ -132,7 +132,7 @@ export const GeneralPortal = () => {
           <thead className="border-b border-ws-rule bg-ws-tick">
             <tr>
               {[t('common.task'), t('common.section'), t('verification.executed'), t('common.blocks'), t('common.crew'), t('common.risk'), t('verification.verificationCol'), ''].map((h, i) => (
-                <th key={h || 'actions'} className={`px-3.5 py-2 font-display text-[10px] font-semibold uppercase tracking-wide text-ws-light whitespace-nowrap ${i >= 5 ? 'text-right' : ''}`}>{h}</th>
+                <th key={h || 'actions'} className={`px-3.5 py-2 font-display text-[10px] font-semibold text-ws-light whitespace-nowrap ${i >= 5 ? 'text-right' : ''}`}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -204,14 +204,14 @@ export const GeneralPortal = () => {
                 [t('common.crew'), (modal.job.assigned_teams || []).join(', ')],
               ].map(([k, v]) => (
                 <div key={k} className="bg-ws-surface px-3 py-2">
-                  <div className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light">{k}</div>
+                  <div className="font-display text-[11px] font-semibold text-ws-light">{k}</div>
                   <div className="font-mono text-[11px] text-ws-ink mt-0.5">{v}</div>
                 </div>
               ))}
             </div>
 
             <div>
-              <label className="font-display text-[11px] font-semibold uppercase tracking-wide text-ws-light block mb-1">
+              <label className="font-display text-[11px] font-semibold text-ws-light block mb-1">
                 {t('verification.comment')} {cfg.requiresComment ? <span className="text-ws-critical">· {t('verification.required')}</span> : `· ${t('verification.optional')}`}
               </label>
               <textarea

@@ -57,9 +57,9 @@ export const Performance = () => {
             <table className="w-full text-left border-collapse">
               <thead className="border-b border-ws-rule">
                 <tr>
-                  <th className="py-1.5 font-display text-[10px] font-semibold uppercase tracking-wide text-ws-light">{t('common.reason')}</th>
-                  <th className="py-1.5 font-display text-[10px] font-semibold uppercase tracking-wide text-ws-light">{t('performance.kind')}</th>
-                  <th className="py-1.5 font-display text-[10px] font-semibold uppercase tracking-wide text-ws-light text-right">{t('performance.count')}</th>
+                  <th className="py-1.5 font-display text-[10px] font-semibold text-ws-light">{t('common.reason')}</th>
+                  <th className="py-1.5 font-display text-[10px] font-semibold text-ws-light">{t('performance.kind')}</th>
+                  <th className="py-1.5 font-display text-[10px] font-semibold text-ws-light text-right">{t('performance.count')}</th>
                 </tr>
               </thead>
               <tbody>

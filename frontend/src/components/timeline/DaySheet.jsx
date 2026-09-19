@@ -3,6 +3,7 @@ import { useI18n } from '../../i18n';
 import { makeScale, ticksFor, packLanes, possessionDomain } from '../../utils/timeScale';
 import { minToHhmm } from '../../utils/time';
 import { bandOf } from '../../utils/risk';
+import { RegionHeader, SegmentedControl, WsSelect } from '../ui/worksheet';
 import sectionTrains from '../../data/live/sectionTrains';
 
 /**
@@ -55,7 +56,7 @@ export const DaySheet = ({
   replannedTaskId,
   onSelectTask,
 }) => {
-  const { t, isHindi } = useI18n();
+  const { t } = useI18n();
   const [domainId, setDomainId] = useState('day');
 
   const tasksBySection = useMemo(() => {
@@ -97,69 +98,40 @@ export const DaySheet = ({
   const corridorLabel = corridorOptions.find((c) => c.id === corridorId)?.label || corridorId;
   const domainHours = Math.round((domain.end - domain.start) / 60);
 
-  const uppercase = isHindi ? '' : 'uppercase';
-  const tracking = isHindi ? '' : 'tracking-[0.1em]';
-
   return (
-    <div className="bg-ws-surface border-b border-ws-rule pt-4 px-5 pb-3.5 font-ws text-ws-body">
-      {/* section header */}
-      <div className="flex items-center gap-2.5 pb-2 flex-wrap">
-        <span className="font-mono text-[11px] font-bold text-ws-light">01</span>
-        <span className={`font-display text-base font-semibold ${uppercase} ${tracking} text-ws-ink`}>
-          {t('overview.daySheet')}
-        </span>
-        <span className="flex-1 min-w-6 h-px bg-ws-rule" />
-        <span className="font-mono text-[10px] text-ws-light">
-          {t('overview.daySheetMeta', { corridor: corridorLabel, date, hours: domainHours })}
-        </span>
-      </div>
+    <div className="bg-ws-surface rounded-lg shadow-soft mx-4 md:mx-5 xl:mx-6 pt-4 px-5 pb-4 font-ws text-ws-body">
+      <RegionHeader
+        title={t('overview.daySheet')}
+        meta={t('overview.daySheetMeta', { corridor: corridorLabel, date, hours: domainHours })}
+      />
 
       {/* controls row */}
-      <div className="flex items-center gap-2.5 mb-2.5 flex-wrap">
-        <select
+      <div className="flex items-center gap-2.5 mb-3 flex-wrap">
+        <WsSelect
           value={corridorId || ''}
           onChange={(e) => onCorridorChange && onCorridorChange(e.target.value)}
-          className="font-ws text-[13px] text-ws-ink bg-ws-surface border border-ws-rule px-2 py-1"
         >
           {corridorOptions.map((c) => (
             <option key={c.id} value={c.id}>{c.label} · {c.count}</option>
           ))}
-        </select>
-        <div className="flex border border-ws-rule">
-          <button
-            onClick={() => setDomainId('day')}
-            className={`px-2.5 py-1 font-display text-[13px] font-bold ${uppercase} ${tracking} ${
-              domainId === 'day' ? 'bg-ws-ink text-white' : 'bg-ws-surface text-ws-mid hover:bg-ws-paper hover:text-ws-ink'
-            }`}
-          >
-            {t('overview.fullDay')}
-          </button>
-          <button
-            onClick={() => setDomainId('night')}
-            className={`px-2.5 py-1 border-l border-ws-rule font-display text-[13px] font-bold ${uppercase} ${tracking} ${
-              domainId === 'night' ? 'bg-ws-ink text-white' : 'bg-ws-surface text-ws-mid hover:bg-ws-paper hover:text-ws-ink'
-            }`}
-          >
-            {t('overview.night0006')}
-          </button>
-          <button
-            onClick={() => hasPossessionDomain && setDomainId('possession')}
-            disabled={!hasPossessionDomain}
-            title={!hasPossessionDomain ? t('overview.possessionWindow') : undefined}
-            className={`px-2.5 py-1 border-l border-ws-rule font-display text-[13px] font-bold ${uppercase} ${tracking} ${
-              !hasPossessionDomain
-                ? 'text-ws-disabled cursor-not-allowed bg-ws-surface'
-                : domainId === 'possession'
-                ? 'bg-ws-ink text-white'
-                : 'bg-ws-surface text-ws-mid hover:bg-ws-paper hover:text-ws-ink'
-            }`}
-          >
-            {t('overview.possessionWindow')}
-          </button>
-        </div>
+        </WsSelect>
+        <SegmentedControl
+          value={domainId}
+          onChange={setDomainId}
+          options={[
+            { id: 'day', label: t('overview.fullDay') },
+            { id: 'night', label: t('overview.night0006') },
+            {
+              id: 'possession',
+              label: t('overview.possessionWindow'),
+              disabled: !hasPossessionDomain,
+              title: !hasPossessionDomain ? t('overview.possessionWindow') : undefined,
+            },
+          ]}
+        />
         <span className="flex-1 min-w-2" />
         <span className="font-mono text-[10px] text-ws-light">
-          {t('overview.daySheetScope', { sections: sections.length, blocks: totalBlocks, trains: totalTrains }).toUpperCase()}
+          {t('overview.daySheetScope', { sections: sections.length, blocks: totalBlocks, trains: totalTrains })}
         </span>
       </div>
 
@@ -229,7 +201,7 @@ export const DaySheet = ({
               </div>
               <div className="font-ws text-xs text-ws-mid truncate">{section.section_name}</div>
               <div className="font-mono text-[9.5px] text-ws-light mt-0.5">
-                {section.section_length_km} KM · {(section.track_type || '').split(' ')[0].toUpperCase()} · {section.maximum_speed_kmph}
+                {section.section_length_km} km · {(section.track_type || '').split(' ')[0]} · {section.maximum_speed_kmph}
               </div>
             </div>
 
@@ -295,15 +267,15 @@ export const DaySheet = ({
       {/* legend */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-2.5">
         <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
-          <LegendSwatch bg="bg-ws-barPlannedBg" border="border-ws-barPlannedBorder" rule="#1B4C8C" />
+          <LegendSwatch bg="bg-ws-barPlannedBg" border="border-ws-barPlannedBorder" rule="#2C63D8" />
           {t('gantt.legendBlock')}
         </span>
         <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
-          <LegendSwatch bg="bg-ws-barCriticalBg" border="border-ws-barCriticalBorder" rule="#B22A22" />
+          <LegendSwatch bg="bg-ws-barCriticalBg" border="border-ws-barCriticalBorder" rule="#C43D30" />
           {t('gantt.legendCritical')}
         </span>
         <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
-          <LegendSwatch bg="bg-ws-barBundledBg" border="border-ws-barBundledBorder" rule="#1C6260" />
+          <LegendSwatch bg="bg-ws-barBundledBg" border="border-ws-barBundledBorder" rule="#17807C" />
           {t('gantt.legendBundled')}
         </span>
         <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">

@@ -20,8 +20,6 @@ export const WorksheetHeader = ({ activeTab, onNavigate, subtitle }) => {
   const { t, isHindi } = useI18n();
 
   const prov = metrics.provenance || {};
-  const uc = isHindi ? '' : 'uppercase';
-  const tr = isHindi ? '' : 'tracking-[0.1em]';
 
   const checksMatch = (prov.post_solve_validation || '').match(/(\d+\/\d+)/);
   const planHorizonMatch = (prov.planning_horizon || '').match(
@@ -51,35 +49,35 @@ export const WorksheetHeader = ({ activeTab, onNavigate, subtitle }) => {
 
   return (
     <>
-      {/* 01 — provenance strip: identity on the left, how these numbers were
+      {/* Provenance strip: identity on the left, how these numbers were
            produced on the right. Run state lives here rather than in the
-           masthead because it describes the run, not the page. */}
-      <div className="bg-ws-ink min-h-[28px] px-3.5 md:px-4 xl:px-5 py-[4px] flex items-center gap-2.5 flex-wrap font-display">
-        <span className={`text-[13px] font-bold ${uc} tracking-[0.18em] text-white`}>
+           masthead because it describes the run, not the page. Light rather
+           than a solid dark block: at full width it was the single heaviest
+           element on every screen. */}
+      <div className="bg-ws-surface border-b border-ws-rule min-h-[34px] px-3.5 md:px-4 xl:px-5 py-1.5 flex items-center gap-3 flex-wrap font-display">
+        <span className="text-[13px] font-bold tracking-[-0.01em] text-ws-ink">
           {t('institution.appName')}
         </span>
-        <span className="w-px h-[11px] bg-[#4A4338] hidden xl:block" />
-        <span className="font-ws text-[11px] text-[#A79F90] hidden xl:inline">{t('institution.appSub')}</span>
+        <span className="font-ws text-[11px] text-ws-light hidden xl:inline">{t('institution.appSub')}</span>
         <span className="flex-1 min-w-2" />
-        <span className="font-mono text-[10px] tracking-wide text-[#A79F90]">
-          <span className="text-white font-bold">{metrics.summary.solver_status}</span> {metrics.summary.runtime_seconds}s
-          {checksMatch && (<> · {t('overview.checksLabel')} <span className="text-white font-bold">{checksMatch[1]}</span></>)}
-          {' · '}<span className="text-white">{t('header.syntheticData')}</span>
+        <span className="font-mono text-[10px] text-ws-mid">
+          <span className="text-ws-ok font-semibold">{metrics.summary.solver_status}</span> {metrics.summary.runtime_seconds}s
+          {checksMatch && (<> · {t('overview.checksLabel')} <span className="text-ws-ink font-semibold">{checksMatch[1]}</span></>)}
+          {' · '}<span className="text-ws-mid">{t('header.syntheticData')}</span>
         </span>
-        <span className="w-px h-[11px] bg-[#4A4338] hidden xl:block" />
-        <span className="font-mono text-[9px] tracking-wide text-[#A79F90] hidden xl:inline">
-          {t('institution.prototype').toUpperCase()}
+        <span className="font-mono text-[9px] text-ws-light hidden xl:inline">
+          {t('institution.prototype')}
         </span>
-        <LanguageSwitch tone="ws" />
+        <LanguageSwitch tone="light" />
       </div>
 
-      {/* 02 — masthead */}
-      <div className="bg-ws-paper border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-3.5 pb-3 flex items-end gap-6 flex-wrap">
+      {/* Masthead */}
+      <div className="bg-ws-paper px-3.5 md:px-4 xl:px-5 pt-5 pb-4 flex items-end gap-6 flex-wrap">
         <div className="min-w-0">
-          <div className={`font-display text-[30px] font-semibold text-ws-ink leading-[1.05] tracking-[-0.005em] ${isHindi ? 'text-[26px]' : ''}`}>
+          <h1 className={`font-display font-semibold text-ws-ink leading-[1.1] tracking-[-0.025em] ${isHindi ? 'text-[26px]' : 'text-[32px]'}`}>
             {t(activeItem?.labelKey || 'nav.overview')}
-          </div>
-          <div className="font-ws text-[13px] text-ws-mid mt-1">
+          </h1>
+          <div className="font-ws text-[13px] text-ws-mid mt-1.5">
             {subtitle || defaultSubtitle}
           </div>
         </div>
@@ -87,19 +85,20 @@ export const WorksheetHeader = ({ activeTab, onNavigate, subtitle }) => {
         <RoleSwitch onNavigate={onNavigate} tone="ws" />
       </div>
 
-      {/* 03 — navigation */}
-      <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 overflow-x-auto custom-scrollbar">
-        <div className="flex items-center gap-5 whitespace-nowrap">
+      {/* Navigation. Sentence case: the uppercase + tracking treatment cost
+           horizontal room on every screen and made the strip shout. */}
+      <div className="bg-ws-paper px-3.5 md:px-4 xl:px-5 overflow-x-auto custom-scrollbar">
+        <div className="flex items-center gap-1 whitespace-nowrap border-b border-ws-rule">
           {navItems.map((item) => {
             const active = item.id === activeTab;
             return (
               <button
                 key={item.id}
                 onClick={() => onNavigate && onNavigate(item.id)}
-                className={`shrink-0 py-[9px] font-display text-sm font-semibold ${uc} ${tr} border-b-2 transition-colors ${
+                className={`shrink-0 px-3 py-2.5 font-display text-[13px] font-semibold border-b-2 -mb-px rounded-t transition-colors ${
                   active
-                    ? 'border-ws-ink text-ws-ink'
-                    : 'border-transparent text-ws-mid hover:text-ws-ink hover:border-ws-rule'
+                    ? 'border-ws-info text-ws-ink'
+                    : 'border-transparent text-ws-mid hover:text-ws-ink hover:bg-ws-tick'
                 }`}
               >
                 {t(item.labelKey)}

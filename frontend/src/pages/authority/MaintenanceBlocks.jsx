@@ -15,7 +15,7 @@ const FlagPill = ({ tone, children }) => {
     critical: 'text-ws-critical border-ws-barCriticalBorder bg-ws-barCriticalBg',
   };
   return (
-    <span className={`inline-flex items-center px-1 py-0.5 font-display text-[8px] font-bold uppercase tracking-wide border ${map[tone]}`}>
+    <span className={`inline-flex items-center px-1 py-0.5 font-display text-[8px] font-bold border ${map[tone]}`}>
       {children}
     </span>
   );
@@ -226,7 +226,7 @@ export const MaintenanceBlocks = ({ onNavigate }) => {
 
       {/* disclosure + footer */}
       <div className="border-l-[3px] border-l-ws-idle bg-ws-paper mx-3.5 md:mx-4 xl:mx-5 my-3.5 px-3 py-2.5">
-        <div className="font-display text-[11px] font-bold uppercase tracking-wide text-ws-idle">{t('maintenanceBlocks.noSavingTitle')}</div>
+        <div className="font-display text-[11px] font-bold text-ws-idle">{t('maintenanceBlocks.noSavingTitle')}</div>
         <div className="font-ws text-xs text-ws-body leading-relaxed mt-1">{t('maintenanceBlocks.noSavingBody')}</div>
       </div>
 

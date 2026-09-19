@@ -11,105 +11,114 @@ export default {
       // because `fontFamily` was never declared and font-sans/font-mono fell
       // back to the system stacks.
       fontFamily: {
-        // The "industrial worksheet" (design 2A) type system, now sitewide:
-        // Barlow for body/interface text, Barlow Semi Condensed for headings,
-        // labels and buttons. JetBrains Mono stays reserved for IDs,
-        // timestamps, minutes and counts — never prose.
-        sans: ['Barlow', '"Noto Sans Devanagari"', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+        // One interface family, not three. Figtree carries body, headings and
+        // labels; emphasis comes from weight, never from swapping family.
+        // Barlow Semi Condensed was dropped in this repaint: condensed display
+        // type is most of what read as "industrial/heavy", and the width it
+        // saved is recovered by dropping forced uppercase + letter-tracking.
+        // JetBrains Mono stays reserved for IDs, timestamps, minutes and
+        // counts. Never prose.
+        sans: ['Figtree', '"Noto Sans Devanagari"', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
-        display: ['"Barlow Semi Condensed"', '"Noto Sans Devanagari"', 'ui-sans-serif', 'sans-serif'],
-        ws: ['Barlow', '"Noto Sans Devanagari"', 'ui-sans-serif', 'sans-serif'],
+        display: ['Figtree', '"Noto Sans Devanagari"', 'ui-sans-serif', 'sans-serif'],
+        ws: ['Figtree', '"Noto Sans Devanagari"', 'ui-sans-serif', 'sans-serif'],
       },
       colors: {
-        // Control-room chrome: status strips, nav, table headers. Warm ink
-        // ramp (design 2A) — the same values the Authority Overview worksheet
-        // uses, now the sitewide chrome palette rather than a screen-scoped one.
+        // Chrome ramp. Cool graphite, not the previous warm espresso: the warm
+        // beige/brass/espresso family is the single most over-used "premium"
+        // palette and it made every dark strip read as a heavy block.
         rail: {
-          950: '#17140F',
-          900: '#1F1C17',
-          800: '#2A251E',
-          700: '#3C372E',
-          600: '#52493C',
-          500: '#6A6255',
-          400: '#8A8171',
-          300: '#A79E8C',
+          950: '#14161B',
+          900: '#1A1D24',
+          800: '#262B35',
+          700: '#363D4A',
+          600: '#4B5462',
+          500: '#626B7B',
+          400: '#8A94A6',
+          300: '#AEB6C4',
         },
-        // Work surfaces. Borders carry structure here, not shadows.
+        // Work surfaces. Structure now comes from space and a very light rule,
+        // with tinted elevation reserved for things that genuinely float.
         surface: {
-          base: '#F3F0E8',
+          base: '#F7F8FA',
           panel: '#FFFFFF',
-          sunken: '#EFEAE0',
+          sunken: '#EFF1F5',
         },
         line: {
-          DEFAULT: '#D7D0C2',
-          strong: '#BBAF98',
-          subtle: '#E8E2D6',
+          DEFAULT: '#E2E6ED',
+          strong: '#CBD2DD',
+          subtle: '#EDF0F5',
         },
         // Semantic only. RED blocked/critical, AMBER conflict/attention,
         // GREEN feasible/complete, BLUE selected/planning, GREY inactive/deferred.
         status: {
-          critical: '#B22A22',
-          'critical-tint': '#F7E4E1',
-          warn: '#96660E',
-          'warn-tint': '#F5ECD6',
-          ok: '#2E6A4A',
-          'ok-tint': '#E1EDE6',
-          info: '#1B4C8C',
-          'info-tint': '#E5EBF4',
-          idle: '#7C7466',
-          'idle-tint': '#EFEAE0',
+          critical: '#C43D30',
+          'critical-tint': '#FBEAE8',
+          warn: '#B4791A',
+          'warn-tint': '#FBF0DC',
+          ok: '#2F7D5B',
+          'ok-tint': '#E4F1EB',
+          info: '#2C63D8',
+          'info-tint': '#E9F0FD',
+          idle: '#7A8496',
+          'idle-tint': '#EFF1F5',
         },
         // Bundling keeps its own hue, matching the day-sheet's bundled-block
         // color so the Gantt legend reads the same everywhere in the app.
         bundle: {
-          DEFAULT: '#1C6260',
-          tint: '#DFEAE8',
+          DEFAULT: '#17807C',
+          tint: '#E2F2F1',
         },
-        // "Industrial worksheet" (design 2A) exact anchor values. The Authority
-        // Overview worksheet and shared day sheet read these directly; every
-        // other screen inherits the same look through the rail/status/surface
-        // tokens above, which are now derived from this same palette.
+        // The sitewide anchor scale. ~1,350 class usages across 32 files read
+        // these names, so the repaint happens here: names are stable, values
+        // moved from a warm espresso-on-beige ramp to a cool graphite-on-white
+        // one. Text contrast is deliberately a step softer than the old
+        // near-black on beige, which is what made long reads tiring.
         ws: {
-          ink: '#1F1C17',
-          body: '#3C372E',
-          mid: '#6A6255',
-          light: '#7A7263',
-          rule: '#D7D0C2',
-          hairline: '#E8E2D6',
-          tick: '#EFEAE0',
-          paper: '#F3F0E8',
-          dossier: '#FBF9F4',
-          band: '#EAE5D9',
+          ink: '#1A1D24',
+          body: '#3B414D',
+          mid: '#626B7B',
+          light: '#8A94A6',
+          rule: '#E2E6ED',
+          hairline: '#EDF0F5',
+          tick: '#EFF1F5',
+          paper: '#F7F8FA',
+          dossier: '#FCFCFD',
+          band: '#F1F3F7',
           surface: '#FFFFFF',
-          disabled: '#BEB6A7',
-          selected: '#EDF1F7',
-          critical: '#B22A22',
-          warn: '#96660E',
-          ok: '#2E6A4A',
-          info: '#1B4C8C',
-          idle: '#7C7466',
-          bundle: '#1C6260',
-          barCriticalBg: '#F7E4E1',
-          barCriticalBorder: '#E0B8B2',
-          barCriticalLabel: '#7E1A14',
-          barPlannedBg: '#E5EBF4',
-          barPlannedBorder: '#BECDE1',
-          barPlannedLabel: '#153C6D',
-          barBundledBg: '#DFEAE8',
-          barBundledBorder: '#B5CCC9',
-          barBundledLabel: '#16504E',
+          disabled: '#B4BCC9',
+          selected: '#EAF1FE',
+          critical: '#C43D30',
+          warn: '#B4791A',
+          ok: '#2F7D5B',
+          info: '#2C63D8',
+          idle: '#7A8496',
+          bundle: '#17807C',
+          barCriticalBg: '#FBEAE8',
+          barCriticalBorder: '#F0C4BE',
+          barCriticalLabel: '#8F251C',
+          barPlannedBg: '#E9F0FD',
+          barPlannedBorder: '#C3D6F7',
+          barPlannedLabel: '#1E4BA8',
+          barBundledBg: '#E2F2F1',
+          barBundledBorder: '#B9DCD9',
+          barBundledLabel: '#10605D',
         },
       },
-      // Radius by surface class (design 2A): flat everywhere — tables,
-      // timelines, panels — except the 2px controls (buttons, inputs, badges).
+      // One radius rule, applied everywhere:
+      //   data surfaces (timeline bars, heat cells) .. 2px  -> rounded-sm
+      //   controls (buttons, inputs, pills, tabs) .... 6px  -> rounded / rounded-md
+      //   panels, cards, dialogs .................... 10px  -> rounded-lg
+      //   feature surfaces (hero, empty states) ..... 14px  -> rounded-xl
+      // Mixing radii without a rule is what reads as broken; this is the rule.
       borderRadius: {
         none: '0',
-        DEFAULT: '2px',
+        DEFAULT: '6px',
         sm: '2px',
-        md: '2px',
-        lg: '0',
-        xl: '0',
-        '2xl': '0',
+        md: '6px',
+        lg: '10px',
+        xl: '14px',
+        '2xl': '18px',
         full: '9999px',
       },
       // Additive only. Tailwind's default scale is left intact deliberately:
@@ -126,8 +135,13 @@ export default {
         'touch': '44px',
       },
       boxShadow: {
-        // Shadows appear on overlays only.
-        overlay: '0 12px 32px -8px rgba(11, 18, 32, 0.28)',
+        // Tinted to the surface hue, never pure black. These replace the hard
+        // 1px box borders that used to fence every panel: one soft edge reads
+        // lighter than a drawn line, and stacks better on a near-white page.
+        soft: '0 1px 2px rgba(26, 29, 36, 0.04), 0 1px 1px rgba(26, 29, 36, 0.03)',
+        panel: '0 1px 3px rgba(26, 29, 36, 0.05), 0 4px 12px -4px rgba(26, 29, 36, 0.06)',
+        lift: '0 2px 6px rgba(26, 29, 36, 0.06), 0 10px 24px -8px rgba(26, 29, 36, 0.10)',
+        overlay: '0 12px 32px -8px rgba(20, 22, 27, 0.24)',
         none: 'none',
       },
       zIndex: {
