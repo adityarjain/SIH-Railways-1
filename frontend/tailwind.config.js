@@ -24,50 +24,51 @@ export default {
         ws: ['Figtree', '"Noto Sans Devanagari"', 'ui-sans-serif', 'sans-serif'],
       },
       colors: {
-        // Chrome ramp. Cool graphite, not the previous warm espresso: the warm
-        // beige/brass/espresso family is the single most over-used "premium"
-        // palette and it made every dark strip read as a heavy block.
+        // Dark control room (see DESIGN.md). Surfaces step UP in lightness as
+        // they come forward; a drop shadow reads as dirt on a dark plane, so
+        // elevation is carried by lightness alone.
         rail: {
-          950: '#14161B',
-          900: '#1A1D24',
-          800: '#262B35',
-          700: '#363D4A',
-          600: '#4B5462',
-          500: '#626B7B',
-          400: '#8A94A6',
-          300: '#AEB6C4',
+          950: '#0D1117', // deep canvas
+          900: '#11161D', // section band
+          800: '#171E27', // panel plane
+          700: '#1C242F', // raised plane
+          600: '#212934', // control track
+          500: '#6B7688', // dim steel (text)
+          400: '#8B97A8', // muted steel (text)
+          300: '#C2CBD8', // body grey (text)
         },
-        // Work surfaces. Structure now comes from space and a very light rule,
-        // with tinted elevation reserved for things that genuinely float.
         surface: {
-          base: '#F7F8FA',
-          panel: '#FFFFFF',
-          sunken: '#EFF1F5',
+          base: '#0D1117',
+          panel: '#171E27',
+          sunken: '#212934',
         },
         line: {
-          DEFAULT: '#E2E6ED',
-          strong: '#CBD2DD',
-          subtle: '#EDF0F5',
+          DEFAULT: '#263040',
+          strong: '#38445A',
+          subtle: '#1E2630',
         },
         // Semantic only. RED blocked/critical, AMBER conflict/attention,
         // GREEN feasible/complete, BLUE selected/planning, GREY inactive/deferred.
+        // Luminous on a dark plane, and the tints are dark fills rather than
+        // pale washes. Semantics are unchanged: these come from the engine
+        // artifacts, so they are data and the legends depend on them.
         status: {
-          critical: '#C43D30',
-          'critical-tint': '#FBEAE8',
-          warn: '#B4791A',
-          'warn-tint': '#FBF0DC',
-          ok: '#2F7D5B',
-          'ok-tint': '#E4F1EB',
-          info: '#2C63D8',
-          'info-tint': '#E9F0FD',
+          critical: '#FF6B5A',
+          'critical-tint': '#2A1714',
+          warn: '#E0A030',
+          'warn-tint': '#2A2112',
+          ok: '#3FBF87',
+          'ok-tint': '#10261D',
+          info: '#4C8DFF',
+          'info-tint': '#131F33',
           idle: '#7A8496',
-          'idle-tint': '#EFF1F5',
+          'idle-tint': '#212934',
         },
         // Bundling keeps its own hue, matching the day-sheet's bundled-block
         // color so the Gantt legend reads the same everywhere in the app.
         bundle: {
-          DEFAULT: '#17807C',
-          tint: '#E2F2F1',
+          DEFAULT: '#2BC4BC',
+          tint: '#0F2926',
         },
         // The sitewide anchor scale. ~1,350 class usages across 32 files read
         // these names, so the repaint happens here: names are stable, values
@@ -75,34 +76,39 @@ export default {
         // one. Text contrast is deliberately a step softer than the old
         // near-black on beige, which is what made long reads tiring.
         ws: {
-          ink: '#1A1D24',
-          body: '#3B414D',
-          mid: '#626B7B',
-          light: '#8A94A6',
-          rule: '#E2E6ED',
-          hairline: '#EDF0F5',
-          tick: '#EFF1F5',
-          paper: '#F7F8FA',
-          dossier: '#FCFCFD',
-          band: '#F1F3F7',
-          surface: '#FFFFFF',
-          disabled: '#B4BCC9',
-          selected: '#EAF1FE',
-          critical: '#C43D30',
-          warn: '#B4791A',
-          ok: '#2F7D5B',
-          info: '#2C63D8',
+          // Text ramp, now light-on-dark.
+          ink: '#E8EDF4',
+          body: '#C2CBD8',
+          mid: '#8B97A8',
+          light: '#6B7688',
+          disabled: '#4A5361',
+          // Structure.
+          rule: '#263040',
+          hairline: '#1E2630',
+          // Surfaces, darkest to lightest as they come forward.
+          paper: '#0D1117',
+          band: '#11161D',
+          surface: '#171E27',
+          dossier: '#1C242F',
+          tick: '#212934',
+          // Blue-shifted, so selection reads as state and not as elevation.
+          selected: '#223049',
+          critical: '#FF6B5A',
+          warn: '#E0A030',
+          ok: '#3FBF87',
+          info: '#4C8DFF',
           idle: '#7A8496',
-          bundle: '#17807C',
-          barCriticalBg: '#FBEAE8',
-          barCriticalBorder: '#F0C4BE',
-          barCriticalLabel: '#8F251C',
-          barPlannedBg: '#E9F0FD',
-          barPlannedBorder: '#C3D6F7',
-          barPlannedLabel: '#1E4BA8',
-          barBundledBg: '#E2F2F1',
-          barBundledBorder: '#B9DCD9',
-          barBundledLabel: '#10605D',
+          bundle: '#2BC4BC',
+          // Timeline bars: dark tint, saturated edge, luminous label.
+          barCriticalBg: '#2A1714',
+          barCriticalBorder: '#6B2E26',
+          barCriticalLabel: '#FF8A7A',
+          barPlannedBg: '#131F33',
+          barPlannedBorder: '#2A4A7A',
+          barPlannedLabel: '#7FB0FF',
+          barBundledBg: '#0F2926',
+          barBundledBorder: '#1E5C57',
+          barBundledLabel: '#4FD6CE',
         },
       },
       // One radius rule, applied everywhere:
@@ -135,13 +141,14 @@ export default {
         'touch': '44px',
       },
       boxShadow: {
-        // Tinted to the surface hue, never pure black. These replace the hard
-        // 1px box borders that used to fence every panel: one soft edge reads
-        // lighter than a drawn line, and stacks better on a near-white page.
-        soft: '0 1px 2px rgba(26, 29, 36, 0.04), 0 1px 1px rgba(26, 29, 36, 0.03)',
-        panel: '0 1px 3px rgba(26, 29, 36, 0.05), 0 4px 12px -4px rgba(26, 29, 36, 0.06)',
-        lift: '0 2px 6px rgba(26, 29, 36, 0.06), 0 10px 24px -8px rgba(26, 29, 36, 0.10)',
-        overlay: '0 12px 32px -8px rgba(20, 22, 27, 0.24)',
+        // On a dark plane a drop shadow reads as dirt, so elevation is carried
+        // by surface lightness instead. `soft`/`panel` stay in the scale
+        // because ~30 call sites reference them, but resolve to nothing.
+        soft: 'none',
+        panel: 'none',
+        lift: 'none',
+        // Overlays still need separation from the page behind them.
+        overlay: '0 16px 40px -12px rgba(0, 0, 0, 0.64)',
         none: 'none',
       },
       zIndex: {

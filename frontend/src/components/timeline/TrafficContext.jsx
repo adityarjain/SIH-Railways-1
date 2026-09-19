@@ -61,7 +61,7 @@ export const TrafficContext = ({ sectionId = 'SEC-0004' }) => {
         <p className="font-ws text-[10px] text-ws-mid">{t('trafficContext.simultaneousTasks', { count: traffic.max_simultaneous_tasks })}</p>
       </div>
 
-      <div className={`${TILE} bg-[#E1EDE6] border-ws-ok`}>
+      <div className={`${TILE} bg-status-ok-tint border-ws-ok`}>
         <div className="flex items-center justify-between text-[11px] text-ws-ok">
           <span className="flex items-center gap-1 font-display font-bold "><CheckCircle2 size={12} />{t('trafficContext.sectionProfile')}</span>
           <Pill tone="ok" size="sm">{t('trafficContext.physical')}</Pill>

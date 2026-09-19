@@ -60,13 +60,13 @@ export const RecommendationActions = ({ taskId = 'TASK-000005' }) => {
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => approveRecommendation(taskId)}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-ws-ok text-white hover:brightness-95 active:scale-[0.98] transition-all"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-ws-ok text-rail-950 hover:brightness-95 active:scale-[0.98] transition-all"
         >
           <CheckCircle2 size={14} /> {t('recommendationActions.approve')}
         </button>
         <button
           onClick={() => setNoteFor('MODIFIED')}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-status-warn-tint text-[#8A5A0E] hover:brightness-[0.97] active:scale-[0.98] transition-all"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-status-warn-tint text-[#E0A030] hover:brightness-[0.97] active:scale-[0.98] transition-all"
         >
           <PencilLine size={14} /> {t('recommendationActions.requestModification')}
         </button>
@@ -79,7 +79,7 @@ export const RecommendationActions = ({ taskId = 'TASK-000005' }) => {
         <button
           onClick={() => reoptimize(taskId)}
           disabled={isReplanned}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-ws-info text-white hover:brightness-95 active:scale-[0.98] disabled:bg-ws-tick disabled:text-ws-disabled disabled:active:scale-100 transition-all"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-ws-info text-rail-950 hover:brightness-95 active:scale-[0.98] disabled:bg-ws-tick disabled:text-ws-disabled disabled:active:scale-100 transition-all"
           title={t('recommendationActions.reoptimizeHint')}
         >
           <RefreshCw size={14} /> {isReplanned ? t('recommendationActions.replanApplied') : t('recommendationActions.reoptimize')}
@@ -102,7 +102,7 @@ export const RecommendationActions = ({ taskId = 'TASK-000005' }) => {
             <button
               onClick={submitNote}
               disabled={!note.trim()}
-              className="px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-ws-info text-white hover:brightness-95 active:scale-[0.98] disabled:bg-ws-rule disabled:text-ws-disabled disabled:active:scale-100 transition-all"
+              className="px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-ws-info text-rail-950 hover:brightness-95 active:scale-[0.98] disabled:bg-ws-rule disabled:text-ws-disabled disabled:active:scale-100 transition-all"
             >
               {t('common.submit')}
             </button>

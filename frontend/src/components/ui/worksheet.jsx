@@ -53,8 +53,8 @@ export const FieldRow = ({ label, value, tone, onClick }) => {
  */
 export const PILL_TONE = {
   critical: 'text-ws-barCriticalLabel bg-ws-barCriticalBg',
-  warn: 'text-[#8A5A0E] bg-status-warn-tint',
-  ok: 'text-[#215A41] bg-status-ok-tint',
+  warn: 'text-status-warn bg-status-warn-tint',
+  ok: 'text-status-ok bg-status-ok-tint',
   info: 'text-ws-barPlannedLabel bg-ws-barPlannedBg',
   bundle: 'text-ws-barBundledLabel bg-ws-barBundledBg',
   idle: 'text-ws-mid bg-ws-tick',
@@ -73,9 +73,9 @@ export const Pill = ({ tone = 'idle', size = 'md', children }) => (
 const ADVISORY_TONE = {
   info: { bg: 'bg-status-info-tint', title: 'text-ws-barPlannedLabel' },
   idle: { bg: 'bg-ws-tick', title: 'text-ws-body' },
-  warn: { bg: 'bg-status-warn-tint', title: 'text-[#8A5A0E]' },
+  warn: { bg: 'bg-status-warn-tint', title: 'text-status-warn' },
   critical: { bg: 'bg-status-critical-tint', title: 'text-ws-barCriticalLabel' },
-  ok: { bg: 'bg-status-ok-tint', title: 'text-[#215A41]' },
+  ok: { bg: 'bg-status-ok-tint', title: 'text-status-ok' },
 };
 
 export const AdvisoryNote = ({ tone = 'info', title, children, action }) => {
@@ -100,7 +100,7 @@ export const AdvisoryNote = ({ tone = 'info', title, children, action }) => {
 export const SegmentedControl = ({ options, value, onChange, size = 'md', className = '' }) => {
   const sizeCls = size === 'sm' ? 'px-2.5 py-1 text-[11px]' : 'px-3 py-1.5 text-[12px]';
   return (
-    <div className={`inline-flex gap-0.5 rounded-md bg-ws-tick p-0.5 shrink-0 ${className}`}>
+    <div className={`inline-flex gap-0.5 rounded-md bg-ws-paper p-0.5 shrink-0 ${className}`}>
       {options.map((opt) => (
         <button
           key={opt.id}
@@ -111,7 +111,7 @@ export const SegmentedControl = ({ options, value, onChange, size = 'md', classN
             opt.disabled
               ? 'text-ws-disabled cursor-not-allowed'
               : value === opt.id
-              ? 'bg-ws-surface text-ws-ink shadow-soft'
+              ? 'bg-ws-selected text-ws-ink'
               : 'text-ws-mid hover:text-ws-ink'
           }`}
         >

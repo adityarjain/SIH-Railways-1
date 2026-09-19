@@ -106,7 +106,7 @@ export const TaskActionModal = ({ isOpen, onClose, task, actionType, onSubmit })
         {/* work order summary */}
         <div className="border border-line">
           <div className="px-3 py-2 bg-surface-sunken border-b border-line flex items-center justify-between gap-3">
-            <span className="text-xs font-semibold text-rail-900">{task.maintenance_type}</span>
+            <span className="text-xs font-semibold text-ws-ink">{task.maintenance_type}</span>
             {band && (
               <StatusBadge tone={bandTone(band)} size="sm">
                 {band} · {task.risk_score?.toFixed?.(1) ?? task.risk_score}
@@ -122,7 +122,7 @@ export const TaskActionModal = ({ isOpen, onClose, task, actionType, onSubmit })
             ].map(([k, v]) => (
               <div key={k} className="bg-surface-panel px-3 py-2">
                 <div className="t-label">{k}</div>
-                <div className="font-mono text-[11px] text-rail-900 mt-0.5">{v}</div>
+                <div className="font-mono text-[11px] text-ws-ink mt-0.5">{v}</div>
               </div>
             ))}
           </div>
@@ -135,7 +135,7 @@ export const TaskActionModal = ({ isOpen, onClose, task, actionType, onSubmit })
               <select
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="w-full text-xs bg-surface-panel border border-line rounded-sm px-2.5 py-2 text-rail-900 focus:outline-none focus:ring-1 focus:ring-status-info"
+                className="w-full text-xs bg-surface-panel border border-line rounded-sm px-2.5 py-2 text-ws-ink focus:outline-none focus:ring-1 focus:ring-status-info"
               >
                 {REASONS.map((r) => <option key={r} value={r}>{r}</option>)}
               </select>
@@ -148,7 +148,7 @@ export const TaskActionModal = ({ isOpen, onClose, task, actionType, onSubmit })
                   type="date"
                   value={proposedDate}
                   onChange={(e) => setProposedDate(e.target.value)}
-                  className="w-full text-xs bg-surface-panel border border-line rounded-sm px-2.5 py-2 text-rail-900 focus:outline-none focus:ring-1 focus:ring-status-info"
+                  className="w-full text-xs bg-surface-panel border border-line rounded-sm px-2.5 py-2 text-ws-ink focus:outline-none focus:ring-1 focus:ring-status-info"
                 />
               </div>
             )}
@@ -162,7 +162,7 @@ export const TaskActionModal = ({ isOpen, onClose, task, actionType, onSubmit })
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Detail for the controlling authority…"
-                className="w-full text-xs bg-surface-panel border border-line rounded-sm px-2.5 py-2 text-rail-900 placeholder:text-rail-400 focus:outline-none focus:ring-1 focus:ring-status-info"
+                className="w-full text-xs bg-surface-panel border border-line rounded-sm px-2.5 py-2 text-ws-ink placeholder:text-rail-400 focus:outline-none focus:ring-1 focus:ring-status-info"
               />
             </div>
           </div>

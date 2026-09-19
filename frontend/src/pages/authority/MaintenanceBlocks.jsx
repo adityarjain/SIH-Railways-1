@@ -143,7 +143,7 @@ export const MaintenanceBlocks = ({ onNavigate }) => {
                 key={id}
                 onClick={() => setView(id)}
                 className={`px-2.5 py-1 font-display text-[11px] font-bold ${uc} ${tr} transition-colors ${i > 0 ? 'border-l border-ws-rule' : ''} ${
-                  view === id ? 'bg-ws-ink text-white' : 'bg-ws-surface text-ws-mid hover:bg-ws-paper hover:text-ws-ink'
+                  view === id ? 'bg-ws-selected text-ws-ink' : 'bg-ws-surface text-ws-mid hover:bg-ws-paper hover:text-ws-ink'
                 }`}
               >
                 {label}

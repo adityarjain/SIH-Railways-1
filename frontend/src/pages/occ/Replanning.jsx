@@ -19,8 +19,8 @@ const FieldRow = ({ label, value, tone }) => (
 
 const PILL_TONE = {
   critical: 'text-ws-critical border-ws-critical bg-ws-barCriticalBg',
-  warn: 'text-ws-warn border-ws-warn bg-[#F5ECD6]',
-  ok: 'text-ws-ok border-ws-ok bg-[#E1EDE6]',
+  warn: 'text-ws-warn border-ws-warn bg-status-warn-tint',
+  ok: 'text-ws-ok border-ws-ok bg-status-ok-tint',
   info: 'text-ws-info border-ws-info bg-ws-barPlannedBg',
   idle: 'text-ws-idle border-ws-rule bg-ws-tick',
 };
@@ -85,7 +85,7 @@ export const Replanning = ({ onNavigate }) => {
           <button
             onClick={() => toggleReplan(false)}
             className={`px-2.5 py-1 font-display text-[11px] font-bold ${uc} ${tr} transition-colors ${
-              !isReplanned ? 'bg-ws-ink text-white' : 'bg-ws-surface text-ws-mid hover:bg-ws-paper hover:text-ws-ink'
+              !isReplanned ? 'bg-ws-selected text-ws-ink' : 'bg-ws-surface text-ws-mid hover:bg-ws-paper hover:text-ws-ink'
             }`}
           >
             {t('replanning.showOriginal')}

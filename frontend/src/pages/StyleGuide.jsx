@@ -22,7 +22,7 @@ const Swatch = ({ name, cls }) => (
   <div className="border border-line rounded-sm overflow-hidden">
     <div className={`h-11 ${cls}`} />
     <div className="px-2 py-1.5 bg-surface-panel">
-      <div className="font-mono text-[10px] text-rail-700">{name}</div>
+      <div className="font-mono text-[10px] text-ws-body">{name}</div>
     </div>
   </div>
 );
@@ -59,7 +59,7 @@ export const StyleGuide = () => {
         <Section
           id="type"
           title="Typography"
-          note="Barlow for interface text, Barlow Semi Condensed for headings/labels, JetBrains Mono for identifiers, timestamps, minutes and counts. Mono is never used for prose."
+          note="Figtree for all interface text, with weight carrying the emphasis rather than a second family. JetBrains Mono for identifiers, timestamps, minutes and counts. Mono is never used for prose."
         >
           <Panel>
             <PanelBody className="space-y-3">
@@ -70,7 +70,7 @@ export const StyleGuide = () => {
               <div><div className="t-section-title">t-section-title · 15px semibold</div></div>
               <div><ScopeCaption>t-scope · full run · 30,000 tasks</ScopeCaption></div>
               <div className="pt-1 border-t border-line-subtle">
-                <div className="t-wordmark text-rail-900">Railway Maintenance Operations</div>
+                <div className="t-wordmark text-ws-ink">Railway Maintenance Operations</div>
                 <div className="t-wordmark-sub text-rail-500">Decision Support System — functional identity, no logo</div>
               </div>
             </PanelBody>
@@ -133,7 +133,7 @@ export const StyleGuide = () => {
               </div>
               <div className="flex flex-wrap items-center gap-4">
                 {TONES.map((t) => (
-                  <span key={t} className="inline-flex items-center gap-1.5 text-xs text-rail-700">
+                  <span key={t} className="inline-flex items-center gap-1.5 text-xs text-ws-body">
                     <StatusDot tone={t} /> {t}
                   </span>
                 ))}
@@ -279,10 +279,10 @@ export const StyleGuide = () => {
             </PanelBody>
           </Panel>
           <Modal isOpen={modal} onClose={() => setModal(false)} title="Why this block was selected" subtitle="TASK-000005 · SEC-0004">
-            <p className="text-xs text-rail-700 leading-relaxed">Modal content. Escape closes; body scroll is refcounted so nested overlays behave.</p>
+            <p className="text-xs text-ws-body leading-relaxed">Modal content. Escape closes; body scroll is refcounted so nested overlays behave.</p>
           </Modal>
           <Drawer isOpen={drawer} onClose={() => setDrawer(false)} title="Maintenance block details" subtitle="TASK-000005">
-            <p className="text-xs text-rail-700 leading-relaxed">Drawer content.</p>
+            <p className="text-xs text-ws-body leading-relaxed">Drawer content.</p>
           </Drawer>
         </Section>
 

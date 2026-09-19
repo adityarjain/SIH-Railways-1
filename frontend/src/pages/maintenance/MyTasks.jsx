@@ -132,7 +132,7 @@ export const MyTasks = ({ onNavigate }) => {
                 </div>
 
                 {t.statusMeta?.reason && (
-                  <div className="px-3.5 py-2 bg-[#F5ECD6] border-b border-ws-rule">
+                  <div className="px-3.5 py-2 bg-status-warn-tint border-b border-ws-rule">
                     <span className="font-display text-[11px] font-semibold text-ws-warn">Crew note</span>
                     <p className="font-ws text-[11px] text-ws-body mt-0.5">{t.statusMeta.reason}</p>
                   </div>

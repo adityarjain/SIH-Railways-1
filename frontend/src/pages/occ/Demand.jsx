@@ -218,7 +218,7 @@ export const Demand = ({ onNavigate }) => {
               </Button>
             )}
 
-            <div className="bg-ws-ink text-white p-4 border border-ws-body space-y-3">
+            <div className="bg-ws-selected text-ws-ink p-4 border border-ws-body space-y-3">
               <div className="flex items-center justify-between">
                 <span className="font-display text-[11px] font-semibold text-ws-light">{t('demand.predictedRisk')}</span>
                 <Pill tone={PILL_TONE_MAP[bandTone(bandOf(selected))] || 'idle'}>{bandOf(selected) || '—'}</Pill>

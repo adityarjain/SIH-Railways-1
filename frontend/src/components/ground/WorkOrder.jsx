@@ -146,7 +146,7 @@ export const ActionBar = ({ status, onAction, disabled }) => {
 
   if (done) {
     return (
-      <div className="px-4 py-4 bg-[#E1EDE6] border-t border-ws-rule flex items-center gap-2.5 flex-wrap">
+      <div className="px-4 py-4 bg-status-ok-tint border-t border-ws-rule flex items-center gap-2.5 flex-wrap">
         <Pill tone="ok" size="md">Completed</Pill>
         <span className="font-ws text-xs text-ws-body">Awaiting verification by Authority.</span>
         <div className="flex-1" />
@@ -207,7 +207,7 @@ export const BlockStatusBanner = ({ task, status }) => {
     ? 'This task has not been placed in a block possession yet.'
     : `${task.is_night ? 'night possession' : 'day possession'} · ${started ? 'work in progress' : 'not yet started'}`;
 
-  const bg = tone === 'ok' ? 'bg-[#E1EDE6]' : tone === 'info' ? 'bg-ws-barPlannedBg' : 'bg-[#F5ECD6]';
+  const bg = tone === 'ok' ? 'bg-status-ok-tint' : tone === 'info' ? 'bg-ws-barPlannedBg' : 'bg-status-warn-tint';
   const fg = tone === 'ok' ? 'text-ws-ok' : tone === 'info' ? 'text-ws-info' : 'text-ws-warn';
   const dot = tone === 'ok' ? 'bg-ws-ok' : tone === 'info' ? 'bg-ws-info' : 'bg-ws-warn';
 

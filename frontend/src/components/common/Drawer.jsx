@@ -21,7 +21,7 @@ export const Drawer = ({ isOpen, onClose, title, subtitle, children, width = 'ma
             <button
               onClick={onClose}
               aria-label="Close"
-              className="p-1 rounded-sm text-rail-400 hover:text-rail-900 hover:bg-line-subtle transition-colors shrink-0"
+              className="p-1 rounded-sm text-rail-400 hover:text-ws-ink hover:bg-line-subtle transition-colors shrink-0"
             >
               <X size={17} />
             </button>

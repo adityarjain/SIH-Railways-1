@@ -267,15 +267,15 @@ export const DaySheet = ({
       {/* legend */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-2.5">
         <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
-          <LegendSwatch bg="bg-ws-barPlannedBg" border="border-ws-barPlannedBorder" rule="#2C63D8" />
+          <LegendSwatch bg="bg-ws-barPlannedBg" border="border-ws-barPlannedBorder" rule="#4C8DFF" />
           {t('gantt.legendBlock')}
         </span>
         <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
-          <LegendSwatch bg="bg-ws-barCriticalBg" border="border-ws-barCriticalBorder" rule="#C43D30" />
+          <LegendSwatch bg="bg-ws-barCriticalBg" border="border-ws-barCriticalBorder" rule="#FF6B5A" />
           {t('gantt.legendCritical')}
         </span>
         <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
-          <LegendSwatch bg="bg-ws-barBundledBg" border="border-ws-barBundledBorder" rule="#17807C" />
+          <LegendSwatch bg="bg-ws-barBundledBg" border="border-ws-barBundledBorder" rule="#2BC4BC" />
           {t('gantt.legendBundled')}
         </span>
         <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">

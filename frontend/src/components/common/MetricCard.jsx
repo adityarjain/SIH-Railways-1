@@ -13,7 +13,7 @@ const TONE = {
   green: 'text-status-ok',
   blue: 'text-status-info',
   purple: 'text-bundle',
-  slate: 'text-rail-900',
+  slate: 'text-ws-ink',
 };
 
 export const MetricCard = ({ title, value, subtext, icon: Icon, color = 'slate', scope, onClick }) => {

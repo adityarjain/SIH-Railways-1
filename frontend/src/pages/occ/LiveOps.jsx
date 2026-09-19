@@ -56,7 +56,7 @@ export const LiveOps = ({ onNavigate }) => {
         <div className="h-px bg-ws-rule mb-3.5" />
 
         {activeEvent ? (
-          <div className="border border-ws-warn bg-[#F5ECD6] p-3.5 space-y-3">
+          <div className="border border-ws-warn bg-status-warn-tint p-3.5 space-y-3">
             <div className="flex items-start justify-between gap-2 flex-wrap">
               <div className="flex items-center gap-2 text-ws-warn font-display font-bold text-sm">
                 <AlertTriangle size={18} /> {t('liveOps.conflictDetected')}
@@ -82,7 +82,7 @@ export const LiveOps = ({ onNavigate }) => {
             <p className="font-ws text-xs text-ws-warn">{activeEvent.details}</p>
 
             {activeEvent.outcomeType === 'OPERATIONAL_UPDATE' && (
-              <div className="bg-[#E1EDE6] border border-ws-ok p-3.5 text-ws-ok space-y-2">
+              <div className="bg-status-ok-tint border border-ws-ok p-3.5 text-ws-ok space-y-2">
                 <div className="flex items-center gap-2 font-display font-bold text-xs">
                   <CheckCircle2 size={16} /> {t('liveOps.operationalUpdate', { action: activeHeld ? t('liveOps.held') : t('liveOps.rerouted') })}
                 </div>
@@ -154,7 +154,7 @@ export const LiveOps = ({ onNavigate }) => {
             <div className="pt-2">
               <button
                 onClick={() => triggerEvent('NEW_TRAIN_BLOCKED')}
-                className="px-3.5 py-1.5 bg-ws-info text-white font-display text-xs font-bold hover:brightness-95 transition-[filter]"
+                className="px-3.5 py-1.5 bg-ws-info text-rail-950 font-display text-xs font-bold hover:brightness-95 transition-[filter]"
               >
                 {t('liveOps.injectConflict')} (TRN-SIM-002)
               </button>
@@ -200,7 +200,7 @@ export const LiveOps = ({ onNavigate }) => {
           <RegionHeader number="03" title={t('liveOps.criteriaCoverage')} isHindi={isHindi} />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 border-t border-ws-rule pt-3">
             {Object.entries(criteriaCoverage).map(([name, c]) => (
-              <div key={name} className={`p-2.5 border text-[11px] ${c.status === 'NOT_IMPLEMENTED' ? 'bg-ws-paper border-ws-hairline' : 'bg-[#E1EDE6] border-ws-ok'}`}>
+              <div key={name} className={`p-2.5 border text-[11px] ${c.status === 'NOT_IMPLEMENTED' ? 'bg-ws-paper border-ws-hairline' : 'bg-status-ok-tint border-ws-ok'}`}>
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-display font-semibold text-ws-ink capitalize">{name.replace(/_/g, ' ')}</span>
                   <span className={`font-mono text-[10px] font-bold ${c.status === 'NOT_IMPLEMENTED' ? 'text-ws-light' : 'text-ws-ok'}`}>{c.status.replace(/_/g, ' ')}</span>

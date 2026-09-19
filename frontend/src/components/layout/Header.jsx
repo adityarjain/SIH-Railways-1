@@ -12,8 +12,8 @@ export const RoleSwitch = ({ onNavigate, tone = 'dark' }) => {
   // A sunken track with one raised active segment, matching SegmentedControl.
   // `tone` picks the track for a light page vs the dark Ground header.
   const base = tone === 'ws'
-    ? { wrap: 'bg-ws-tick', idle: 'text-ws-mid hover:text-ws-ink', active: 'bg-ws-surface text-ws-ink shadow-soft' }
-    : { wrap: 'bg-rail-800', idle: 'text-rail-300 hover:text-white', active: 'bg-status-info text-white' };
+    ? { wrap: 'bg-ws-paper', idle: 'text-ws-mid hover:text-ws-ink', active: 'bg-ws-selected text-ws-ink' }
+    : { wrap: 'bg-rail-800', idle: 'text-rail-300 hover:text-white', active: 'bg-status-info text-rail-950' };
 
   const seg = (target, label) => {
     const active = role === target;

@@ -14,7 +14,7 @@ export const LanguageSwitch = ({ tone = 'dark', className = '' }) => {
   // switch and the in-page segmented controls, so all three read as one family.
   const base = tone === 'dark'
     ? { wrap: 'bg-rail-800', idle: 'text-rail-300 hover:text-white', active: 'bg-rail-600 text-white' }
-    : { wrap: 'bg-ws-tick', idle: 'text-ws-mid hover:text-ws-ink', active: 'bg-ws-surface text-ws-ink shadow-soft' };
+    : { wrap: 'bg-ws-paper', idle: 'text-ws-mid hover:text-ws-ink', active: 'bg-ws-selected text-ws-ink' };
 
   return (
     <div

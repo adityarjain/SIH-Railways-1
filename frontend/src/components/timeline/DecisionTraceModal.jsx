@@ -9,8 +9,8 @@ import { Award } from 'lucide-react';
 
 const STATUS_STYLES = {
   SELECTED: { row: 'bg-status-ok-tint font-semibold text-status-ok', label: 'text-status-ok' },
-  FEASIBLE: { row: 'text-rail-600', label: 'text-status-info' },
-  REJECTED: { row: 'text-rail-600', label: 'text-status-critical' },
+  FEASIBLE: { row: 'text-ws-mid', label: 'text-status-info' },
+  REJECTED: { row: 'text-ws-mid', label: 'text-status-critical' },
 };
 
 export const DecisionTraceModal = ({ isOpen, onClose, task }) => {
@@ -72,30 +72,30 @@ export const DecisionTraceModal = ({ isOpen, onClose, task }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="h-6 w-6 rounded-full bg-status-info-tint text-status-info font-bold text-xs flex items-center justify-center">1</span>
-                <h5 className="text-xs font-bold text-rail-900 ">Step 1 — Maintenance Request</h5>
+                <h5 className="text-xs font-bold text-ws-ink ">Step 1 — Maintenance Request</h5>
               </div>
               <Badge variant="primary" size="sm">{request.required_duration_minutes} MIN</Badge>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs bg-surface-sunken p-3 rounded-lg border border-line-subtle">
               <div>
                 <span className="text-rail-500 block text-[11px]">Type</span>
-                <span className="font-semibold text-rail-800">{request.maintenance_type}</span>
+                <span className="font-semibold text-ws-body">{request.maintenance_type}</span>
               </div>
               <div>
                 <span className="text-rail-500 block text-[11px]">Duration</span>
-                <span className="font-semibold text-rail-800">
+                <span className="font-semibold text-ws-body">
                   {request.required_duration_minutes} min ({request.blocks_required} blocks)
                 </span>
               </div>
               <div>
                 <span className="text-rail-500 block text-[11px]">Crew required</span>
-                <span className="font-semibold text-rail-800">
+                <span className="font-semibold text-ws-body">
                   {request.required_team_size} · {request.department}
                 </span>
               </div>
               <div>
                 <span className="text-rail-500 block text-[11px]">Deadline</span>
-                <span className="font-semibold text-rail-800 font-mono">{request.deadline}</span>
+                <span className="font-semibold text-ws-body font-mono">{request.deadline}</span>
               </div>
             </div>
           </div>
@@ -105,7 +105,7 @@ export const DecisionTraceModal = ({ isOpen, onClose, task }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="h-6 w-6 rounded-full bg-status-critical-tint text-status-critical font-bold text-xs flex items-center justify-center">2</span>
-                <h5 className="text-xs font-bold text-rail-900 ">Step 2 — Failure Risk Signal</h5>
+                <h5 className="text-xs font-bold text-ws-ink ">Step 2 — Failure Risk Signal</h5>
               </div>
               <Badge variant="CRITICAL" size="sm">{risk.risk_level} RISK</Badge>
             </div>
@@ -118,11 +118,11 @@ export const DecisionTraceModal = ({ isOpen, onClose, task }) => {
               </div>
               <div>
                 <span className="text-rail-500 block text-[11px]">30-day failure probability</span>
-                <span className="font-bold text-rail-800 font-mono text-sm">
+                <span className="font-bold text-ws-body font-mono text-sm">
                   {(risk.failure_probability_30d * 100).toFixed(1)}%
                 </span>
               </div>
-              <div className="col-span-2 text-rail-600 text-[11px] pt-1">
+              <div className="col-span-2 text-ws-mid text-[11px] pt-1">
                 Weighted into a composite priority score of{' '}
                 <strong>{risk.priority_score.toLocaleString()}</strong>, which is how the objective
                 ranks this task against competing demand. Source:{' '}
@@ -136,7 +136,7 @@ export const DecisionTraceModal = ({ isOpen, onClose, task }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="h-6 w-6 rounded-full bg-bundle-tint text-bundle font-bold text-xs flex items-center justify-center">3</span>
-                <h5 className="text-xs font-bold text-rail-900 ">
+                <h5 className="text-xs font-bold text-ws-ink ">
                   Step 3 — Candidate Evaluation &amp; Feasibility Filters
                 </h5>
               </div>
@@ -151,7 +151,7 @@ export const DecisionTraceModal = ({ isOpen, onClose, task }) => {
 
             <div className="border border-line rounded-lg overflow-x-auto text-xs">
               <table className="w-full text-left min-w-[560px]">
-                <thead className="bg-surface-sunken text-[11px] text-rail-600 font-mono border-b border-line">
+                <thead className="bg-surface-sunken text-[11px] text-ws-mid font-mono border-b border-line">
                   <tr>
                     <th className="py-1.5 px-3">Block Window</th>
                     <th className="py-1.5 px-3">Time</th>
@@ -169,7 +169,7 @@ export const DecisionTraceModal = ({ isOpen, onClose, task }) => {
                         <td className="py-2 px-3 whitespace-nowrap">{c.window}</td>
                         <td className={`py-2 px-3 font-semibold ${style.label}`}>{c.status}</td>
                         <td className="py-2 px-3 text-rail-500">{c.rule}</td>
-                        <td className="py-2 px-3 font-sans text-rail-600 font-normal">{c.reason}</td>
+                        <td className="py-2 px-3 font-sans text-ws-mid font-normal">{c.reason}</td>
                       </tr>
                     );
                   })}
@@ -183,13 +183,13 @@ export const DecisionTraceModal = ({ isOpen, onClose, task }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="h-6 w-6 rounded-full bg-status-ok-tint text-status-ok font-bold text-xs flex items-center justify-center">4</span>
-                <h5 className="text-xs font-bold text-rail-900 ">
+                <h5 className="text-xs font-bold text-ws-ink ">
                   Step 4 — Team Feasibility (S005 / S006)
                 </h5>
               </div>
               <Badge variant="success" size="sm">CREW QUALIFIED</Badge>
             </div>
-            <div className="text-xs text-rail-600 bg-surface-sunken p-3 rounded-lg border border-line-subtle space-y-1">
+            <div className="text-xs text-ws-mid bg-surface-sunken p-3 rounded-lg border border-line-subtle space-y-1">
               {selected.teams.map((t) => (
                 <div key={t.team_id}>
                   • <strong>{t.team_id}</strong> ({t.department}, shift {t.shift}) — crew{' '}
@@ -208,7 +208,7 @@ export const DecisionTraceModal = ({ isOpen, onClose, task }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="h-6 w-6 rounded-full bg-status-info-tint text-status-info font-bold text-xs flex items-center justify-center">5</span>
-                <h5 className="text-xs font-bold text-rail-900 ">
+                <h5 className="text-xs font-bold text-ws-ink ">
                   Step 5 — Affected Train Services
                 </h5>
               </div>
@@ -217,9 +217,9 @@ export const DecisionTraceModal = ({ isOpen, onClose, task }) => {
               </Badge>
             </div>
 
-            <div className="text-xs text-rail-600 bg-surface-sunken p-3 rounded-lg border border-line-subtle space-y-2">
+            <div className="text-xs text-ws-mid bg-surface-sunken p-3 rounded-lg border border-line-subtle space-y-2">
               <div>
-                <span className="font-semibold text-rail-700">Conflicting movements (C002):</span>{' '}
+                <span className="font-semibold text-ws-body">Conflicting movements (C002):</span>{' '}
                 {trainImpact?.conflicting?.length ? (
                   <span className="font-mono text-status-critical">
                     {trainImpact.conflicting.map((t) => t.train_id).join(', ')}
@@ -232,7 +232,7 @@ export const DecisionTraceModal = ({ isOpen, onClose, task }) => {
               </div>
 
               <div>
-                <span className="font-semibold text-rail-700">
+                <span className="font-semibold text-ws-body">
                   Adjacent services (±{trainImpact?.adjacency_buffer_minutes ?? 60} min, C008):
                 </span>{' '}
                 {trainImpact?.adjacent?.length ? (

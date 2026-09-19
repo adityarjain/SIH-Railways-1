@@ -10,19 +10,23 @@ import {
 // Tailwind classes), so the charts read as one system with the rest of the
 // interface. Teal stays reserved for bundling.
 const TOKEN = {
-  critical: '#C43D30',
-  warn: '#B4791A',
-  info: '#2C63D8',
-  ok: '#2F7D5B',
-  ink: '#3B414D',
+  critical: '#FF6B5A',
+  warn: '#E0A030',
+  info: '#4C8DFF',
+  ok: '#3FBF87',
+  // Neutral series. A near-white bar glares on the dark canvas, so the
+  // unbanded workload chart uses a muted steel-blue instead.
+  ink: '#40547A',
 };
 
 const TIP_STYLE = {
   fontSize: '11px',
-  borderRadius: '0',
-  border: '1px solid #E2E6ED',
-  padding: '4px 8px',
-  fontFamily: 'Barlow, sans-serif',
+  borderRadius: '6px',
+  background: '#1C242F',
+  border: '1px solid #263040',
+  color: '#E8EDF4',
+  padding: '6px 10px',
+  fontFamily: 'Figtree, sans-serif',
 };
 
 export const Analytics = () => {
@@ -83,7 +87,7 @@ export const Analytics = () => {
               <BarChart data={riskData} margin={{ top: 8, right: 8, left: -20, bottom: 24 }}>
                 <XAxis dataKey="name" tick={{ fontSize: 9, fill: '#7C7466' }} angle={-15} textAnchor="end" />
                 <YAxis tick={{ fontSize: 10, fill: '#7C7466' }} allowDecimals={false} />
-                <Tooltip contentStyle={TIP_STYLE} cursor={{ fill: '#EFF1F5' }} />
+                <Tooltip contentStyle={TIP_STYLE} cursor={{ fill: '#212934' }} />
                 <Bar dataKey="count" radius={0}>
                   {riskData.map((entry) => <Cell key={entry.name} fill={entry.color} />)}
                 </Bar>
@@ -99,7 +103,7 @@ export const Analytics = () => {
               <BarChart data={departmentData} layout="vertical" margin={{ top: 8, right: 16, left: 16, bottom: 4 }}>
                 <XAxis type="number" tick={{ fontSize: 10, fill: '#7C7466' }} allowDecimals={false} />
                 <YAxis type="category" dataKey="name" tick={{ fontSize: 9, fill: '#7C7466' }} width={88} />
-                <Tooltip contentStyle={TIP_STYLE} cursor={{ fill: '#EFF1F5' }} />
+                <Tooltip contentStyle={TIP_STYLE} cursor={{ fill: '#212934' }} />
                 <Bar dataKey="count" fill={TOKEN.ink} radius={0} />
               </BarChart>
             </ResponsiveContainer>

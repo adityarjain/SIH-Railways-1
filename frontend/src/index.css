@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-surface-base text-rail-900 font-sans antialiased text-sm;
+    @apply bg-surface-base text-ws-ink font-sans antialiased text-sm;
   }
 
   /* Technical values line up in columns: IDs, timestamps, minutes, counts. */
@@ -25,19 +25,19 @@
   }
 
   .t-value {
-    @apply text-[13px] font-medium text-rail-900;
+    @apply text-[13px] font-medium text-ws-ink;
   }
 
   .t-mono-id {
-    @apply font-mono text-xs font-medium text-rail-800;
+    @apply font-mono text-xs font-medium text-ws-body;
   }
 
   .t-metric {
-    @apply font-mono text-xl font-semibold text-rail-900;
+    @apply font-mono text-xl font-semibold text-ws-ink;
   }
 
   .t-section-title {
-    @apply font-display text-[15px] font-semibold text-rail-900;
+    @apply font-display text-[15px] font-semibold text-ws-ink;
   }
 
   /* The product wordmark is set in the same type as the interface: no logo,
@@ -61,7 +61,7 @@
    never actually defined until now. */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(98, 107, 123, 0.30) transparent;
+  scrollbar-color: rgba(139, 151, 168, 0.32) transparent;
 }
 
 ::-webkit-scrollbar {
@@ -72,13 +72,13 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(98, 107, 123, 0.26);
+  background: rgba(139, 151, 168, 0.28);
   border-radius: 9999px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(98, 107, 123, 0.44);
+  background: rgba(139, 151, 168, 0.48);
   background-clip: content-box;
 }
 

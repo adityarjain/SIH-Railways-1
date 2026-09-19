@@ -270,27 +270,27 @@ export const Overview = ({ onNavigate }) => {
                 aria-pressed={active}
                 className={`flex-1 min-w-[58px] rounded-lg px-1.5 pt-2.5 pb-3 text-center transition-colors ${
                   active
-                    ? 'bg-ws-info text-white'
+                    ? 'bg-ws-info'
                     : weekend
-                    ? 'bg-ws-tick hover:bg-ws-band'
-                    : 'bg-ws-surface shadow-soft hover:bg-ws-tick'
+                    ? 'bg-ws-band hover:bg-ws-tick'
+                    : 'bg-ws-surface hover:bg-ws-tick'
                 }`}
               >
-                <span className={`block font-display text-[10px] font-semibold ${active ? 'text-white/70' : 'text-ws-light'}`}>
+                <span className={`block font-display text-[10px] font-semibold ${active ? 'text-rail-950/70' : 'text-ws-light'}`}>
                   {weekday}
                 </span>
-                <span className={`block font-mono text-[20px] font-semibold leading-none mt-1 tracking-[-0.02em] ${active ? 'text-white' : 'text-ws-ink'}`}>
+                <span className={`block font-mono text-[20px] font-semibold leading-none mt-1 tracking-[-0.02em] ${active ? 'text-rail-950' : 'text-ws-ink'}`}>
                   {day}
                 </span>
-                <span className={`block h-[3px] rounded-full mt-2.5 ${active ? 'bg-white/25' : 'bg-ws-hairline'}`}>
+                <span className={`block h-[3px] rounded-full mt-2.5 ${active ? 'bg-rail-950/25' : 'bg-ws-tick'}`}>
                   {o.count > 0 && (
                     <span
-                      className={`block h-full rounded-full ${active ? 'bg-white' : 'bg-ws-info/45'}`}
+                      className={`block h-full rounded-full ${active ? 'bg-rail-950/70' : 'bg-ws-info/60'}`}
                       style={{ width: `${Math.max(10, (o.count / maxDayCount) * 100)}%` }}
                     />
                   )}
                 </span>
-                <span className={`block font-mono text-[11px] mt-1.5 ${active ? 'text-white/85' : o.count ? 'text-ws-mid' : 'text-ws-disabled'}`}>
+                <span className={`block font-mono text-[11px] mt-1.5 ${active ? 'text-rail-950/85' : o.count ? 'text-ws-mid' : 'text-ws-disabled'}`}>
                   {o.count || '0'}
                 </span>
               </button>
@@ -381,7 +381,7 @@ export const Overview = ({ onNavigate }) => {
           <div className="flex items-center gap-2.5 pt-[15px] flex-wrap">
             <button
               onClick={() => onNavigate && onNavigate('decision-trace')}
-              className="px-4 py-2 rounded-md font-display text-[13px] font-semibold text-white bg-ws-info hover:bg-[#2455BE] active:scale-[0.98] transition-all"
+              className="px-4 py-2 rounded-md font-display text-[13px] font-semibold text-rail-950 bg-ws-info hover:brightness-95 active:scale-[0.98] transition-all"
             >
               {t('overview.openDecisionTrace')}
             </button>

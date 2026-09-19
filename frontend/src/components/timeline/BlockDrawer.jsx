@@ -30,7 +30,7 @@ export const BlockDrawer = ({ task, isOpen, onClose, onOpenDecisionTrace }) => {
         </p>
         <button
           onClick={() => onOpenDecisionTrace(task)}
-          className="mt-3 w-full bg-status-info hover:bg-status-info text-white text-xs font-semibold py-2 px-3 transition-colors"
+          className="mt-3 w-full bg-status-info hover:bg-status-info text-rail-950 text-xs font-semibold py-2 px-3 transition-colors"
         >
           Why This Block Was Selected
         </button>
@@ -46,26 +46,26 @@ export const BlockDrawer = ({ task, isOpen, onClose, onOpenDecisionTrace }) => {
         <div className="grid grid-cols-2 gap-3 text-xs">
           <div>
             <span className="text-rail-500 block text-[11px]">Assigned Block(s)</span>
-            <span className="font-mono font-bold text-rail-900 text-sm">
+            <span className="font-mono font-bold text-ws-ink text-sm">
               {Array.isArray(task.block_ids) ? task.block_ids.join(' + ') : task.block_ids}
             </span>
           </div>
           <div>
             <span className="text-rail-500 block text-[11px]">Execution Window</span>
-            <span className="font-mono font-bold text-rail-900 text-sm">
+            <span className="font-mono font-bold text-ws-ink text-sm">
               {startTime} – {endTime} ({task.duration_minutes}m)
             </span>
           </div>
           <div>
             <span className="text-rail-500 block text-[11px]">Scheduled Date</span>
-            <span className="font-medium text-rail-800 flex items-center gap-1 mt-0.5">
+            <span className="font-medium text-ws-body flex items-center gap-1 mt-0.5">
               <Calendar size={13} className="text-rail-400" />
               {task.date}
             </span>
           </div>
           <div>
             <span className="text-rail-500 block text-[11px]">Location / Section</span>
-            <span className="font-medium text-rail-800 flex items-center gap-1 mt-0.5">
+            <span className="font-medium text-ws-body flex items-center gap-1 mt-0.5">
               <MapPin size={13} className="text-rail-400" />
               {task.section_id} ({task.corridor_id})
             </span>
@@ -82,7 +82,7 @@ export const BlockDrawer = ({ task, isOpen, onClose, onOpenDecisionTrace }) => {
 
         <div className="flex items-center justify-between p-3 rounded-lg bg-surface-sunken border border-line-subtle">
           <div>
-            <span className="text-xs font-semibold text-rail-800 block">
+            <span className="text-xs font-semibold text-ws-body block">
               {task.maintenance_type || 'Track Inspection / Renewal'}
             </span>
             <span className="text-[11px] text-rail-500">{task.department}</span>
@@ -98,17 +98,17 @@ export const BlockDrawer = ({ task, isOpen, onClose, onOpenDecisionTrace }) => {
         <div className="grid grid-cols-2 gap-3 text-xs pt-1">
           <div>
             <span className="text-rail-500 block text-[11px]">Asset Identifier</span>
-            <span className="font-mono font-bold text-rail-800">{task.asset_id}</span>
+            <span className="font-mono font-bold text-ws-body">{task.asset_id}</span>
           </div>
           <div>
             <span className="text-rail-500 block text-[11px]">Optimizer Priority Score</span>
-            <span className="font-mono font-bold text-rail-800">
+            <span className="font-mono font-bold text-ws-body">
               {task.priority_score != null ? task.priority_score.toFixed(1) : '\u2014'}
             </span>
           </div>
           <div>
             <span className="text-rail-500 block text-[11px]">Night Window Bonus</span>
-            <span className="font-medium text-rail-800">
+            <span className="font-medium text-ws-body">
               {task.is_night ? 'Applied (00:00 - 08:00)' : 'Day Execution'}
             </span>
           </div>
@@ -128,7 +128,7 @@ export const BlockDrawer = ({ task, isOpen, onClose, onOpenDecisionTrace }) => {
 
         <div className="flex items-center justify-between text-xs">
           <div>
-            <span className="font-bold text-rail-900 font-mono">
+            <span className="font-bold text-ws-ink font-mono">
               {Array.isArray(task.assigned_teams) && task.assigned_teams.length > 0
                 ? task.assigned_teams.join(', ')
                 : task.assigned_teams || 'No crew recorded'}
@@ -149,7 +149,7 @@ export const BlockDrawer = ({ task, isOpen, onClose, onOpenDecisionTrace }) => {
           <p className="text-xs text-bundle leading-relaxed">
             This task shares its possession window with compatible work in the same section:
           </p>
-          <div className="bg-surface-panel p-2.5 rounded-lg border border-bundle text-xs text-rail-800 font-mono">
+          <div className="bg-surface-panel p-2.5 rounded-lg border border-bundle text-xs text-ws-body font-mono">
             {task.bundled_with && task.bundled_with.length > 0
               ? `Shared with: ${task.bundled_with.join(', ')}`
               : 'Bundled possession — partner task not recorded in this artifact'}

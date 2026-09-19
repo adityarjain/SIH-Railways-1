@@ -35,7 +35,7 @@ export const Login = ({ onLoginSuccess }) => {
         role === value ? 'border-status-info bg-status-info-tint' : 'border-line hover:border-line-strong'
       }`}
     >
-      <div className="text-[13px] font-semibold text-rail-900">{title}</div>
+      <div className="text-[13px] font-semibold text-ws-ink">{title}</div>
       <div className="text-[11px] text-rail-500 mt-0.5 leading-relaxed">{desc}</div>
     </button>
   );

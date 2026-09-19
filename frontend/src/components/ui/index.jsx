@@ -107,7 +107,7 @@ export const StatusBadge = ({ tone: t = 'idle', children, size = 'md', className
 export const Metric = ({ label, value, sub, tone: t, scope, mono = true, className = '' }) => (
   <div className={className}>
     <div className="t-label">{label}</div>
-    <div className={`${mono ? 'font-mono' : ''} text-xl font-semibold mt-0.5 ${t ? tone(t).text : 'text-rail-900'}`}>
+    <div className={`${mono ? 'font-mono' : ''} text-xl font-semibold mt-0.5 ${t ? tone(t).text : 'text-ws-ink'}`}>
       {value}
     </div>
     {sub && <div className="text-[10px] text-rail-400 mt-0.5">{sub}</div>}
@@ -126,10 +126,10 @@ export const MetricRow = ({ label, value, sub, tone: t, onClick }) => {
       }`}
     >
       <span className="min-w-0">
-        <span className="block text-xs font-medium text-rail-700">{label}</span>
+        <span className="block text-xs font-medium text-ws-body">{label}</span>
         {sub && <span className="block text-[10px] text-rail-400 mt-0.5">{sub}</span>}
       </span>
-      <span className={`font-mono text-sm font-bold shrink-0 ${t ? tone(t).text : 'text-rail-900'}`}>
+      <span className={`font-mono text-sm font-bold shrink-0 ${t ? tone(t).text : 'text-ws-ink'}`}>
         {value}
       </span>
     </Tag>
@@ -144,10 +144,10 @@ export const Button = ({
   // Filled or tinted, no outline: an outline plus a fill is two edges doing
   // one job. `active:scale` gives the press a physical acknowledgement.
   const variants = {
-    primary: 'bg-status-info text-white hover:brightness-95',
-    secondary: 'bg-surface-sunken text-rail-700 hover:bg-line-subtle',
-    danger: 'bg-status-critical text-white hover:brightness-95',
-    warn: 'bg-status-warn-tint text-[#8A5A0E] hover:brightness-[0.97]',
+    primary: 'bg-status-info text-rail-950 hover:brightness-95',
+    secondary: 'bg-surface-sunken text-ws-body hover:bg-line-subtle',
+    danger: 'bg-status-critical text-rail-950 hover:brightness-95',
+    warn: 'bg-status-warn-tint text-[#E0A030] hover:brightness-[0.97]',
     ghost: 'bg-transparent text-rail-500 hover:bg-surface-sunken',
   };
   const sizes = {
@@ -178,8 +178,8 @@ export const Tabs = ({ items, value, onChange, className = '' }) => (
           onClick={() => onChange(it.id)}
           className={`px-4 py-2.5 text-xs font-semibold tracking-wide border-b-2 -mb-px transition-colors ${
             active
-              ? 'border-status-info text-rail-900'
-              : 'border-transparent text-rail-500 hover:text-rail-700'
+              ? 'border-status-info text-ws-ink'
+              : 'border-transparent text-rail-500 hover:text-ws-body'
           }`}
         >
           {it.label}
@@ -204,7 +204,7 @@ export const Select = ({ label, className = '', ...props }) => (
   <label className="inline-flex items-center gap-1.5">
     {label && <span className="t-label">{label}</span>}
     <select
-      className={`text-xs bg-surface-panel border border-line rounded-sm px-2 py-1.5 font-medium text-rail-700 focus:outline-none focus:ring-1 focus:ring-status-info ${className}`}
+      className={`text-xs bg-surface-panel border border-line rounded-sm px-2 py-1.5 font-medium text-ws-body focus:outline-none focus:ring-1 focus:ring-status-info ${className}`}
       {...props}
     />
   </label>
@@ -212,7 +212,7 @@ export const Select = ({ label, className = '', ...props }) => (
 
 export const TextInput = ({ className = '', ...props }) => (
   <input
-    className={`text-xs bg-surface-panel border border-line rounded-sm px-2.5 py-1.5 text-rail-900 placeholder:text-rail-400 focus:outline-none focus:ring-1 focus:ring-status-info ${className}`}
+    className={`text-xs bg-surface-panel border border-line rounded-sm px-2.5 py-1.5 text-ws-ink placeholder:text-rail-400 focus:outline-none focus:ring-1 focus:ring-status-info ${className}`}
     {...props}
   />
 );
@@ -229,7 +229,7 @@ export const Alert = ({ tone: t = 'info', title, children, action, className = '
       <Icon size={15} className={`${c.text} shrink-0 mt-0.5`} />
       <div className="min-w-0 flex-1">
         {title && <div className={`text-xs font-bold ${c.text}`}>{title}</div>}
-        {children && <div className="text-xs text-rail-700 mt-0.5 leading-relaxed">{children}</div>}
+        {children && <div className="text-xs text-ws-body mt-0.5 leading-relaxed">{children}</div>}
       </div>
       {action && <div className="shrink-0">{action}</div>}
     </div>

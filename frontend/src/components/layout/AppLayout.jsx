@@ -79,7 +79,7 @@ const GroundShell = ({ activeTab, onTabChange, children }) => {
                       key={i.id}
                       onClick={() => onTabChange(i.id)}
                       className={`shrink-0 px-3.5 py-3 font-display text-[11px] font-semibold whitespace-nowrap border-b-2 -mb-px transition-colors ${
-                        active ? 'border-status-info text-rail-900' : 'border-transparent text-rail-500 hover:text-rail-700 hover:border-line'
+                        active ? 'border-status-info text-ws-ink' : 'border-transparent text-rail-500 hover:text-ws-body hover:border-line'
                       }`}
                     >
                       {t(i.labelKey)}
