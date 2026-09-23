@@ -141,24 +141,24 @@ export const MetricRow = ({ label, value, sub, tone: t, onClick }) => {
 export const Button = ({
   variant = 'secondary', size = 'md', children, className = '', ...props
 }) => {
-  // Physical keys: raised at rest; on press they drop 2px and the shadow
-  // inverts into the surface. Safety orange is reserved for the primary key.
+  // Primary is burnished gold; secondary is a black outline that warms to
+  // gold on hover; ghost is text that underlines. Nothing moves.
   const variants = {
     primary: 'bg-accent text-accent-ink shadow-key-accent hover:bg-accent-hover',
-    secondary: 'bg-ws-surface text-ws-ink shadow-key hover:text-status-info',
-    danger: 'bg-status-critical text-white shadow-key hover:brightness-110',
-    warn: 'bg-ws-surface text-status-warn shadow-key hover:text-ws-ink',
-    ghost: 'bg-transparent text-ws-mid hover:shadow-recessed',
+    secondary: 'bg-transparent text-ws-ink border border-ws-ink hover:bg-ws-tick hover:border-accent hover:text-accent',
+    danger: 'bg-status-critical text-white hover:brightness-110',
+    warn: 'bg-transparent text-status-warn border border-status-warn hover:bg-status-warn-tint',
+    ghost: 'bg-transparent text-ws-mid hover:text-ws-ink hover:underline decoration-accent-bright underline-offset-4',
   };
   const sizes = {
     sm: 'text-[12px] px-2.5 py-1.5',
     md: 'text-[13px] px-3.5 py-2',
     // Ground portal: 44px minimum touch target.
-    lg: 'text-sm px-6 py-3 min-h-12',
+    lg: 'text-[15px] px-6 py-3 min-h-[44px]',
   };
   return (
     <button
-      className={`inline-flex items-center justify-center gap-1.5 font-bold uppercase tracking-[0.05em] rounded-md transition-all duration-150 ease-spring active:translate-y-[2px] active:shadow-pressed focus:outline-none focus-visible:shadow-focus disabled:opacity-40 disabled:cursor-not-allowed disabled:active:translate-y-0 ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`inline-flex items-center justify-center gap-1.5 font-semibold tracking-[0.03em] rounded-md touch-manipulation transition-all duration-200 ease-out focus:outline-none focus-visible:shadow-focus disabled:opacity-40 disabled:cursor-not-allowed ${variants[variant]} ${sizes[size]} ${className}`}
       {...props}
     >
       {children}

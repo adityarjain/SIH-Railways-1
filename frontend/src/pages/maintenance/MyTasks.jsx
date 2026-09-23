@@ -98,7 +98,7 @@ export const MyTasks = ({ onNavigate }) => {
             const sec = SECTION[t.section_id];
 
             return (
-              <div key={t.task_id} className={`rounded-lg shadow-panel bg-ws-surface overflow-hidden overflow-hidden ${started ? 'border-l-4 border-l-ws-info' : ''}`}>
+              <div key={t.task_id} className={`rounded-lg shadow-panel bg-ws-surface overflow-hidden ${started ? 'border-l-4 border-l-ws-steel' : ''}`}>
                 <div className="px-3.5 py-3 flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="font-mono text-[15px] font-bold text-ws-ink">{t.task_id}</div>

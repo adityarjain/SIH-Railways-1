@@ -154,7 +154,7 @@ export const LiveOps = ({ onNavigate }) => {
             <div className="pt-2">
               <button
                 onClick={() => triggerEvent('NEW_TRAIN_BLOCKED')}
-                className="px-3.5 py-1.5 rounded-md font-display text-xs font-bold uppercase tracking-[0.05em] transition-all duration-150 bg-accent text-accent-ink shadow-key-accent hover:bg-accent-hover active:translate-y-[1px] active:shadow-pressed"
+                className="px-3.5 py-1.5 rounded-md font-display text-[13px] font-semibold tracking-[0.03em] transition-all duration-150 bg-accent text-accent-ink shadow-key-accent hover:bg-accent-hover"
               >
                 {t('liveOps.injectConflict')} (TRN-SIM-002)
               </button>

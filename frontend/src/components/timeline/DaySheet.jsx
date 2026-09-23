@@ -36,7 +36,7 @@ const barTone = (task, replannedTaskId) => {
   if (bandOf(task) === 'CRITICAL') {
     return { bg: 'bg-ws-barCriticalBg', border: 'border-ws-barCriticalBorder', rule: 'border-l-ws-critical', label: 'text-ws-barCriticalLabel' };
   }
-  return { bg: 'bg-ws-barPlannedBg', border: 'border-ws-barPlannedBorder', rule: 'border-l-ws-info', label: 'text-ws-barPlannedLabel' };
+  return { bg: 'bg-ws-barPlannedBg', border: 'border-ws-barPlannedBorder', rule: 'border-l-ws-steel', label: 'text-ws-barPlannedLabel' };
 };
 
 const LegendSwatch = ({ bg, border, rule, h = 10 }) => (
@@ -99,7 +99,7 @@ export const DaySheet = ({
   const domainHours = Math.round((domain.end - domain.start) / 60);
 
   return (
-    <div className="bg-ws-surface rounded-lg shadow-panel bolted mx-4 md:mx-5 xl:mx-6 pt-7 px-7 pb-7 font-ws text-ws-body">
+    <div className="bg-ws-surface rounded-lg shadow-panel mx-4 md:mx-5 xl:mx-6 pt-7 px-7 pb-7 font-ws text-ws-body">
       <RegionHeader
         title={t('overview.daySheet')}
         meta={t('overview.daySheetMeta', { corridor: corridorLabel, date, hours: domainHours })}
@@ -267,15 +267,15 @@ export const DaySheet = ({
       {/* legend */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-2.5">
         <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
-          <LegendSwatch bg="bg-ws-barPlannedBg" border="border-ws-barPlannedBorder" rule="#5469D4" />
+          <LegendSwatch bg="bg-ws-barPlannedBg" border="border-ws-barPlannedBorder" rule="#4E6072" />
           {t('gantt.legendBlock')}
         </span>
         <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
-          <LegendSwatch bg="bg-ws-barCriticalBg" border="border-ws-barCriticalBorder" rule="#DF1B41" />
+          <LegendSwatch bg="bg-ws-barCriticalBg" border="border-ws-barCriticalBorder" rule="#A61B1B" />
           {t('gantt.legendCritical')}
         </span>
         <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
-          <LegendSwatch bg="bg-ws-barBundledBg" border="border-ws-barBundledBorder" rule="#0A7E8C" />
+          <LegendSwatch bg="bg-ws-barBundledBg" border="border-ws-barBundledBorder" rule="#2F6B6B" />
           {t('gantt.legendBundled')}
         </span>
         <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">

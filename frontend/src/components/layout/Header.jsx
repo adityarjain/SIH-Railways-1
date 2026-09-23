@@ -2,18 +2,12 @@ import React from 'react';
 import { useAuth, ROLES } from '../../context/AuthContext';
 import { useI18n } from '../../i18n';
 
-/** The two experiences are distinct products, so the switch is a segmented
- *  control rather than a dropdown — the active one has to be unmistakable. */
-export const RoleSwitch = ({ onNavigate, tone = 'dark' }) => {
+/** The three roles as small-caps links; the active one carries a gold rule,
+ *  so which product you are in is always unmistakable. */
+export const RoleSwitch = ({ onNavigate }) => {
   const { currentUser, login } = useAuth();
   const { t } = useI18n();
   const role = currentUser?.role;
-
-  // A sunken track with one raised active segment, matching SegmentedControl.
-  // `tone` picks the track for a light page vs the dark Ground header.
-  const base = tone === 'ws'
-    ? { wrap: 'rounded-md bg-ws-tick shadow-recessed p-1 gap-1', idle: 'text-ws-mid hover:text-ws-ink', active: 'bg-ws-surface text-ws-ink shadow-key' }
-    : { wrap: 'border border-white/30', idle: 'text-white/75 hover:text-white hover:bg-rail-800', active: 'bg-white text-rail-950' };
 
   const seg = (target, label) => {
     const active = role === target;
@@ -23,9 +17,7 @@ export const RoleSwitch = ({ onNavigate, tone = 'dark' }) => {
         type="button"
         aria-pressed={active}
         onClick={() => (onNavigate ? onNavigate(null, target) : login(target))}
-        className={`px-3 py-1.5 rounded font-mono text-[10px] font-bold uppercase tracking-[0.05em] transition-all duration-150 ease-spring focus:outline-none focus-visible:shadow-focus ${
-          active ? base.active : base.idle
-        }`}
+        className={`py-1 border-b-2 font-mono text-[11px] font-medium uppercase tracking-[0.12em] transition-colors duration-200 ease-out focus:outline-none focus-visible:shadow-focus ${active ? 'border-accent-bright text-ws-ink' : 'border-transparent text-ws-mid hover:text-ws-ink'}`}
       >
         {label}
       </button>
@@ -36,7 +28,7 @@ export const RoleSwitch = ({ onNavigate, tone = 'dark' }) => {
     <div
       role="group"
       aria-label={t('role.switchLabel')}
-      className={`inline-flex items-stretch shrink-0 ${base.wrap}`}
+      className="inline-flex items-center gap-4 shrink-0"
     >
       {seg(ROLES.AUTHORITY, t('role.authorityShort'))}
       {seg(ROLES.GROUND, t('role.groundShort'))}

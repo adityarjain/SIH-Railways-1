@@ -98,7 +98,7 @@ export const CompletedWork = () => {
             const band = bandOf(j);
             const sec = SECTION[j.section_id];
             return (
-              <div key={j.task_id} className="rounded-lg shadow-panel bg-ws-surface overflow-hidden overflow-hidden">
+              <div key={j.task_id} className="rounded-lg shadow-panel bg-ws-surface overflow-hidden">
                 <div className="px-3.5 py-3 flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="font-mono text-[14px] font-bold text-ws-ink">{j.task_id}</div>

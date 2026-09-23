@@ -5,38 +5,42 @@
 @layer base {
   body {
     @apply bg-surface-base text-ws-ink font-sans antialiased text-sm;
+    letter-spacing: 0.01em;
   }
 
-  /* Matte ABS plastic: fractal noise over the whole chassis. Fixed and
-     pointer-inert, so it never repaints on scroll. */
+  /* Paper: a faint fractal grain over the ivory, like uncoated stock. Fixed
+     and pointer-inert, so it never repaints on scroll. */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
     z-index: 60;
     pointer-events: none;
-    opacity: 0.22;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.3;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  /* Technical values line up in columns: IDs, timestamps, minutes, counts. */
+  /* Tabular figures wherever numbers sit in columns. */
   .font-mono {
     font-variant-numeric: tabular-nums;
+  }
+  .font-serif {
+    font-variant-numeric: lining-nums;
   }
 }
 
 @layer components {
   /* --- Typographic roles ------------------------------------------------ */
 
-  /* Stamped label: the printed legend on a panel. Mono, uppercase, tracked. */
+  /* Small caps: tracked uppercase mono for labels and meta. */
   .t-stamp,
   .t-label {
-    @apply font-mono text-[11px] font-bold uppercase tracking-[0.07em] text-ws-mid;
+    @apply font-mono text-[11px] font-medium uppercase tracking-[0.15em] text-ws-mid;
   }
 
   .t-value {
-    @apply text-[13px] font-medium text-ws-ink;
+    @apply text-[14px] font-medium text-ws-ink;
   }
 
   .t-mono-id {
@@ -44,85 +48,44 @@
   }
 
   .t-metric {
-    @apply font-mono text-xl font-semibold text-ws-ink;
+    @apply font-serif text-2xl text-ws-ink;
   }
 
   .t-section-title {
-    @apply font-display text-[15px] font-bold text-ws-ink;
+    @apply font-serif text-[20px] text-ws-ink;
   }
 
   .t-wordmark {
-    @apply font-display text-[11px] font-semibold uppercase tracking-[0.14em];
+    @apply font-serif text-[15px];
   }
 
   .t-wordmark-sub {
-    @apply text-[10px] font-medium tracking-wide;
+    @apply text-[11px] font-medium tracking-[0.05em];
   }
 
   .t-scope {
-    @apply font-mono text-[11px] uppercase tracking-[0.05em] text-ws-mid;
+    @apply font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-ws-mid;
   }
 
-  /* Embossed type: a one-pixel highlight under dark text on the chassis. */
-  .t-emboss {
-    text-shadow: 0 1px 0 #ffffff;
+  /* Section label: small caps in gold between two hairline rules. */
+  .t-section-label {
+    @apply flex items-center gap-4 font-mono text-[11px] font-medium uppercase tracking-[0.15em] text-accent;
   }
-
-  /* --- Manufacturing details ------------------------------------------- */
-
-  /* Four screw heads, 12px in from each corner. Layered under the panel's own
-     background so it can be combined with any fill. */
-  .bolted {
-    background-image:
-      radial-gradient(circle at 12px 12px, rgba(0, 0, 0, 0.18) 1.5px, rgba(255, 255, 255, 0.7) 2.5px, transparent 3.5px),
-      radial-gradient(circle at calc(100% - 12px) 12px, rgba(0, 0, 0, 0.18) 1.5px, rgba(255, 255, 255, 0.7) 2.5px, transparent 3.5px),
-      radial-gradient(circle at 12px calc(100% - 12px), rgba(0, 0, 0, 0.18) 1.5px, rgba(255, 255, 255, 0.7) 2.5px, transparent 3.5px),
-      radial-gradient(circle at calc(100% - 12px) calc(100% - 12px), rgba(0, 0, 0, 0.18) 1.5px, rgba(255, 255, 255, 0.7) 2.5px, transparent 3.5px);
-  }
-
-  /* A row of three recessed vent slots. */
-  .vents {
-    @apply inline-flex gap-1 shrink-0;
-  }
-  .vents > span {
-    @apply block h-5 w-1 rounded-full bg-ws-tick;
-    box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.18), 0 1px 0 #ffffff;
-  }
-
-  /* Status LED. Colour comes from a bg-* utility; glow from shadow-led-*. */
-  .led {
-    @apply inline-block h-2 w-2 rounded-full shrink-0;
-  }
-
-  /* CRT readout: charcoal glass with scanlines over a phosphor glow. */
-  .crt {
-    @apply relative overflow-hidden rounded-md bg-rail-950;
-    box-shadow: inset 3px 3px 8px rgba(0, 0, 0, 0.7), inset -1px -1px 2px rgba(255, 255, 255, 0.08);
-  }
-  .crt::after {
+  .t-section-label::before,
+  .t-section-label::after {
     content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%);
-    background-size: 100% 4px;
+    @apply h-px flex-1 bg-line;
   }
-  .crt-glow {
-    color: #ffb27a;
-    text-shadow: 0 0 6px rgba(255, 107, 26, 0.55);
-  }
-}
 
-@layer utilities {
-  /* Mechanical spring: a slight overshoot, as a sprung switch returns. */
-  .ease-spring {
-    transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  /* A state dot: colour comes from a bg-* utility. No glow. */
+  .led {
+    @apply inline-block h-1.5 w-1.5 rounded-full shrink-0;
   }
 }
 
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(74, 85, 104, 0.35) transparent;
+  scrollbar-color: rgba(107, 107, 107, 0.3) transparent;
 }
 
 ::-webkit-scrollbar {
@@ -133,13 +96,13 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(74, 85, 104, 0.3);
+  background: rgba(107, 107, 107, 0.25);
   border-radius: 9999px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(74, 85, 104, 0.5);
+  background: rgba(107, 107, 107, 0.45);
   background-clip: content-box;
 }
 
@@ -149,17 +112,17 @@
 .ws-conflict-hatch {
   background-image: repeating-linear-gradient(
     45deg,
-    rgba(198, 40, 40, 0.9) 0,
-    rgba(198, 40, 40, 0.9) 3px,
-    rgba(198, 40, 40, 0.3) 3px,
-    rgba(198, 40, 40, 0.3) 6px
+    rgba(166, 27, 27, 0.85) 0,
+    rgba(166, 27, 27, 0.85) 3px,
+    rgba(166, 27, 27, 0.25) 3px,
+    rgba(166, 27, 27, 0.25) 6px
   );
 }
 
-/* Devanagari needs more vertical room than Latin at the same font-size, and
-   has no case: uppercase does nothing, and letter-spacing breaks conjuncts. */
+/* Devanagari needs more vertical room than Latin at the same size, and has no
+   case: uppercase does nothing, and letter-spacing breaks conjuncts. */
 :root[data-lang='hi'] {
-  --dev-leading: 1.55;
+  --dev-leading: 1.6;
 }
 :root[data-lang='hi'] body,
 :root[data-lang='hi'] .t-label,
@@ -168,12 +131,19 @@
 :root[data-lang='hi'] .t-section-title {
   line-height: var(--dev-leading);
 }
+:root[data-lang='hi'] body,
 :root[data-lang='hi'] .t-label,
 :root[data-lang='hi'] .t-stamp,
 :root[data-lang='hi'] .t-scope,
+:root[data-lang='hi'] .t-section-label,
 :root[data-lang='hi'] .t-wordmark {
   text-transform: none;
   letter-spacing: 0.01em;
+}
+
+/* Tracked small caps must not letter-space Devanagari. */
+[lang='hi'] {
+  letter-spacing: normal;
 }
 
 @media (prefers-reduced-motion: reduce) {

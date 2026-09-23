@@ -42,8 +42,8 @@ export const AppLayout = ({ activeTab, onTabChange, children }) => {
   }));
 
   const mainCls = isGround
-    ? 'flex-1 px-4 md:px-6 py-6 space-y-4 max-w-[1200px] w-full mx-auto'
-    : FULL_BLEED_TABS.has(activeTab) ? 'flex-1 min-w-0' : 'flex-1 p-6 space-y-4 min-w-0';
+    ? 'flex-1 px-5 md:px-8 py-8 space-y-6 max-w-[1200px] w-full mx-auto'
+    : FULL_BLEED_TABS.has(activeTab) ? 'flex-1 min-w-0' : 'flex-1 px-5 md:px-8 pb-8 space-y-6 min-w-0';
 
   return (
     <div className="min-h-screen bg-ws-paper flex">
@@ -52,7 +52,7 @@ export const AppLayout = ({ activeTab, onTabChange, children }) => {
         <TopBar>
           {solver && (
             <span className="hidden md:inline-flex items-center gap-2 t-stamp">
-              <span className={`led ${solverOk ? 'bg-[#22C55E] shadow-led-ok' : 'bg-[#D63031] shadow-led-critical'}`} aria-hidden="true" />
+              <span className={`led ${solverOk ? 'bg-status-ok' : 'bg-status-critical'}`} aria-hidden="true" />
               {t('header.solver')} {solver}
             </span>
           )}
@@ -61,7 +61,7 @@ export const AppLayout = ({ activeTab, onTabChange, children }) => {
               <span className="text-ws-ink font-medium">{currentUser?.department}</span> · {currentUser?.name}
             </span>
           )}
-          <RoleSwitch onNavigate={onTabChange} tone="ws" />
+          <RoleSwitch onNavigate={onTabChange} />
         </TopBar>
         <MobileNav groups={groups} activeId={activeTab} onSelect={onTabChange} />
         {!isGround && activeTab !== 'overview' && <WorksheetHeader activeTab={activeTab} onNavigate={onTabChange} />}

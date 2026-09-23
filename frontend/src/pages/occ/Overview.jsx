@@ -268,29 +268,29 @@ export const Overview = ({ onNavigate }) => {
                 key={o.date}
                 onClick={() => setSelectedDate(o.date)}
                 aria-pressed={active}
-                className={`flex-1 min-w-[58px] rounded-md px-1.5 pt-2.5 pb-3 text-center transition-all duration-150 ${
+                className={`flex-1 min-w-[58px] rounded-md px-1.5 pt-2.5 pb-3 text-center touch-manipulation transition-colors duration-200 ease-out ${
                   active
-                    ? 'bg-accent translate-y-[1px] shadow-[inset_3px_3px_6px_rgba(150,50,0,0.45),inset_-2px_-2px_4px_rgba(255,170,120,0.5)]'
+                    ? 'bg-ws-ink'
                     : weekend
-                    ? 'bg-ws-tick shadow-key hover:text-status-info'
-                    : 'bg-ws-surface shadow-key hover:text-status-info'
+                    ? 'bg-ws-tick hover:text-accent'
+                    : 'bg-ws-surface shadow-key hover:text-accent'
                 }`}
               >
-                <span className={`block font-display text-[10px] font-semibold ${active ? 'text-accent-ink/80' : 'text-ws-light'}`}>
+                <span className={`block font-mono text-[10px] uppercase tracking-[0.12em] ${active ? 'text-white/70' : 'text-ws-light'}`}>
                   {weekday}
                 </span>
-                <span className={`block font-mono text-[20px] font-semibold leading-none mt-1 tracking-[-0.02em] ${active ? 'text-accent-ink' : 'text-ws-ink'}`}>
+                <span className={`block font-serif text-[24px] leading-none mt-1.5 ${active ? 'text-white' : 'text-ws-ink'}`}>
                   {day}
                 </span>
-                <span className={`block h-[3px] rounded-full mt-2.5 ${active ? 'bg-accent-ink/20' : 'bg-ws-tick'}`}>
+                <span className={`block h-[3px] rounded-full mt-2.5 ${active ? 'bg-white/20' : 'bg-ws-tick'}`}>
                   {o.count > 0 && (
                     <span
-                      className={`block h-full rounded-full ${active ? 'bg-accent-ink' : 'bg-ws-steel/70'}`}
+                      className={`block h-full rounded-full ${active ? 'bg-accent-soft' : 'bg-ws-steel/60'}`}
                       style={{ width: `${Math.max(10, (o.count / maxDayCount) * 100)}%` }}
                     />
                   )}
                 </span>
-                <span className={`block font-mono text-[11px] mt-1.5 ${active ? 'text-accent-ink' : o.count ? 'text-ws-mid' : 'text-ws-disabled'}`}>
+                <span className={`block font-mono text-[11px] mt-1.5 ${active ? 'text-white/85' : o.count ? 'text-ws-mid' : 'text-ws-disabled'}`}>
                   {o.count || '0'}
                 </span>
               </button>
@@ -323,16 +323,13 @@ export const Overview = ({ onNavigate }) => {
 
           <div className="flex items-end gap-5 pt-0.5 pb-3 border-b border-ws-rule flex-wrap">
             <div>
-              {/* The one number a controller acts on, set as an instrument readout. */}
-              <div className="crt px-5 pt-3 pb-4 min-w-[260px]">
-                <div className="flex items-center gap-2">
-                  <span className="led bg-[#22C55E] shadow-led-ok" aria-hidden="true" />
-                  <span className={`font-mono text-[11px] font-bold ${uc} ${tr} text-[#A8B2D1]`}>{t('overview.recommendedWindow')}</span>
-                </div>
-                <div className="crt-glow font-mono text-[40px] font-bold leading-[1.1] tracking-[-0.02em] mt-2">
+              {/* The one number a controller acts on, set as the page's display figure. */}
+              <div className="min-w-[240px] border-l-2 border-accent-bright pl-5 py-1">
+                <div className={`t-stamp !text-accent ${uc} ${tr}`}>{t('overview.recommendedWindow')}</div>
+                <div className="font-serif text-[46px] md:text-[54px] leading-none tracking-[-0.01em] text-ws-ink mt-3">
                   {dSel.window || '—'}
                 </div>
-                <div className="font-mono text-xs text-[#A8B2D1] mt-1">{dSel.date}</div>
+                <div className="t-scope mt-3">{dSel.date}</div>
               </div>
             </div>
             <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2.5 flex-1 min-w-[280px]">
@@ -387,13 +384,13 @@ export const Overview = ({ onNavigate }) => {
           <div className="flex items-center gap-2.5 pt-[15px] flex-wrap">
             <button
               onClick={() => onNavigate && onNavigate('decision-trace')}
-              className="px-4 py-2 rounded-md font-display text-[13px] font-semibold text-accent-ink bg-accent shadow-key-accent hover:bg-accent-hover active:translate-y-[1px] active:shadow-pressed transition-all"
+              className="px-4 py-2 rounded-md font-display text-[13px] font-semibold text-accent-ink bg-accent shadow-key-accent hover:bg-accent-hover transition-all"
             >
               {t('overview.openDecisionTrace')}
             </button>
             <button
               onClick={() => onNavigate && onNavigate('block-planning')}
-              className="px-4 py-2 rounded-md font-display text-[13px] font-semibold text-ws-ink bg-ws-surface shadow-key hover:text-status-info active:translate-y-[1px] active:shadow-pressed transition-all duration-150"
+              className="px-4 py-2 rounded-md font-display text-[13px] font-semibold text-ws-ink bg-ws-surface shadow-key hover:text-status-info transition-all duration-150"
             >
               {t('overview.goToBlockPlanning')}
             </button>

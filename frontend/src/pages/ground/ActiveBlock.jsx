@@ -76,7 +76,7 @@ export const ActiveBlock = ({ onNavigate }) => {
         <Pill tone={isStarted ? 'info' : 'ok'} size="md">{isStarted ? t('status.inProgressCaps') : t('status.readyToStart')}</Pill>
       </div>
 
-      <div className="rounded-lg shadow-panel bolted bg-ws-surface overflow-hidden overflow-hidden">
+      <div className="rounded-lg shadow-panel bg-ws-surface overflow-hidden">
         <WorkOrderHeader task={active} status={active.status} />
         <WorkOrderFacts task={active} />
         <BlockStatusBanner task={active} status={active.status} />

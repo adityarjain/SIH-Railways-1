@@ -30,7 +30,7 @@ export const BlockDrawer = ({ task, isOpen, onClose, onOpenDecisionTrace }) => {
         </p>
         <button
           onClick={() => onOpenDecisionTrace(task)}
-          className="mt-3 w-full bg-accent text-accent-ink shadow-key-accent hover:bg-accent-hover active:translate-y-[1px] active:shadow-pressed text-xs font-semibold py-2 px-3 transition-colors"
+          className="mt-3 w-full bg-accent text-accent-ink shadow-key-accent hover:bg-accent-hover text-xs font-semibold py-2 px-3 transition-colors"
         >
           Why This Block Was Selected
         </button>

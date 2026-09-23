@@ -1,94 +1,102 @@
 # Design System: Railway Maintenance Operations
 
-**Industrial skeuomorphism.** The interface is a physical control panel: a
-matte plastic chassis, modules bolted onto it, keys that press in, LEDs that
-report real state, and one CRT readout for the number a controller acts on.
-References: Braun control surfaces, Teenage Engineering, spacecraft panels.
+**Editorial serif.** The interface is set like a well-made publication: ivory
+paper, a high-contrast display serif, fine warm rules for structure, small-caps
+labels, and a single burnished-gold accent. Restraint does the work; nothing
+moves for show.
 
 Three audiences share it: Authority (planning and approval), Ground Operations
 (field execution) and Admin (model and solver verification).
 
-## 1. Physics
+## 1. Principles
 
-- **One light source, top-left at 45°.** Highlights fall top-left, shadows
-  bottom-right, on every element.
-- **Elevation:**
-  - −1, recessed: fields, switch tracks, notices, and the CRT glass.
-  - 0, chassis: the page.
-  - +1, panels: modules bolted to the chassis.
-  - +2, keys: buttons, selected switch segments, calendar days.
-- **Press:** keys drop 1–2px and their shadow inverts into the surface
-  (150ms, spring easing `cubic-bezier(0.175, 0.885, 0.32, 1.275)`).
+- **The serif is the voice.** Playfair Display appears only where it earns its
+  place: page titles, section titles, large figures and the wordmark. Every
+  other word is set in the interface sans.
+- **Rules, not boxes.** Sections are divided by 1px warm rules; cards carry a
+  hairline edge and almost no shadow.
+- **Editorial frame, working data.** The landing page, page headers and section
+  openings get magazine spacing. Timelines, tables and the calendar keep full
+  width and working density, framed by the rules and serif headings.
+- **One accent, one job.** Gold marks what you can act on and what is current
+  (buttons, the current page, the selected option). It never marks status.
+- **Nothing bounces, nothing lifts.** Colour and underline transitions only,
+  200ms ease-out; `prefers-reduced-motion` disables them.
 
-## 2. Tokens (`tailwind.config.js`)
+## 2. Colour (`tailwind.config.js`)
 
-**Colour**
-- Chassis `#E0E5EC` · raised panel `#F0F2F5` · recessed `#D1D9E6`
-- Ink `#2D3436` · labels `#4A5568` (AA) · disabled `#8A94A6`
-- Shadow pair `#BABECC` / `#FFFFFF` · rules `#C8CFDA` / `#A3B1C6`
-- **Safety orange `#FF6B1A`**: buttons, toggles and the active nav key only.
-  Labels on it are charcoal `#2D3436`, not white: white on orange fails WCAG AA.
-  Its dark form `#B3400A` is used for accent text and icons.
-- **Critical red `#C62828`**: critical risk and conflicts only. Controls and
-  alarms never share a colour.
-- Steel blue `#4F6F95` (`ws-steel`): planned, moderate and active-possession
-  state, so no status ever reads as a control.
-- Charcoal plates `#2D3436` / `#1E2427` for the footer and CRT bezels, with
-  text `#A8B2D1`.
-- LEDs: green `#22C55E` (ok), red `#D63031` (critical), orange (active key).
-
-**Shadows:** `soft` / `panel` / `lift` (raised), `key` / `key-accent` (keys),
-`pressed` / `recessed` (inset), `led-ok` / `led-critical` / `led-accent`
-(glow), `focus` (orange ring).
-
-**Radius:** badges 4px · controls 8px · panels 16px · feature surfaces 24px.
+- Ivory page `#FAFAF8` · white cards `#FFFFFF` · warm muted `#F5F3F0`
+- Rich black `#1A1A1A` text · warm grey `#6B6B6B` secondary text
+- Rules `#E8E4DF` · stronger rule `#D4CFC8`
+- **Gold accent:**
+  - `accent` `#8F6A08` for button fills (white text ≈ 4.9:1)
+  - `status-info` `#8B6508` for gold text
+  - `accent-bright` `#B8860B` for rules, rings and underlines only
+- **Status** (desaturated to sit in the palette):
+  - critical `#A61B1B`
+  - warning **rust** `#A4471A`, not amber, so it never reads as the gold accent
+  - complete `#2E6B3F` · planned / moderate / active **slate** `#4E6072`
+  - inactive `#6B6B6B` · bundled `#2F6B6B`
 
 ## 3. Type
 
-- **Inter** for the interface. Page titles are 800 weight, tight tracking,
-  with a one-pixel white emboss (`.t-emboss`).
-- **JetBrains Mono** for stamped labels (`.t-stamp`: 11px, bold, uppercase,
-  tracked), badges, switch legends and every number.
-- **Noto Sans Devanagari** for Hindi; stamps drop uppercase and tracking in
-  Hindi, because the script has no case and tracking breaks conjuncts.
+- **Playfair Display**: headlines (40–72px on the landing page, 38–52px page
+  titles), section titles (21px), display figures (34–54px), wordmark.
+- **Source Sans 3**: all interface text; body at 1.75 line-height on reading
+  surfaces.
+- **IBM Plex Mono**: small caps (`.t-stamp`, `.t-scope`: 10–11px, uppercase,
+  0.12–0.15em tracking) and tabular figures.
+- **Hindi**: headlines in Noto Serif Devanagari so they stay serif; body in
+  Noto Sans Devanagari. Small caps drop uppercase and tracking for Devanagari,
+  which has no case and whose conjuncts break when letter-spaced.
 
-## 4. Manufacturing details (`index.css`)
+`font-display` and `font-ws` deliberately remain the interface sans: they are
+used on ~130 small labels and buttons, where an 11px display serif would be
+illegible. The serif is applied through `font-serif` only.
 
-- `.bolted`: four screw heads 12px in from the corners. Used on the large
-  modules only (sidebar, day sheet, Ground's next task, landing control
-  panel), where padding keeps content clear of the screws.
-- `.vents` / `<Vents />`: three recessed slots, top-right of bolted modules.
-- `.led`: status light; colour and glow always reflect real state (solver
-  status, selected key, notice tone), never decoration.
-- `.crt` / `.crt-glow`: charcoal glass, scanlines, phosphor-orange digits.
-  Used for Overview's recommended possession window and the landing readout.
-- Body noise: fractal-noise overlay for the matte plastic surface; fixed and
-  pointer-inert.
+## 4. Signature elements (`index.css`, `components/ui/worksheet.jsx`)
+
+- `.t-section-label`: gold small caps between two hairline rules (landing
+  masthead).
+- **Page header**: gold small-caps section label, serif title, a 48px gold rule,
+  then the summary.
+- **Section header** (`RegionHeader`): serif title over a hairline rule, meta
+  in small caps.
+- **Display figures**: `StatFigure`, the landing figures row, and Overview's
+  recommended possession window, set in the serif beside a gold rule.
+- **Notices** (`AdvisoryNote`): an editorial aside, a 2px coloured rule on the
+  left over the muted tint.
+- **Segmented controls**, role and language switches: set as a contents line,
+  with the selected option underlined in gold.
+- **Paper grain**: a faint fractal-noise overlay, fixed and pointer-inert.
 
 ## 5. Components
 
-- **Sidebar:** a bolted key bank. The current page is a pressed key with a lit
-  orange LED; others raise on hover. Below lg it becomes a recessed strip.
-- **Top bar:** chassis, government name, a solver LED from the artifact, the
-  role and language switches.
-- **Buttons:** physical keys, uppercase legends. Primary orange; secondary,
-  warning and danger are chassis keys with coloured legends.
-- **Segmented controls:** recessed track; the selected key stands proud.
-- **Fields:** recessed wells, mono text, orange ring on focus.
-- **Notices:** recessed windows with an LED beside a stamped title.
-- **Footer:** charcoal plate with the non-official disclaimer.
+- **Sidebar**: a contents page. Serif wordmark, gold small-caps section labels,
+  and a gold rule beside the current page. Below lg it becomes one line of links.
+- **Buttons**:
+  - Primary: gold fill.
+  - Secondary: black outline that warms to gold on hover.
+  - Warning: rust outline. Ghost: underlines on hover.
+  - All: 6px radius, 44px minimum on the Ground touch targets.
+- **Cards**: white, 8px radius, hairline edge (carried by `shadow-soft` /
+  `shadow-panel` as a 1px ring), optional 2px gold top rule for the featured
+  card.
+- **Fields**: white, 1px warm border, gold border and ring on focus.
+- **Badges**: small caps on a pale tint, 4px radius.
 
-## 6. Deliberate deviations from the source spec
+## 6. Deliberate deviations from the source brief
 
-- Charcoal, not white, labels on orange (contrast).
-- Safety orange `#FF6B1A` instead of red `#FF4757` for controls, because red
-  already means critical risk in this app.
-- No card hover-lift and no slide-up entrance animations: on a dense ops
-  screen thirty moving cards are noise. Keys still press physically, and
-  `prefers-reduced-motion` disables all transitions.
-- Marketing-page devices in the spec (pricing tags, push-pinned testimonials,
-  hero device mockup) have no counterpart here and are not used; the landing
-  readout plays the device role with real data.
+- **Contrast**: the brief's `#B8860B` gold measures ≈ 3.2:1 both as white-on-gold
+  and gold-on-white, below WCAG AA. Buttons use the deeper `#8F6A08`, text uses
+  `#8B6508`, and `#B8860B` is kept for non-text marks.
+- **No hover lift**: the brief both prescribes and forbids a button lift; the
+  restraint reading wins.
+- **Warnings are rust**, per the decision that gold and amber must never be
+  confused.
+- **Whitespace** is editorial on framing surfaces only (see §1).
+- Marketing sections in the brief (pricing, testimonials, FAQ) have no
+  counterpart in this app and are not used.
 
 ## 7. Identity and honesty
 
@@ -97,3 +105,7 @@ Emblem of India (Prohibition of Improper Use) Act, 2005). The footer states the
 system is a demonstration prototype on synthetic data. No national flag
 colours. Every figure traces to an artifact field, and demo-scenario numbers
 are captioned separately from full-run numbers.
+
+Token names such as `shadow-key`, `shadow-pressed` and `ws-*` are stable across
+repaints (about 1,350 call sites read them); their values, not their names,
+carry the current style.

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth, ROLES, DEPARTMENTS } from '../context/AuthContext';
 import { useI18n } from '../i18n';
 import { usePlan } from '../context/PlanContext';
-import { InstitutionalHeader, AppFooter, Vents } from '../components/layout/InstitutionalHeader';
+import { InstitutionalHeader, AppFooter } from '../components/layout/InstitutionalHeader';
 import { Button, Select } from '../components/ui';
 
 /**
@@ -10,8 +10,7 @@ import { Button, Select } from '../components/ui';
  * claim to be: no credential is checked, and the form exists so an evaluator can
  * enter any of the three experiences directly.
  *
- * The readout beside it shows the full-run artifact's own values, not
- * decoration: solver status, runtime, validation checks and scheduled count.
+ * The figures are the full-run artifact's own values, not decoration.
  */
 export const Login = ({ onLoginSuccess }) => {
   const { login, selectedDept, setSelectedDept } = useAuth();
@@ -30,65 +29,77 @@ export const Login = ({ onLoginSuccess }) => {
     { value: ROLES.ADMIN, title: t('role.admin'), desc: t('role.adminDesc') },
   ];
 
-  const prov = m?.provenance || {};
-  const horizon = (prov.planning_horizon || '').replace(/\s*\.\.\s*/, ' → ');
-  const checks = (prov.post_solve_validation || '').match(/(\d+\/\d+)/)?.[1];
-  const solver = m?.summary?.solver_status;
-  const solverOk = solver === 'FEASIBLE' || solver === 'OPTIMAL';
-  const readout = [
-    [t('header.solver'), solver ? `${solver} · ${m.summary.runtime_seconds}s` : null],
-    [t('overview.checksLabel'), checks],
-    [t('status.scheduled'), m?.summary ? `${m.summary.total_scheduled.toLocaleString()} / ${m.summary.total_tasks_considered.toLocaleString()}` : null],
-    [t('header.planHorizon'), horizon || null],
-  ].filter(([, v]) => v);
+  const s = m?.summary;
+  const checks = (m?.provenance?.post_solve_validation || '').match(/(\d+\/\d+)/)?.[1];
+  const figures = [
+    s && [s.total_scheduled.toLocaleString(), `${t('status.scheduled')} / ${s.total_tasks_considered.toLocaleString()}`],
+    checks && [checks, t('overview.checksLabel')],
+    s && [`${s.runtime_seconds}s`, `${t('header.solver')} · ${s.solver_status}`],
+  ].filter(Boolean);
 
   return (
     <div className="min-h-screen bg-surface-base flex flex-col">
       <InstitutionalHeader />
 
-      <main id="main-content" tabIndex={-1} className="flex-1 w-full max-w-6xl mx-auto px-4 md:px-12 py-12 md:py-16 outline-none">
-        <h1 className={`font-extrabold text-ws-ink leading-[1.05] tracking-[-0.03em] t-emboss max-w-3xl ${isHindi ? 'text-[36px] md:text-[48px]' : 'text-[40px] md:text-[60px]'}`}>
-          {t('institution.appName')}
-        </h1>
-        <p className="text-[17px] text-ws-mid mt-3">{t('institution.appSub')}</p>
+      <main id="main-content" tabIndex={-1} className="flex-1 w-full max-w-5xl mx-auto px-5 md:px-8 outline-none">
+        {/* Masthead */}
+        <header className="pt-20 md:pt-32 pb-16 md:pb-20 text-center">
+          <div className="t-section-label max-w-md mx-auto">{t('institution.appSub')}</div>
+          <h1 className={`font-serif text-ws-ink leading-[1.1] tracking-[-0.02em] mt-8 ${isHindi ? 'text-[38px] md:text-[56px]' : 'text-[40px] md:text-[72px]'}`}>
+            {t('institution.appName')}
+          </h1>
+        </header>
 
-        <div className="mt-10 md:mt-12 grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-8 items-start">
-          {/* Control panel */}
+        {/* Figures from the last full run */}
+        {figures.length > 0 && (
+          <section aria-label={t('scope.fullRun')} className="border-y border-ws-rule py-10">
+            <div className="t-scope text-center mb-8">{t('scope.fullRun')}</div>
+            <dl className="grid grid-cols-1 sm:grid-cols-3 gap-y-8 sm:divide-x divide-ws-rule">
+              {figures.map(([value, label]) => (
+                <div key={label} className="text-center px-4">
+                  <dd className="font-serif text-[40px] md:text-[48px] leading-none text-ws-ink">{value}</dd>
+                  <dt className="t-scope mt-3">{label}</dt>
+                </div>
+              ))}
+            </dl>
+          </section>
+        )}
+
+        {/* Role selection */}
+        <section className="py-20 md:py-28 grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-10 lg:gap-16 items-start">
+          <div>
+            <h2 className="font-serif text-[30px] md:text-[36px] leading-[1.2] tracking-[-0.01em] text-ws-ink">
+              {t('login.selectRole')}
+            </h2>
+            <p className="text-[15px] text-ws-mid leading-[1.75] mt-5 max-w-sm">
+              {t('login.notAuthBody')}
+            </p>
+          </div>
+
           <form
-            className="bg-ws-surface rounded-xl shadow-lift bolted px-6 md:px-9 pt-8 pb-9"
+            className="bg-ws-surface rounded-lg shadow-panel border-t-2 border-t-accent-bright px-6 md:px-9 pt-4 pb-9"
             onSubmit={(e) => { e.preventDefault(); enter(role); }}
           >
-            <div className="flex items-center justify-between gap-4 mb-6">
-              <span className="t-stamp">{t('login.selectRole')}</span>
-              <Vents />
-            </div>
             <fieldset>
               <legend className="sr-only">{t('login.selectRole')}</legend>
-              <div className="space-y-3">
+              <div className="divide-y divide-ws-rule">
                 {options.map((o) => {
                   const on = role === o.value;
                   return (
-                    <label
-                      key={o.value}
-                      className={`flex gap-4 items-start px-5 py-4 rounded-md cursor-pointer transition-all duration-150 ease-spring has-[:focus-visible]:shadow-focus ${
-                        on ? 'shadow-pressed translate-y-[1px]' : 'shadow-key hover:text-ws-ink'
-                      }`}
-                    >
+                    <label key={o.value} className="flex gap-4 items-start py-5 cursor-pointer touch-manipulation group">
                       <input
                         type="radio"
                         name="role"
                         value={o.value}
                         checked={on}
                         onChange={() => setRole(o.value)}
-                        className="sr-only"
-                      />
-                      <span
-                        className={`led mt-1.5 ${on ? 'bg-accent shadow-led-accent' : 'bg-ws-rule shadow-[inset_1px_1px_2px_rgba(0,0,0,0.2)]'}`}
-                        aria-hidden="true"
+                        className="mt-2 h-4 w-4 accent-[#8F6A08] focus:outline-none focus-visible:shadow-focus"
                       />
                       <span>
-                        <span className="block text-[15px] font-bold text-ws-ink">{o.title}</span>
-                        <span className="block text-[13px] text-ws-mid mt-1 leading-snug">{o.desc}</span>
+                        <span className={`block font-serif text-[20px] leading-[1.3] transition-colors duration-200 ${on ? 'text-ws-ink' : 'text-ws-body group-hover:text-ws-ink'}`}>
+                          {o.title}
+                        </span>
+                        <span className="block text-[14px] text-ws-mid mt-1 leading-[1.6]">{o.desc}</span>
                       </span>
                     </label>
                   );
@@ -97,7 +108,7 @@ export const Login = ({ onLoginSuccess }) => {
             </fieldset>
 
             {role === ROLES.GROUND && (
-              <div className="mt-5">
+              <div className="mt-2">
                 <Select
                   label={t('login.department')}
                   value={selectedDept}
@@ -115,29 +126,7 @@ export const Login = ({ onLoginSuccess }) => {
               {t('login.enter')}
             </Button>
           </form>
-
-          {/* Readout: the device's screen, bezel included. */}
-          <div className="bg-rail-900 rounded-xl p-3 shadow-lift">
-            <div className="flex items-center justify-between px-2 pb-2.5 pt-1">
-              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.08em] text-[#A8B2D1]">
-                {t('scope.fullRun')}
-              </span>
-              <span className={`led ${solverOk ? 'bg-[#22C55E] shadow-led-ok' : 'bg-[#D63031] shadow-led-critical'}`} aria-hidden="true" />
-            </div>
-            <dl className="crt px-5 py-5 space-y-4">
-              {readout.map(([k, v]) => (
-                <div key={k}>
-                  <dt className="font-mono text-[10px] font-bold uppercase tracking-[0.08em] text-[#A8B2D1]">{k}</dt>
-                  <dd className="crt-glow font-mono text-[18px] font-semibold mt-0.5">{v}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        </div>
-
-        <p className="text-[13px] text-ws-mid leading-relaxed mt-10 max-w-2xl">
-          <span className="font-semibold text-ws-body">{t('login.notAuthTitle')}.</span> {t('login.notAuthBody')}
-        </p>
+        </section>
       </main>
       <AppFooter />
     </div>

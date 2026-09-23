@@ -109,7 +109,7 @@ export const MaintDashboard = ({ onNavigate }) => {
           </div>
         </div>
       ) : (
-        <div className="rounded-lg shadow-panel bolted bg-ws-surface overflow-hidden overflow-hidden">
+        <div className="rounded-lg shadow-panel bg-ws-surface overflow-hidden">
           <div className="px-4 pt-3">
             <Pill tone={next.status === 'In Progress' ? 'info' : 'ok'}>{next.status === 'In Progress' ? 'IN PROGRESS' : 'NEXT TASK'}</Pill>
           </div>
