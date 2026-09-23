@@ -99,8 +99,8 @@ export const BlockPlanning = ({ onNavigate }) => {
       <div className="bg-ws-paper border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-2.5 flex items-center justify-between gap-4 flex-wrap">
         <p className="font-ws text-xs text-ws-mid max-w-3xl leading-relaxed flex-1 min-w-[240px]">{t('blockPlanning.subtitle')}</p>
         <div className="text-right shrink-0">
-          <div className="font-mono text-[10px] text-ws-light uppercase">{t('blockPlanning.generatedOffline')}</div>
-          <div className="font-mono text-[10px] text-ws-light">$ python demo.py</div>
+          <div className="text-[12px] text-ws-mid uppercase">{t('blockPlanning.generatedOffline')}</div>
+          <div className="text-[12px] text-ws-mid">$ python demo.py</div>
         </div>
       </div>
 
@@ -121,7 +121,7 @@ export const BlockPlanning = ({ onNavigate }) => {
           </WsSelect>
           <span className="flex-1 min-w-2" />
           {dateOptions.length > 0 && (
-            <span className="font-mono text-[10px] text-ws-light">
+            <span className="text-[12px] text-ws-mid">
               {t('blockPlanning.planSpan', { from: dateOptions[0].date, to: dateOptions[dateOptions.length - 1].date })}
             </span>
           )}

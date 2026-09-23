@@ -1,158 +1,99 @@
 # Design System: Railway Maintenance Operations
 
-Dark control-room interface for a rail maintenance decision-support tool.
+**Industrial skeuomorphism.** The interface is a physical control panel: a
+matte plastic chassis, modules bolted onto it, keys that press in, LEDs that
+report real state, and one CRT readout for the number a controller acts on.
+References: Braun control surfaces, Teenage Engineering, spacecraft panels.
+
 Three audiences share it: Authority (planning and approval), Ground Operations
-(field execution), Admin (model and solver verification).
+(field execution) and Admin (model and solver verification).
 
-Dials: **Variance 4 · Motion 3 · Density 5.** Deliberately below the default
-baseline on variance and motion. This is an operations instrument, not a
-landing page: a controller scans it under time pressure, so layout stays
-predictable and motion only ever confirms an action.
+## 1. Physics
 
----
+- **One light source, top-left at 45°.** Highlights fall top-left, shadows
+  bottom-right, on every element.
+- **Elevation:**
+  - −1, recessed: fields, switch tracks, notices, and the CRT glass.
+  - 0, chassis: the page.
+  - +1, panels: modules bolted to the chassis.
+  - +2, keys: buttons, selected switch segments, calendar days.
+- **Press:** keys drop 1–2px and their shadow inverts into the surface
+  (150ms, spring easing `cubic-bezier(0.175, 0.885, 0.32, 1.275)`).
 
-## 1. Visual Theme & Atmosphere
+## 2. Tokens (`tailwind.config.js`)
 
-A darkened control room at night. The canvas recedes to near-black blue-grey
-so the only bright things on screen are the data itself: block windows, risk
-figures, train occupancy, solver status. Panels are flat planes lifted from
-the canvas by one step of lightness, never by a drop shadow, because on a dark
-surface a shadow reads as dirt rather than elevation.
+**Colour**
+- Chassis `#E0E5EC` · raised panel `#F0F2F5` · recessed `#D1D9E6`
+- Ink `#2D3436` · labels `#4A5568` (AA) · disabled `#8A94A6`
+- Shadow pair `#BABECC` / `#FFFFFF` · rules `#C8CFDA` / `#A3B1C6`
+- **Safety orange `#FF6B1A`**: buttons, toggles and the active nav key only.
+  Labels on it are charcoal `#2D3436`, not white: white on orange fails WCAG AA.
+  Its dark form `#B3400A` is used for accent text and icons.
+- **Critical red `#C62828`**: critical risk and conflicts only. Controls and
+  alarms never share a colour.
+- Steel blue `#4F6F95` (`ws-steel`): planned, moderate and active-possession
+  state, so no status ever reads as a control.
+- Charcoal plates `#2D3436` / `#1E2427` for the footer and CRT bezels, with
+  text `#A8B2D1`.
+- LEDs: green `#22C55E` (ok), red `#D63031` (critical), orange (active key).
 
-The mood is instrument, not dashboard. Restrained, high-contrast, quiet in the
-chrome and loud in the numbers. Nothing decorative competes with a value a
-controller has to read correctly at a glance.
+**Shadows:** `soft` / `panel` / `lift` (raised), `key` / `key-accent` (keys),
+`pressed` / `recessed` (inset), `led-ok` / `led-critical` / `led-accent`
+(glow), `focus` (orange ring).
 
-Density is mid-scale. Data is dense where density is the point (the day sheet,
-the possession register, the candidate table) and generous everywhere else.
-Rules divide sections, not rows.
+**Radius:** badges 4px · controls 8px · panels 16px · feature surfaces 24px.
 
----
+## 3. Type
 
-## 2. Color Palette & Roles
+- **Inter** for the interface. Page titles are 800 weight, tight tracking,
+  with a one-pixel white emboss (`.t-emboss`).
+- **JetBrains Mono** for stamped labels (`.t-stamp`: 11px, bold, uppercase,
+  tracked), badges, switch legends and every number.
+- **Noto Sans Devanagari** for Hindi; stamps drop uppercase and tracking in
+  Hindi, because the script has no case and tracking breaks conjuncts.
 
-Cool blue-grey neutrals. One accent. Status hues are load-bearing, defined by
-the engine artifacts, so they are treated as data rather than decoration.
+## 4. Manufacturing details (`index.css`)
 
-**Canvas and surfaces**
-- **Deep Canvas** (`#0D1117`) — page background, the darkest plane
-- **Section Band** (`#11161D`) — grouping band behind a run of panels
-- **Panel Plane** (`#171E27`) — card, panel and table fill
-- **Raised Plane** (`#1C242F`) — a panel sitting on another panel
-- **Control Track** (`#212934`) — inset track for segmented controls, hover fill
-- **Selected Plane** (`#223049`) — active segment, selected row; blue-shifted so selection reads as state, not elevation
+- `.bolted`: four screw heads 12px in from the corners. Used on the large
+  modules only (sidebar, day sheet, Ground's next task, landing control
+  panel), where padding keeps content clear of the screws.
+- `.vents` / `<Vents />`: three recessed slots, top-right of bolted modules.
+- `.led`: status light; colour and glow always reflect real state (solver
+  status, selected key, notice tone), never decoration.
+- `.crt` / `.crt-glow`: charcoal glass, scanlines, phosphor-orange digits.
+  Used for Overview's recommended possession window and the landing readout.
+- Body noise: fractal-noise overlay for the matte plastic surface; fixed and
+  pointer-inert.
 
-**Structure**
-- **Structural Rule** (`#263040`) — 1px divider between sections and table headers
-- **Hairline** (`#1E2630`) — the faintest divider, used only inside a dense table
-- **Strong Rule** (`#38445A`) — input borders and focus-adjacent edges
+## 5. Components
 
-**Text ramp**
-- **Instrument White** (`#E8EDF4`) — primary values, headings, figures
-- **Body Grey** (`#C2CBD8`) — prose and descriptions
-- **Muted Steel** (`#8B97A8`) — labels, secondary metadata
-- **Dim Steel** (`#6B7688`) — provenance, captions, column headers
-- **Disabled** (`#4A5361`) — unavailable controls only
+- **Sidebar:** a bolted key bank. The current page is a pressed key with a lit
+  orange LED; others raise on hover. Below lg it becomes a recessed strip.
+- **Top bar:** chassis, government name, a solver LED from the artifact, the
+  role and language switches.
+- **Buttons:** physical keys, uppercase legends. Primary orange; secondary,
+  warning and danger are chassis keys with coloured legends.
+- **Segmented controls:** recessed track; the selected key stands proud.
+- **Fields:** recessed wells, mono text, orange ring on focus.
+- **Notices:** recessed windows with an LED beside a stamped title.
+- **Footer:** charcoal plate with the non-official disclaimer.
 
-**Accent (one)**
-- **Signal Blue** (`#4C8DFF`) — selection, active tab, primary action, focus ring
+## 6. Deliberate deviations from the source spec
 
-**Status (data, not decoration)**
-- **Critical Coral** (`#FF6B5A`) — blocked, critical risk band
-- **Caution Amber** (`#E0A030`) — conflict, needs attention
-- **Clear Green** (`#3FBF87`) — feasible, complete, solver OK
-- **Signal Blue** (`#4C8DFF`) — planned, selected
-- **Idle Steel** (`#7A8496`) — inactive, deferred
-- **Bundle Teal** (`#2BC4BC`) — concurrent cross-department possession
+- Charcoal, not white, labels on orange (contrast).
+- Safety orange `#FF6B1A` instead of red `#FF4757` for controls, because red
+  already means critical risk in this app.
+- No card hover-lift and no slide-up entrance animations: on a dense ops
+  screen thirty moving cards are noise. Keys still press physically, and
+  `prefers-reduced-motion` disables all transitions.
+- Marketing-page devices in the spec (pricing tags, push-pinned testimonials,
+  hero device mockup) have no counterpart here and are not used; the landing
+  readout plays the device role with real data.
 
-**Timeline bar fills** — dark tint, luminous label, saturated left rule:
-- Planned: fill `#131F33`, edge `#2A4A7A`, label `#7FB0FF`
-- Critical: fill `#2A1714`, edge `#6B2E26`, label `#FF8A7A`
-- Bundled: fill `#0F2926`, edge `#1E5C57`, label `#4FD6CE`
+## 7. Identity and honesty
 
-**Banned:** pure black (`#000000`), purple/violet accents, neon outer glows,
-gradient text, any second accent colour.
-
----
-
-## 3. Typography Rules
-
-- **Interface — Figtree.** Carries headings, labels and body. Emphasis comes
-  from weight and colour, never from a second family. Headings track tight
-  (`-0.02em`) at 15–32px; hierarchy is weight-driven, not size-driven.
-- **Data — JetBrains Mono, tabular figures.** Reserved for IDs, timestamps,
-  minute counts, durations and metrics so columns align. Never prose.
-- **Devanagari — Noto Sans Devanagari**, with looser leading (1.55). Hindi
-  never takes uppercase or letter-tracking: the script has no case and
-  tracking breaks conjuncts.
-- **Body** sits at 12–13px with relaxed leading, capped near 65 characters.
-- **Banned:** Inter, any serif, forced uppercase with letter-tracking as a
-  label style, and type scaled up purely to shout.
-
----
-
-## 4. Component Stylings
-
-- **Buttons.** Filled or tinted, never both filled and outlined. Primary is
-  Signal Blue with near-black text (`#0D1117`) for contrast on a luminous
-  fill. Secondary is Control Track with Body Grey. Press gives a tactile
-  `scale(0.98)`. No glow, ever.
-- **Panels.** Panel Plane fill, 10px radius, separated by space. A border only
-  where a panel abuts another surface of the same lightness.
-- **Pills and badges.** Tinted fill plus luminous text, no outline. A dozen can
-  sit on one screen, and outlines turned them into stickers.
-- **Segmented controls.** Inset Control Track with the active segment on
-  Selected Plane. The role switch, language switch and in-page segmented
-  controls all use this one shape so they read as one family.
-- **Inputs.** Label above, error below, never a placeholder as a label. Focus
-  is a Signal Blue border plus a soft ring, not a colour swap.
-- **Tables.** Header row on Section Band with Dim Steel labels. Hairline
-  between rows only above roughly eight rows; below that, space is enough.
-  Horizontal overflow scrolls, it never squeezes columns.
-- **Loading.** Skeletal blocks matching final layout dimensions. No spinners.
-- **Empty states.** A composed explanation of why it is empty and what fills
-  it, never the words "No data".
-
----
-
-## 5. Layout Principles
-
-- CSS Grid throughout; no flexbox percentage math.
-- Content capped at 1400px and centred; full-bleed only for timelines.
-- Every multi-column layout collapses to a single column below 768px, declared
-  explicitly in the component rather than assumed.
-- No overlapping elements. Each element owns its spatial zone.
-- Full-height surfaces use `min-h-[100dvh]`, never `h-screen`.
-- Section rhythm comes from space; the page carries far fewer rules than
-  values.
-
----
-
-## 6. Motion & Interaction
-
-Motion is set at 3 deliberately, and the implementation matches the claim:
-hover colour transitions, a `scale(0.98)` press, and focus rings. No scroll
-hijacking, no pinned sections, no infinite loops, no parallax. In a tool where
-a mis-read leads to a wrong possession decision, animation that moves data
-while it is being read is a defect.
-
-Anything added later animates `transform` and `opacity` only, and collapses
-under `prefers-reduced-motion`.
-
----
-
-## 7. Anti-Patterns (Banned)
-
-- Pure black, purple/AI-gradient accents, neon or outer-glow shadows
-- Gradient text on headings; oversaturated fills
-- A second accent colour anywhere
-- Inter; any serif; uppercase + letter-tracked micro-labels as a house style
-- Ordinal prefixes on section headings (`01`, `02`) as decoration
-- A hairline under every row of a short list
-- Drop shadows used for elevation on dark surfaces
-- Em-dashes in any user-visible string, in both languages. Dataset values are
-  exempt: corridor names such as `Delhi–Agra` carry an en-dash from the source
-  CSVs, and rewriting them would misreport the data.
-- Emojis, custom cursors, scroll cues ("Scroll to explore"), version stamps
-- Invented precision: every figure on screen traces to an artifact field, and
-  demo-scenario numbers are captioned separately from full-run numbers
+Text identity only; no State Emblem or official logo (restricted by the State
+Emblem of India (Prohibition of Improper Use) Act, 2005). The footer states the
+system is a demonstration prototype on synthetic data. No national flag
+colours. Every figure traces to an artifact field, and demo-scenario numbers
+are captioned separately from full-run numbers.

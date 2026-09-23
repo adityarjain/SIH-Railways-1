@@ -18,6 +18,7 @@ export const en = {
     appSub: 'Decision Support System',
     prototype: 'SIH 2026 Demonstration Prototype',
     prototypeLong: 'Demonstration prototype built on a synthetic dataset. Not an official Indian Railways system and not connected to any live railway installation.',
+    skipToContent: 'Skip to main content',
   },
 
   lang: {
@@ -29,9 +30,9 @@ export const en = {
     authority: 'Authority',
     ground: 'Ground Operations',
     admin: 'Admin',
-    authorityShort: 'AUTHORITY',
-    groundShort: 'GROUND OPS',
-    adminShort: 'ADMIN',
+    authorityShort: 'Authority',
+    groundShort: 'Ground ops',
+    adminShort: 'Admin',
     switchLabel: 'Select operational role',
     authorityDesc: 'Plan · control · optimize: network overview, block planning, replanning, verification.',
     groundDesc: 'Execute · update · report: assigned work orders, block status, completion.',
@@ -968,7 +969,7 @@ export const en = {
 
   login: {
     selectRole: 'Select operational role',
-    enter: 'ENTER',
+    enter: 'Continue',
     notAuthTitle: 'Not an authentication system',
     notAuthBody: 'Role selection is a demonstration control. No credential is checked and no account exists. Any of the three experiences can be entered directly, and the role can be switched at any time from the header.',
     stack: 'risk model · OR-Tools CP-SAT optimizer · dynamic replanning',

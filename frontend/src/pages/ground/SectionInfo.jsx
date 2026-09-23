@@ -39,10 +39,10 @@ export const SectionInfo = () => {
 
   if (mySections.length === 0) {
     return (
-      <div className="border border-ws-rule bg-ws-surface">
+      <div className="rounded-lg shadow-panel bg-ws-surface overflow-hidden">
         <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
           <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.sectionInfoTitle')}</span>
-          <span className="font-mono text-[10px] text-ws-light block mt-0.5">{selectedDept}</span>
+          <span className="text-[12px] text-ws-mid block mt-0.5">{selectedDept}</span>
         </div>
         <div className="px-4 py-8 text-center font-ws text-xs font-semibold text-ws-mid">{t('ground.noSectionAssigned')}</div>
       </div>
@@ -64,10 +64,10 @@ export const SectionInfo = () => {
       </div>
 
       {!sec ? (
-        <div className="border border-ws-rule bg-ws-surface px-4 py-8 text-center font-ws text-xs font-semibold text-ws-mid">{t('ground.sectionNotPresent')}</div>
+        <div className="rounded-lg shadow-panel bg-ws-surface overflow-hidden px-4 py-8 text-center font-ws text-xs font-semibold text-ws-mid">{t('ground.sectionNotPresent')}</div>
       ) : (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 border border-ws-rule bg-ws-surface p-3.5">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 rounded-lg shadow-panel bg-ws-surface overflow-hidden p-3.5">
             <StatFigure value={sec.maximum_speed_kmph} label={`${t('ground.lineSpeed')} · kmph`} />
             <StatFigure value={sec.section_length_km} label={`${t('ground.length')} · km`} />
             <StatFigure value={sec.electrified ? 'Yes' : 'No'} label={t('ground.electrified')} />
@@ -75,10 +75,10 @@ export const SectionInfo = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="border border-ws-rule bg-ws-surface">
+            <div className="rounded-lg shadow-panel bg-ws-surface overflow-hidden">
               <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
                 <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.sectionRecord')}</span>
-                <span className="font-mono text-[10px] text-ws-light block mt-0.5">corridors_sections.csv</span>
+                <span className="text-[12px] text-ws-mid block mt-0.5">corridors_sections.csv</span>
               </div>
               <FieldRow label={t('common.section')} value={`${sec.section_id} · ${sec.section_name}`} />
               <FieldRow label={t('common.corridor')} value={`${sec.corridor_id} · ${sec.corridor_name}`} />
@@ -91,10 +91,10 @@ export const SectionInfo = () => {
 
             <div className="space-y-4">
               {traffic ? (
-                <div className="border border-ws-rule bg-ws-surface">
+                <div className="rounded-lg shadow-panel bg-ws-surface overflow-hidden">
                   <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
                     <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.trafficProfile')}</span>
-                    <span className="font-mono text-[10px] text-ws-light block mt-0.5">section_traffic.json · {traffic.date}</span>
+                    <span className="text-[12px] text-ws-mid block mt-0.5">section_traffic.json · {traffic.date}</span>
                   </div>
                   <FieldRow label={t('ground.passengerServices')} value={traffic.passenger_trains} />
                   <FieldRow label={t('ground.freightServices')} value={traffic.expected_freight_trains ?? traffic.freight_trains} />
@@ -103,7 +103,7 @@ export const SectionInfo = () => {
                   <FieldRow label={t('ground.blockWindowsAvailable')} value={`${traffic.available_block_windows} / ${traffic.total_block_windows}`} tone="text-ws-ok font-bold" />
                 </div>
               ) : (
-                <div className="border border-ws-rule bg-ws-surface">
+                <div className="rounded-lg shadow-panel bg-ws-surface overflow-hidden">
                   <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
                     <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.trafficProfile')}</span>
                   </div>
@@ -111,10 +111,10 @@ export const SectionInfo = () => {
                 </div>
               )}
 
-              <div className="border border-ws-rule bg-ws-surface">
+              <div className="rounded-lg shadow-panel bg-ws-surface overflow-hidden">
                 <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
                   <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.recordedMovements')}</span>
-                  <span className="font-mono text-[10px] text-ws-light block mt-0.5">{t('ground.projectedFrom')}</span>
+                  <span className="text-[12px] text-ws-mid block mt-0.5">{t('ground.projectedFrom')}</span>
                 </div>
                 {trainDates.length === 0 ? (
                   <div className="px-4 py-6 text-center font-ws text-xs text-ws-mid">{t('ground.noTrainForSection')}</div>
@@ -126,7 +126,7 @@ export const SectionInfo = () => {
                         <div key={d} className="px-3 py-2 border-b border-ws-hairline last:border-b-0">
                           <div className="flex items-center justify-between">
                             <span className="font-mono text-[11px] text-ws-ink">{d}</span>
-                            <span className="font-mono text-[10px] text-ws-light">
+                            <span className="text-[12px] text-ws-mid">
                               {trains.length === 1 ? t('ground.movementCount', { count: trains.length }) : t('ground.movementCountPlural', { count: trains.length })}
                             </span>
                           </div>
@@ -146,10 +146,10 @@ export const SectionInfo = () => {
             </div>
           </div>
 
-          <div className="border border-ws-rule bg-ws-surface">
+          <div className="rounded-lg shadow-panel bg-ws-surface overflow-hidden">
             <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
               <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.gapsTitle')}</span>
-              <span className="font-mono text-[10px] text-ws-light block mt-0.5">{t('ground.gapsScope')}</span>
+              <span className="text-[12px] text-ws-mid block mt-0.5">{t('ground.gapsScope')}</span>
             </div>
             {[
               [t('ground.gapGradient'), t('ground.gapNoColumn')],

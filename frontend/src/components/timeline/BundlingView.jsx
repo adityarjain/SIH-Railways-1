@@ -73,7 +73,7 @@ export const BundlingView = () => {
               <div className="h-3 w-full bg-ws-tick relative overflow-hidden">
                 <div className="absolute h-full bg-ws-bundle" style={{ left: `${left}%`, width: `${width}%` }} />
               </div>
-              <div className="flex items-center justify-between font-mono text-[10px] text-ws-light">
+              <div className="flex items-center justify-between text-[12px] text-ws-mid">
                 <span>{minToHhmm(task.start_minute)} – {minToHhmm(task.end_minute)} ({task.duration_minutes} min)</span>
                 <span className="flex items-center gap-1"><Users size={10} /> {(task.assigned_teams || []).join(', ') || '—'}</span>
               </div>

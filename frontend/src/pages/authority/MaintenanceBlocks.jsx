@@ -78,7 +78,7 @@ export const MaintenanceBlocks = ({ onNavigate }) => {
           <span className="font-mono text-[11px] font-bold text-ws-light">01</span>
           <span className={`font-display text-base font-semibold ${uc} ${tr} text-ws-ink`}>{t('overview.planState')}</span>
           <span className="flex-1 min-w-6 h-px bg-ws-rule" />
-          <span className="font-mono text-[10px] text-ws-light">{t('scope.demoScenario').toUpperCase()}</span>
+          <span className="text-[12px] text-ws-mid">{t('scope.demoScenario').toUpperCase()}</span>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-5 gap-y-3.5 border-t border-ws-rule pt-3">
           <div>
@@ -106,7 +106,7 @@ export const MaintenanceBlocks = ({ onNavigate }) => {
           <span className="font-mono text-[11px] font-bold text-ws-light">02</span>
           <span className={`font-display text-base font-semibold ${uc} ${tr} text-ws-ink`}>{t('maintenanceBlocks.register')}</span>
           <span className="flex-1 min-w-6 h-px bg-ws-rule" />
-          <span className="font-mono text-[10px] text-ws-light">
+          <span className="text-[12px] text-ws-mid">
             {t('maintenanceBlocks.registerScope', { shown: rows.length, total: scheduledTasks.length })}
           </span>
         </div>
@@ -118,12 +118,12 @@ export const MaintenanceBlocks = ({ onNavigate }) => {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={t('maintenanceBlocks.searchPlaceholder')}
-                className="font-ws text-[13px] text-ws-ink bg-ws-surface border border-ws-rule px-2.5 py-1.5 placeholder:text-ws-light focus:outline-none flex-1 min-w-[220px]"
+                className="font-ws text-[13px] text-ws-ink rounded-lg shadow-panel bg-ws-surface overflow-hidden px-2.5 py-1.5 placeholder:text-ws-light focus:outline-none flex-1 min-w-[220px]"
               />
               <select
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="font-ws text-[13px] text-ws-ink bg-ws-surface border border-ws-rule px-2 py-1.5"
+                className="font-ws text-[13px] text-ws-ink rounded-lg shadow-panel bg-ws-surface overflow-hidden px-2 py-1.5"
               >
                 <option value="ALL">{t('common.allDates')}</option>
                 {dates.map((d) => (
@@ -188,7 +188,7 @@ export const MaintenanceBlocks = ({ onNavigate }) => {
                   <td className="px-3.5 py-1.5 font-mono text-[11px] text-ws-body whitespace-nowrap">{task.section_id}</td>
                   <td className="px-3.5 py-1.5 font-mono text-[11px] font-medium text-ws-ink whitespace-nowrap">{task.task_id}</td>
                   <td className="px-3.5 py-1.5 font-ws text-[11px] text-ws-body whitespace-nowrap">{task.maintenance_type}</td>
-                  <td className="px-3.5 py-1.5 font-mono text-[10px] text-ws-mid whitespace-nowrap">{(task.assigned_teams || []).join(', ') || '—'}</td>
+                  <td className="px-3.5 py-1.5 text-[12px] text-ws-mid whitespace-nowrap">{(task.assigned_teams || []).join(', ') || '—'}</td>
                   <td className="px-3.5 py-1.5 text-right whitespace-nowrap">
                     <span className="inline-flex gap-1 justify-end">
                       {task.is_night && <FlagPill tone="info">{t('maintenanceBlocks.flagNight')}</FlagPill>}
@@ -219,7 +219,7 @@ export const MaintenanceBlocks = ({ onNavigate }) => {
           <span className="font-mono text-[11px] font-bold text-ws-light">03</span>
           <span className={`font-display text-base font-semibold ${uc} ${tr} text-ws-ink`}>{t('maintenanceBlocks.bundlingTitle')}</span>
           <span className="flex-1 min-w-6 h-px bg-ws-rule" />
-          <span className="font-mono text-[10px] text-ws-light">{t('maintenanceBlocks.bundlingPairs', { count: bundlePairs.length })}</span>
+          <span className="text-[12px] text-ws-mid">{t('maintenanceBlocks.bundlingPairs', { count: bundlePairs.length })}</span>
         </div>
         <BundlingView />
       </div>
@@ -231,7 +231,7 @@ export const MaintenanceBlocks = ({ onNavigate }) => {
       </div>
 
       <div className="bg-ws-band border-t border-ws-rule px-3.5 md:px-4 xl:px-5 py-2 flex flex-wrap items-center gap-3.5">
-        <span className="font-mono text-[10px] text-ws-mid">
+        <span className="text-[12px] text-ws-mid">
           {t('maintenanceBlocks.registerScopeNote', { desc: metrics.provenance?.description || t('scope.demoScenario').toLowerCase() })}
         </span>
       </div>

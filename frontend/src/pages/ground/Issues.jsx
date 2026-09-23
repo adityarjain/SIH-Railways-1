@@ -53,17 +53,17 @@ export const Issues = ({ onNavigate }) => {
         <p className="font-ws text-xs text-ws-mid mt-0.5 max-w-3xl leading-relaxed">{t('ground.issuesSubtitle')}</p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 border border-ws-rule bg-ws-surface p-3.5">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 rounded-lg shadow-panel bg-ws-surface overflow-hidden p-3.5">
         <StatFigure value={flagged.length} label={t('ground.openIssues')} tone={flagged.length ? 'text-ws-warn' : 'text-ws-ok'} />
         <StatFigure value={flagged.filter((tk) => (tk.status || '').startsWith('Reschedule')).length} label={t('ground.rescheduleRequests')} />
         <StatFigure value={flagged.filter((tk) => (tk.status || '').startsWith('Rejected')).length} label={t('ground.rejectedCount')} tone="text-ws-critical" />
         <StatFigure value={deptTasks.length} label={t('ground.assignedWork')} />
       </div>
 
-      <div className="border border-ws-rule bg-ws-surface overflow-x-auto custom-scrollbar">
+      <div className="rounded-lg shadow-panel bg-ws-surface overflow-hidden overflow-x-auto custom-scrollbar">
         <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
           <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.flaggedWork')}</span>
-          <span className="font-mono text-[10px] text-ws-light block mt-0.5">
+          <span className="text-[12px] text-ws-mid block mt-0.5">
             {flagged.length === 1 ? t('ground.flaggedScope', { count: flagged.length }) : t('ground.flaggedScopePlural', { count: flagged.length })}
           </span>
         </div>
@@ -97,10 +97,10 @@ export const Issues = ({ onNavigate }) => {
         )}
       </div>
 
-      <div className="border border-ws-rule bg-ws-surface">
+      <div className="rounded-lg shadow-panel bg-ws-surface overflow-hidden">
         <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
           <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.reportAnIssue')}</span>
-          <span className="font-mono text-[10px] text-ws-light block mt-0.5">{t('ground.reportScope')}</span>
+          <span className="text-[12px] text-ws-mid block mt-0.5">{t('ground.reportScope')}</span>
         </div>
         {reportable.length === 0 ? (
           <div className="px-4 py-8 text-center font-ws text-xs text-ws-mid">{t('ground.noActivePossession')}</div>

@@ -51,10 +51,10 @@ export const ActiveBlock = ({ onNavigate }) => {
 
   if (!active) {
     return (
-      <div className="border border-ws-rule bg-ws-surface">
+      <div className="rounded-lg shadow-panel bg-ws-surface overflow-hidden">
         <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
           <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.activeBlockTitle')}</span>
-          <span className="font-mono text-[10px] text-ws-light block mt-0.5">{selectedDept}</span>
+          <span className="text-[12px] text-ws-mid block mt-0.5">{selectedDept}</span>
         </div>
         <div className="px-4 py-6 text-center">
           <div className="font-ws text-xs font-semibold text-ws-mid">{t('ground.noAssignment')}</div>
@@ -76,7 +76,7 @@ export const ActiveBlock = ({ onNavigate }) => {
         <Pill tone={isStarted ? 'info' : 'ok'} size="md">{isStarted ? t('status.inProgressCaps') : t('status.readyToStart')}</Pill>
       </div>
 
-      <div className="border border-ws-rule border-l-4 border-l-ws-info bg-ws-surface overflow-hidden">
+      <div className="rounded-lg shadow-panel bolted bg-ws-surface overflow-hidden overflow-hidden">
         <WorkOrderHeader task={active} status={active.status} />
         <WorkOrderFacts task={active} />
         <BlockStatusBanner task={active} status={active.status} />

@@ -7,6 +7,19 @@
     @apply bg-surface-base text-ws-ink font-sans antialiased text-sm;
   }
 
+  /* Matte ABS plastic: fractal noise over the whole chassis. Fixed and
+     pointer-inert, so it never repaints on scroll. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.22;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
   /* Technical values line up in columns: IDs, timestamps, minutes, counts. */
   .font-mono {
     font-variant-numeric: tabular-nums;
@@ -14,14 +27,12 @@
 }
 
 @layer components {
-  /* --- Typographic roles -------------------------------------------------
-     Mono is reserved for IDs, timestamps, minutes and counts. Never prose. */
+  /* --- Typographic roles ------------------------------------------------ */
 
-  /* Labels lost their forced uppercase: at 11px, caps plus letter-tracking is
-     harder to scan than sentence case, and nearly every row on every screen
-     carried one, so it was a large share of the visual noise. */
+  /* Stamped label: the printed legend on a panel. Mono, uppercase, tracked. */
+  .t-stamp,
   .t-label {
-    @apply font-display text-[11px] font-semibold text-rail-500;
+    @apply font-mono text-[11px] font-bold uppercase tracking-[0.07em] text-ws-mid;
   }
 
   .t-value {
@@ -37,11 +48,9 @@
   }
 
   .t-section-title {
-    @apply font-display text-[15px] font-semibold text-ws-ink;
+    @apply font-display text-[15px] font-bold text-ws-ink;
   }
 
-  /* The product wordmark is set in the same type as the interface: no logo,
-     no icon mark, no colour treatment. */
   .t-wordmark {
     @apply font-display text-[11px] font-semibold uppercase tracking-[0.14em];
   }
@@ -50,18 +59,70 @@
     @apply text-[10px] font-medium tracking-wide;
   }
 
-  /* Scope caption. Every figure carries the artifact scope it came from, so a
-     62-task demo number can never be read as the 30,000-task run. */
   .t-scope {
-    @apply text-[10px] font-medium text-rail-400;
+    @apply font-mono text-[11px] uppercase tracking-[0.05em] text-ws-mid;
+  }
+
+  /* Embossed type: a one-pixel highlight under dark text on the chassis. */
+  .t-emboss {
+    text-shadow: 0 1px 0 #ffffff;
+  }
+
+  /* --- Manufacturing details ------------------------------------------- */
+
+  /* Four screw heads, 12px in from each corner. Layered under the panel's own
+     background so it can be combined with any fill. */
+  .bolted {
+    background-image:
+      radial-gradient(circle at 12px 12px, rgba(0, 0, 0, 0.18) 1.5px, rgba(255, 255, 255, 0.7) 2.5px, transparent 3.5px),
+      radial-gradient(circle at calc(100% - 12px) 12px, rgba(0, 0, 0, 0.18) 1.5px, rgba(255, 255, 255, 0.7) 2.5px, transparent 3.5px),
+      radial-gradient(circle at 12px calc(100% - 12px), rgba(0, 0, 0, 0.18) 1.5px, rgba(255, 255, 255, 0.7) 2.5px, transparent 3.5px),
+      radial-gradient(circle at calc(100% - 12px) calc(100% - 12px), rgba(0, 0, 0, 0.18) 1.5px, rgba(255, 255, 255, 0.7) 2.5px, transparent 3.5px);
+  }
+
+  /* A row of three recessed vent slots. */
+  .vents {
+    @apply inline-flex gap-1 shrink-0;
+  }
+  .vents > span {
+    @apply block h-5 w-1 rounded-full bg-ws-tick;
+    box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.18), 0 1px 0 #ffffff;
+  }
+
+  /* Status LED. Colour comes from a bg-* utility; glow from shadow-led-*. */
+  .led {
+    @apply inline-block h-2 w-2 rounded-full shrink-0;
+  }
+
+  /* CRT readout: charcoal glass with scanlines over a phosphor glow. */
+  .crt {
+    @apply relative overflow-hidden rounded-md bg-rail-950;
+    box-shadow: inset 3px 3px 8px rgba(0, 0, 0, 0.7), inset -1px -1px 2px rgba(255, 255, 255, 0.08);
+  }
+  .crt::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%);
+    background-size: 100% 4px;
+  }
+  .crt-glow {
+    color: #ffb27a;
+    text-shadow: 0 0 6px rgba(255, 107, 26, 0.55);
   }
 }
 
-/* Used in 5 components (Sidebar, Drawer, Modal, GanttTimeline, Demand) but
-   never actually defined until now. */
+@layer utilities {
+  /* Mechanical spring: a slight overshoot, as a sprung switch returns. */
+  .ease-spring {
+    transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+}
+
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(139, 151, 168, 0.32) transparent;
+  scrollbar-color: rgba(74, 85, 104, 0.35) transparent;
 }
 
 ::-webkit-scrollbar {
@@ -72,56 +133,55 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(139, 151, 168, 0.28);
+  background: rgba(74, 85, 104, 0.3);
   border-radius: 9999px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(139, 151, 168, 0.48);
+  background: rgba(74, 85, 104, 0.5);
   background-clip: content-box;
 }
 
 /* Conflict hatch. Drawn only where an artifact establishes a conflict, never
    derived by overlap arithmetic in the UI. */
-.conflict-hatch {
-  background-image: repeating-linear-gradient(
-    45deg,
-    rgba(196, 61, 48, 0.9) 0,
-    rgba(196, 61, 48, 0.9) 3px,
-    rgba(196, 61, 48, 0.32) 3px,
-    rgba(196, 61, 48, 0.32) 6px
-  );
-}
-
-/* Same hatch at the day sheet's critical hex, kept as its own class so the
-   Overview timeline can diverge from the shared one without a repaint. */
+.conflict-hatch,
 .ws-conflict-hatch {
   background-image: repeating-linear-gradient(
     45deg,
-    rgba(196, 61, 48, 0.9) 0,
-    rgba(196, 61, 48, 0.9) 3px,
-    rgba(196, 61, 48, 0.32) 3px,
-    rgba(196, 61, 48, 0.32) 6px
+    rgba(198, 40, 40, 0.9) 0,
+    rgba(198, 40, 40, 0.9) 3px,
+    rgba(198, 40, 40, 0.3) 3px,
+    rgba(198, 40, 40, 0.3) 6px
   );
 }
 
-/* Devanagari needs more vertical room than Latin at the same font-size:
-   ascenders/descenders and the shirorekha collide at our dense line-heights.
-   Scoped to the Hindi document so the English layout is untouched. */
+/* Devanagari needs more vertical room than Latin at the same font-size, and
+   has no case: uppercase does nothing, and letter-spacing breaks conjuncts. */
 :root[data-lang='hi'] {
   --dev-leading: 1.55;
 }
 :root[data-lang='hi'] body,
 :root[data-lang='hi'] .t-label,
+:root[data-lang='hi'] .t-stamp,
 :root[data-lang='hi'] .t-value,
 :root[data-lang='hi'] .t-section-title {
   line-height: var(--dev-leading);
 }
 :root[data-lang='hi'] .t-label,
+:root[data-lang='hi'] .t-stamp,
+:root[data-lang='hi'] .t-scope,
 :root[data-lang='hi'] .t-wordmark {
-  /* Devanagari has no case, so uppercasing does nothing but letter-spacing
-     still breaks conjuncts. */
   text-transform: none;
   letter-spacing: 0.01em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

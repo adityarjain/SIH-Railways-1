@@ -41,8 +41,8 @@ export const MonthlyHeatmapWorksheet = ({ onSelectDate }) => {
 
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap items-center gap-3.5 font-mono text-[10px] text-ws-light">
-        <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 bg-ws-surface border border-ws-rule" /> {t('maintenanceBlocks.workloadLow')}</span>
+      <div className="flex flex-wrap items-center gap-3.5 text-[12px] text-ws-mid">
+        <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-lg shadow-panel bg-ws-surface overflow-hidden" /> {t('maintenanceBlocks.workloadLow')}</span>
         <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 bg-ws-barPlannedBg border border-ws-barPlannedBorder" /> {t('maintenanceBlocks.workloadMedium')}</span>
         <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 bg-ws-barCriticalBg border border-ws-barCriticalBorder" /> {t('maintenanceBlocks.workloadHigh')}</span>
       </div>

@@ -107,7 +107,7 @@ export const Replanning = ({ onNavigate }) => {
           <span className="font-mono text-[11px] font-bold text-ws-light">01</span>
           <span className={`font-display text-base font-semibold ${uc} ${tr} text-ws-ink`}>{t('replanning.title')}</span>
           <span className="flex-1 min-w-6 h-px bg-ws-rule" />
-          <span className="font-mono text-[10px] text-ws-light">{m.affected_task_id} · {m.conflict_type}</span>
+          <span className="text-[12px] text-ws-mid">{m.affected_task_id} · {m.conflict_type}</span>
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 bg-ws-rule gap-px">
@@ -117,7 +117,7 @@ export const Replanning = ({ onNavigate }) => {
             <span className={`font-display text-sm font-semibold ${uc} ${tr} text-ws-ink`}>{t('replanning.step1')}</span>
             <Pill tone={isReplanned ? 'idle' : 'info'}>{isReplanned ? t('status.superseded') : t('status.active')}</Pill>
           </div>
-          <div className="font-mono text-[10px] text-ws-light pb-1.5">{t('replanning.step1Scope')}</div>
+          <div className="text-[12px] text-ws-mid pb-1.5">{t('replanning.step1Scope')}</div>
           <FieldRow label={t('common.task')} value={m.affected_task_id} />
           <FieldRow label={t('common.date')} value={before.date} />
           <FieldRow label={t('common.window')} value={win(before)} />
@@ -132,7 +132,7 @@ export const Replanning = ({ onNavigate }) => {
             <span className={`font-display text-sm font-semibold ${uc} ${tr} text-ws-ink`}>{t('replanning.step2')}</span>
             <Pill tone="critical">{t('status.conflict')}</Pill>
           </div>
-          <div className="font-mono text-[10px] text-ws-light pb-1.5">{m.conflict_type} · {ev.event_id || ''}</div>
+          <div className="text-[12px] text-ws-mid pb-1.5">{m.conflict_type} · {ev.event_id || ''}</div>
           <FieldRow label={t('replanning.train')} value={ev.train_id} />
           <FieldRow label={t('replanning.sectionDate')} value={`${ev.section_id} · ${ev.date}`} />
           <FieldRow
@@ -176,7 +176,7 @@ export const Replanning = ({ onNavigate }) => {
             <span className={`font-display text-sm font-semibold ${uc} ${tr} text-ws-ink`}>{t('replanning.step3')}</span>
             <Pill tone={isReplanned ? 'warn' : 'idle'}>{isReplanned ? t('status.active') : t('status.preview')}</Pill>
           </div>
-          <div className="font-mono text-[10px] text-ws-light pb-1.5">{t('replanning.step3Scope', { action: m.action_taken })}</div>
+          <div className="text-[12px] text-ws-mid pb-1.5">{t('replanning.step3Scope', { action: m.action_taken })}</div>
           <FieldRow label={t('common.task')} value={m.affected_task_id} />
           <FieldRow label={t('common.date')} value={after.date} tone="text-ws-warn font-bold" />
           <FieldRow label={t('common.window')} value={win(after)} tone="text-ws-warn font-bold" />
@@ -195,7 +195,7 @@ export const Replanning = ({ onNavigate }) => {
             <span className="font-mono text-[11px] font-bold text-ws-light">02</span>
             <span className={`font-display text-base font-semibold ${uc} ${tr} text-ws-ink`}>{t('replanning.auditRecord')}</span>
             <span className="flex-1 min-w-6 h-px bg-ws-rule" />
-            <span className="font-mono text-[10px] text-ws-light">{t('replanning.auditScope')}</span>
+            <span className="text-[12px] text-ws-mid">{t('replanning.auditScope')}</span>
           </div>
           <div className="border-t border-ws-rule">
             <FieldRow label={t('replanning.actionTaken')} value={m.action_taken} />
@@ -233,7 +233,7 @@ export const Replanning = ({ onNavigate }) => {
               <span className="font-mono text-[11px] font-bold text-ws-light">03</span>
               <span className={`font-display text-base font-semibold ${uc} ${tr} text-ws-ink`}>{t('replanning.retention')}</span>
               <span className="flex-1 min-w-6 h-px bg-ws-rule" />
-              <span className="font-mono text-[10px] text-ws-light">{t('replanning.retentionScope', { count: retention.tasks_in_plan ?? '—' })}</span>
+              <span className="text-[12px] text-ws-mid">{t('replanning.retentionScope', { count: retention.tasks_in_plan ?? '—' })}</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-3.5 gap-y-2 border-t border-ws-rule pt-3">
               <div>
@@ -270,11 +270,11 @@ export const Replanning = ({ onNavigate }) => {
 
       {/* footer */}
       <div className="bg-ws-band border-t border-ws-rule px-3.5 md:px-4 xl:px-5 py-2 flex flex-wrap items-center gap-3.5">
-        <span className="font-mono text-[10px] text-ws-mid">
+        <span className="text-[12px] text-ws-mid">
           {t('replanning.artifactsScope', { dir: m.replan_artifacts_directory })}
         </span>
         <span className="flex-1 min-w-2" />
-        <span className="font-mono text-[10px] text-ws-light break-all">{t('replanning.baselineNote')}</span>
+        <span className="text-[12px] text-ws-mid break-all">{t('replanning.baselineNote')}</span>
       </div>
     </div>
   );

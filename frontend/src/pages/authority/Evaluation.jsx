@@ -83,7 +83,7 @@ export const Evaluation = () => {
           {['CRITICAL', 'HIGH', 'MODERATE', 'LOW'].map((band) => {
             const n = dist[band] || 0;
             const share = n / evaluation.rows_evaluated;
-            const tone = band === 'CRITICAL' ? 'bg-ws-critical' : band === 'HIGH' ? 'bg-ws-warn' : band === 'MODERATE' ? 'bg-ws-info' : 'bg-ws-ok';
+            const tone = band === 'CRITICAL' ? 'bg-ws-critical' : band === 'HIGH' ? 'bg-ws-warn' : band === 'MODERATE' ? 'bg-ws-steel' : 'bg-ws-ok';
             const bandKey = { CRITICAL: 'risk.critical', HIGH: 'risk.high', MODERATE: 'risk.moderate', LOW: 'risk.low' }[band];
             return (
               <div key={band} className="flex items-center gap-3">
@@ -103,11 +103,11 @@ export const Evaluation = () => {
       </div>
 
       <div className="bg-ws-band px-3.5 md:px-4 xl:px-5 py-2 flex flex-wrap items-center gap-3.5">
-        <span className="font-mono text-[10px] text-ws-light break-all">
+        <span className="text-[12px] text-ws-mid break-all">
           {prov.predictions_artifact} · $ PYTHONPATH=. python scripts/evaluate_neev.py
         </span>
         <span className="flex-1 min-w-2" />
-        <span className="font-mono text-[10px] text-ws-mid">{t('common.scope')}: {evaluation.scope}</span>
+        <span className="text-[12px] text-ws-mid">{t('common.scope')}: {evaluation.scope}</span>
       </div>
     </div>
   );

@@ -36,7 +36,7 @@ export const WeeklyViewWorksheet = ({ selectedDate, onSelectDate }) => {
 
   return (
     <div className="space-y-2">
-      <div className="font-mono text-[10px] text-ws-light">{t('maintenanceBlocks.weeklyCaption')}</div>
+      <div className="text-[12px] text-ws-mid">{t('maintenanceBlocks.weeklyCaption')}</div>
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
         {days.map((d) => (
           <button
@@ -48,7 +48,7 @@ export const WeeklyViewWorksheet = ({ selectedDate, onSelectDate }) => {
           >
             <div className="flex items-center justify-between">
               <span className="font-mono text-xs font-bold text-ws-ink">{d.day}</span>
-              <span className="font-mono text-[10px] text-ws-light">{d.date.slice(8)}</span>
+              <span className="text-[12px] text-ws-mid">{d.date.slice(8)}</span>
             </div>
             <div className="mt-2 space-y-0.5">
               <div className="flex justify-between text-[11px]">

@@ -99,7 +99,7 @@ export const DaySheet = ({
   const domainHours = Math.round((domain.end - domain.start) / 60);
 
   return (
-    <div className="bg-ws-surface rounded-lg shadow-soft mx-4 md:mx-5 xl:mx-6 pt-4 px-5 pb-4 font-ws text-ws-body">
+    <div className="bg-ws-surface rounded-lg shadow-panel bolted mx-4 md:mx-5 xl:mx-6 pt-7 px-7 pb-7 font-ws text-ws-body">
       <RegionHeader
         title={t('overview.daySheet')}
         meta={t('overview.daySheetMeta', { corridor: corridorLabel, date, hours: domainHours })}
@@ -130,7 +130,7 @@ export const DaySheet = ({
           ]}
         />
         <span className="flex-1 min-w-2" />
-        <span className="font-mono text-[10px] text-ws-light">
+        <span className="text-[12px] text-ws-mid">
           {t('overview.daySheetScope', { sections: sections.length, blocks: totalBlocks, trains: totalTrains })}
         </span>
       </div>
@@ -153,7 +153,7 @@ export const DaySheet = ({
           {labelTicks.map((tk) => (
             <span
               key={tk.minute}
-              className="absolute font-mono text-[10px] text-ws-light"
+              className="absolute text-[12px] text-ws-mid"
               style={
                 tk.minute === scale.domainStart
                   ? { left: 0 }
@@ -267,15 +267,15 @@ export const DaySheet = ({
       {/* legend */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-2.5">
         <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
-          <LegendSwatch bg="bg-ws-barPlannedBg" border="border-ws-barPlannedBorder" rule="#4C8DFF" />
+          <LegendSwatch bg="bg-ws-barPlannedBg" border="border-ws-barPlannedBorder" rule="#5469D4" />
           {t('gantt.legendBlock')}
         </span>
         <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
-          <LegendSwatch bg="bg-ws-barCriticalBg" border="border-ws-barCriticalBorder" rule="#FF6B5A" />
+          <LegendSwatch bg="bg-ws-barCriticalBg" border="border-ws-barCriticalBorder" rule="#DF1B41" />
           {t('gantt.legendCritical')}
         </span>
         <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
-          <LegendSwatch bg="bg-ws-barBundledBg" border="border-ws-barBundledBorder" rule="#2BC4BC" />
+          <LegendSwatch bg="bg-ws-barBundledBg" border="border-ws-barBundledBorder" rule="#0A7E8C" />
           {t('gantt.legendBundled')}
         </span>
         <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
@@ -287,7 +287,7 @@ export const DaySheet = ({
           {t('overview.nightWindowLegend')}
         </span>
         <span className="flex-1 min-w-2" />
-        <span className="font-mono text-[10px] text-ws-light">
+        <span className="text-[12px] text-ws-mid">
           trains.csv · {sectionTrains.provenance?.records_emitted ?? 0} {t('common.of')} {sectionTrains.provenance?.source_rows?.toLocaleString?.() ?? 0} · {t('gantt.legendConflict').toLowerCase()}
         </span>
       </div>

@@ -1,24 +1,22 @@
 import React, { useState } from 'react';
 import { useAuth, ROLES, DEPARTMENTS } from '../context/AuthContext';
 import { useI18n } from '../i18n';
-import { LanguageSwitch } from '../components/layout/LanguageSwitch';
-import { Button, Select, Alert } from '../components/ui';
-
-const NamePair = ({ hi, en }) => (
-  <div className="leading-tight">
-    <div lang="hi" className="text-[12px] font-medium text-white">{hi}</div>
-    <div className="text-[10px] text-rail-400 tracking-wide">{en}</div>
-  </div>
-);
+import { usePlan } from '../context/PlanContext';
+import { InstitutionalHeader, AppFooter, Vents } from '../components/layout/InstitutionalHeader';
+import { Button, Select } from '../components/ui';
 
 /**
  * Role selection for the demonstration. This is not authentication and does not
  * claim to be: no credential is checked, and the form exists so an evaluator can
  * enter any of the three experiences directly.
+ *
+ * The readout beside it shows the full-run artifact's own values, not
+ * decoration: solver status, runtime, validation checks and scheduled count.
  */
 export const Login = ({ onLoginSuccess }) => {
   const { login, selectedDept, setSelectedDept } = useAuth();
   const { t, isHindi } = useI18n();
+  const { baselineMetrics: m } = usePlan();
   const [role, setRole] = useState(ROLES.AUTHORITY);
 
   const enter = (selectedRole) => {
@@ -26,94 +24,122 @@ export const Login = ({ onLoginSuccess }) => {
     if (onLoginSuccess) onLoginSuccess(selectedRole);
   };
 
-  const RoleCard = ({ value, title, desc }) => (
-    <button
-      type="button"
-      onClick={() => setRole(value)}
-      aria-pressed={role === value}
-      className={`w-full text-left px-4 py-3 border rounded-sm transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-status-info ${
-        role === value ? 'border-status-info bg-status-info-tint' : 'border-line hover:border-line-strong'
-      }`}
-    >
-      <div className="text-[13px] font-semibold text-ws-ink">{title}</div>
-      <div className="text-[11px] text-rail-500 mt-0.5 leading-relaxed">{desc}</div>
-    </button>
-  );
+  const options = [
+    { value: ROLES.AUTHORITY, title: t('role.authority'), desc: t('role.authorityDesc') },
+    { value: ROLES.GROUND, title: t('role.ground'), desc: t('role.groundDesc') },
+    { value: ROLES.ADMIN, title: t('role.admin'), desc: t('role.adminDesc') },
+  ];
+
+  const prov = m?.provenance || {};
+  const horizon = (prov.planning_horizon || '').replace(/\s*\.\.\s*/, ' → ');
+  const checks = (prov.post_solve_validation || '').match(/(\d+\/\d+)/)?.[1];
+  const solver = m?.summary?.solver_status;
+  const solverOk = solver === 'FEASIBLE' || solver === 'OPTIMAL';
+  const readout = [
+    [t('header.solver'), solver ? `${solver} · ${m.summary.runtime_seconds}s` : null],
+    [t('overview.checksLabel'), checks],
+    [t('status.scheduled'), m?.summary ? `${m.summary.total_scheduled.toLocaleString()} / ${m.summary.total_tasks_considered.toLocaleString()}` : null],
+    [t('header.planHorizon'), horizon || null],
+  ].filter(([, v]) => v);
 
   return (
-    <div className="min-h-screen bg-rail-950 flex flex-col">
-      {/* Institutional band — text identity only; see InstitutionalHeader for
-          why no emblem or logo asset is shipped. */}
-      <div className="border-b border-rail-800 px-5 py-2.5 flex items-center gap-5 flex-wrap">
-        <NamePair hi={t('institution.govHi')} en={t('institution.gov')} />
-        <span className="h-7 w-px bg-rail-800 shrink-0" aria-hidden="true" />
-        <NamePair hi={t('institution.ministryHi')} en={t('institution.ministry')} />
-        <span className="h-7 w-px bg-rail-800 shrink-0 hidden sm:block" aria-hidden="true" />
-        <div className="hidden sm:block">
-          <NamePair hi={t('institution.railwaysHi')} en={t('institution.railways')} />
-        </div>
-        <div className="flex-1" />
-        <LanguageSwitch tone="dark" />
-      </div>
+    <div className="min-h-screen bg-surface-base flex flex-col">
+      <InstitutionalHeader />
 
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-lg space-y-5">
-          <div className="border-l-2 border-status-info pl-4">
-            <h1 className={`text-white font-semibold uppercase ${isHindi ? 'text-[15px] tracking-[0.04em]' : 'text-[15px] tracking-[0.14em]'}`}>
-              {t('institution.appName')}
-            </h1>
-            <p className="text-xs text-rail-400 font-medium tracking-wide mt-1">
-              {t('institution.appSub')}
-            </p>
-            <span className="inline-block bg-rail-800 text-rail-300 text-[10px] px-2 py-0.5 font-mono border border-rail-700 mt-2.5">
-              {t('institution.prototype')}
-            </span>
-          </div>
+      <main id="main-content" tabIndex={-1} className="flex-1 w-full max-w-6xl mx-auto px-4 md:px-12 py-12 md:py-16 outline-none">
+        <h1 className={`font-extrabold text-ws-ink leading-[1.05] tracking-[-0.03em] t-emboss max-w-3xl ${isHindi ? 'text-[36px] md:text-[48px]' : 'text-[40px] md:text-[60px]'}`}>
+          {t('institution.appName')}
+        </h1>
+        <p className="text-[17px] text-ws-mid mt-3">{t('institution.appSub')}</p>
 
-          <div className="bg-surface-panel rounded-lg border border-line overflow-hidden">
-            <div className="px-4 py-3 bg-surface-sunken border-b border-line">
-              <div className="t-label">{t('login.selectRole')}</div>
+        <div className="mt-10 md:mt-12 grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-8 items-start">
+          {/* Control panel */}
+          <form
+            className="bg-ws-surface rounded-xl shadow-lift bolted px-6 md:px-9 pt-8 pb-9"
+            onSubmit={(e) => { e.preventDefault(); enter(role); }}
+          >
+            <div className="flex items-center justify-between gap-4 mb-6">
+              <span className="t-stamp">{t('login.selectRole')}</span>
+              <Vents />
             </div>
+            <fieldset>
+              <legend className="sr-only">{t('login.selectRole')}</legend>
+              <div className="space-y-3">
+                {options.map((o) => {
+                  const on = role === o.value;
+                  return (
+                    <label
+                      key={o.value}
+                      className={`flex gap-4 items-start px-5 py-4 rounded-md cursor-pointer transition-all duration-150 ease-spring has-[:focus-visible]:shadow-focus ${
+                        on ? 'shadow-pressed translate-y-[1px]' : 'shadow-key hover:text-ws-ink'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="role"
+                        value={o.value}
+                        checked={on}
+                        onChange={() => setRole(o.value)}
+                        className="sr-only"
+                      />
+                      <span
+                        className={`led mt-1.5 ${on ? 'bg-accent shadow-led-accent' : 'bg-ws-rule shadow-[inset_1px_1px_2px_rgba(0,0,0,0.2)]'}`}
+                        aria-hidden="true"
+                      />
+                      <span>
+                        <span className="block text-[15px] font-bold text-ws-ink">{o.title}</span>
+                        <span className="block text-[13px] text-ws-mid mt-1 leading-snug">{o.desc}</span>
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            </fieldset>
 
-            <div className="p-4 space-y-3">
-              <RoleCard value={ROLES.AUTHORITY} title={t('role.authority')} desc={t('role.authorityDesc')} />
-              <RoleCard value={ROLES.GROUND} title={t('role.ground')} desc={t('role.groundDesc')} />
-              <RoleCard value={ROLES.ADMIN} title={t('role.admin')} desc={t('role.adminDesc')} />
+            {role === ROLES.GROUND && (
+              <div className="mt-5">
+                <Select
+                  label={t('login.department')}
+                  value={selectedDept}
+                  onChange={(e) => setSelectedDept(e.target.value)}
+                  className="w-full"
+                >
+                  {DEPARTMENTS.map((d) => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </Select>
+              </div>
+            )}
 
-              {role === ROLES.GROUND && (
-                <div className="pt-1">
-                  <Select
-                    label={t('login.department')}
-                    value={selectedDept}
-                    onChange={(e) => setSelectedDept(e.target.value)}
-                    className="w-full"
-                  >
-                    {DEPARTMENTS.map((d) => (
-                      <option key={d} value={d}>{d}</option>
-                    ))}
-                  </Select>
+            <Button type="submit" size="lg" variant="primary" className="w-full mt-7">
+              {t('login.enter')}
+            </Button>
+          </form>
+
+          {/* Readout: the device's screen, bezel included. */}
+          <div className="bg-rail-900 rounded-xl p-3 shadow-lift">
+            <div className="flex items-center justify-between px-2 pb-2.5 pt-1">
+              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.08em] text-[#A8B2D1]">
+                {t('scope.fullRun')}
+              </span>
+              <span className={`led ${solverOk ? 'bg-[#22C55E] shadow-led-ok' : 'bg-[#D63031] shadow-led-critical'}`} aria-hidden="true" />
+            </div>
+            <dl className="crt px-5 py-5 space-y-4">
+              {readout.map(([k, v]) => (
+                <div key={k}>
+                  <dt className="font-mono text-[10px] font-bold uppercase tracking-[0.08em] text-[#A8B2D1]">{k}</dt>
+                  <dd className="crt-glow font-mono text-[18px] font-semibold mt-0.5">{v}</dd>
                 </div>
-              )}
-
-              <Button size="lg" variant="primary" className="w-full" onClick={() => enter(role)}>
-                {t('login.enter')}
-              </Button>
-            </div>
-          </div>
-
-          <Alert tone="idle" title={t('login.notAuthTitle')}>
-            {t('login.notAuthBody')}
-          </Alert>
-
-          <p className="text-center text-[10px] text-rail-500 leading-relaxed">
-            {t('institution.prototypeLong')}
-          </p>
-
-          <div className="text-center text-[10px] text-rail-500 font-mono">
-            {t('login.stack')}
+              ))}
+            </dl>
           </div>
         </div>
-      </div>
+
+        <p className="text-[13px] text-ws-mid leading-relaxed mt-10 max-w-2xl">
+          <span className="font-semibold text-ws-body">{t('login.notAuthTitle')}.</span> {t('login.notAuthBody')}
+        </p>
+      </main>
+      <AppFooter />
     </div>
   );
 };

@@ -51,17 +51,17 @@ export const BlockStatus = () => {
         <p className="font-ws text-xs text-ws-mid mt-0.5 max-w-3xl leading-relaxed">{t('ground.blockStatusSubtitle', { dept: selectedDept })}</p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 border border-ws-rule bg-ws-surface p-3.5">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 rounded-lg shadow-panel bg-ws-surface overflow-hidden p-3.5">
         <StatFigure value={rows.length} label={t('ground.possessions')} />
         <StatFigure value={nightCount} label={t('ground.nightWindows')} tone="text-ws-info" />
         <StatFigure value={new Set(rows.map((tk) => tk.section_id)).size} label={t('common.sections')} />
         <StatFigure value={rows.filter((tk) => tk.status === 'In Progress').length} label={t('ground.inProgressCount')} tone="text-ws-info" />
       </div>
 
-      <div className="border border-ws-rule bg-ws-surface overflow-x-auto custom-scrollbar">
+      <div className="rounded-lg shadow-panel bg-ws-surface overflow-hidden overflow-x-auto custom-scrollbar">
         <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
           <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.allocated')}</span>
-          <span className="font-mono text-[10px] text-ws-light block mt-0.5">{t('ground.allocatedScope', { count: rows.length })}</span>
+          <span className="text-[12px] text-ws-mid block mt-0.5">{t('ground.allocatedScope', { count: rows.length })}</span>
         </div>
         {rows.length === 0 ? (
           <div className="px-4 py-8 text-center font-ws text-xs text-ws-mid">{t('ground.noAllocated')}</div>
@@ -82,7 +82,7 @@ export const BlockStatus = () => {
                   <td className="px-3.5 py-1.5 font-mono text-[11px] text-ws-body whitespace-nowrap">{tk.start_minute != null ? `${minToHhmm(tk.start_minute)}–${minToHhmm(tk.end_minute)}` : '—'}</td>
                   <td className="px-3.5 py-1.5 whitespace-nowrap">
                     <div className="font-mono text-[11px] text-ws-body">{tk.section_id}</div>
-                    <div className="font-mono text-[9px] text-ws-light">{SECTION[tk.section_id]?.section_name}</div>
+                    <div className="text-[12px] text-ws-mid">{SECTION[tk.section_id]?.section_name}</div>
                   </td>
                   <td className="px-3.5 py-1.5 font-mono text-[11px] font-medium text-ws-ink whitespace-nowrap">{tk.task_id}</td>
                   <td className="px-3.5 py-1.5 text-right whitespace-nowrap"><Pill tone={RISK_PILL[statusTone(tk.status)] || 'idle'} size="sm">{tk.status || t('status.scheduled')}</Pill></td>
@@ -93,10 +93,10 @@ export const BlockStatus = () => {
         )}
       </div>
 
-      <div className="border border-ws-rule bg-ws-surface">
+      <div className="rounded-lg shadow-panel bg-ws-surface overflow-hidden">
         <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
           <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.trainMovements')}</span>
-          <span className="font-mono text-[10px] text-ws-light block mt-0.5">{t('ground.trainMovementsScope')}</span>
+          <span className="text-[12px] text-ws-mid block mt-0.5">{t('ground.trainMovementsScope')}</span>
         </div>
         {sectionDates.length === 0 ? (
           <div className="px-4 py-8 text-center font-ws text-xs text-ws-mid">{t('ground.noScheduledSection')}</div>
@@ -108,7 +108,7 @@ export const BlockStatus = () => {
                 <div key={`${section}-${date}`} className="px-3 py-2.5 border-b border-ws-hairline last:border-b-0">
                   <div className="flex items-center justify-between gap-3">
                     <span className="font-mono text-[11px] font-semibold text-ws-ink">{section} · {date}</span>
-                    <span className="font-mono text-[10px] text-ws-light">
+                    <span className="text-[12px] text-ws-mid">
                       {trains.length === 1 ? t('ground.movementCount', { count: trains.length }) : t('ground.movementCountPlural', { count: trains.length })}
                     </span>
                   </div>
@@ -133,7 +133,7 @@ export const BlockStatus = () => {
 
       <AdvisoryNote tone="idle" title={t('ground.contextTitle')}>{t('ground.contextBody')}</AdvisoryNote>
 
-      <div className="font-mono text-[10px] text-ws-mid">
+      <div className="text-[12px] text-ws-mid">
         {t('ground.trainDataScope', { records: sectionTrains.provenance?.records_emitted, source: sectionTrains.provenance?.source_rows?.toLocaleString() })}
       </div>
     </div>

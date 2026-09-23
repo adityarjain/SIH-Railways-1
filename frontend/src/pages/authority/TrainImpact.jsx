@@ -169,7 +169,7 @@ export const TrainImpact = ({ onNavigate }) => {
       </div>
 
       <div className="bg-ws-band px-3.5 md:px-4 xl:px-5 py-2 flex flex-wrap items-center gap-3.5">
-        <span className="font-mono text-[10px] text-ws-light break-all">
+        <span className="text-[12px] text-ws-mid break-all">
           {sectionTrains.provenance?.source} · $ {sectionTrains.provenance?.command}
         </span>
       </div>

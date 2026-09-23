@@ -10,21 +10,21 @@ import {
 // Tailwind classes), so the charts read as one system with the rest of the
 // interface. Teal stays reserved for bundling.
 const TOKEN = {
-  critical: '#FF6B5A',
-  warn: '#E0A030',
-  info: '#4C8DFF',
-  ok: '#3FBF87',
+  critical: '#DF1B41',
+  warn: '#E0932B',
+  info: '#5469D4',
+  ok: '#1EA672',
   // Neutral series. A near-white bar glares on the dark canvas, so the
   // unbanded workload chart uses a muted steel-blue instead.
-  ink: '#40547A',
+  ink: '#8792A2',
 };
 
 const TIP_STYLE = {
   fontSize: '11px',
   borderRadius: '6px',
-  background: '#1C242F',
-  border: '1px solid #263040',
-  color: '#E8EDF4',
+  background: '#FFFFFF',
+  border: '1px solid #E3E8EE',
+  color: '#1A1F36',
   padding: '6px 10px',
   fontFamily: 'Figtree, sans-serif',
 };
@@ -85,9 +85,9 @@ export const Analytics = () => {
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={riskData} margin={{ top: 8, right: 8, left: -20, bottom: 24 }}>
-                <XAxis dataKey="name" tick={{ fontSize: 9, fill: '#7C7466' }} angle={-15} textAnchor="end" />
-                <YAxis tick={{ fontSize: 10, fill: '#7C7466' }} allowDecimals={false} />
-                <Tooltip contentStyle={TIP_STYLE} cursor={{ fill: '#212934' }} />
+                <XAxis dataKey="name" tick={{ fontSize: 9, fill: '#697386' }} angle={-15} textAnchor="end" />
+                <YAxis tick={{ fontSize: 10, fill: '#697386' }} allowDecimals={false} />
+                <Tooltip contentStyle={TIP_STYLE} cursor={{ fill: '#F1F4F7' }} />
                 <Bar dataKey="count" radius={0}>
                   {riskData.map((entry) => <Cell key={entry.name} fill={entry.color} />)}
                 </Bar>
@@ -101,9 +101,9 @@ export const Analytics = () => {
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={departmentData} layout="vertical" margin={{ top: 8, right: 16, left: 16, bottom: 4 }}>
-                <XAxis type="number" tick={{ fontSize: 10, fill: '#7C7466' }} allowDecimals={false} />
-                <YAxis type="category" dataKey="name" tick={{ fontSize: 9, fill: '#7C7466' }} width={88} />
-                <Tooltip contentStyle={TIP_STYLE} cursor={{ fill: '#212934' }} />
+                <XAxis type="number" tick={{ fontSize: 10, fill: '#697386' }} allowDecimals={false} />
+                <YAxis type="category" dataKey="name" tick={{ fontSize: 9, fill: '#697386' }} width={88} />
+                <Tooltip contentStyle={TIP_STYLE} cursor={{ fill: '#F1F4F7' }} />
                 <Bar dataKey="count" fill={TOKEN.ink} radius={0} />
               </BarChart>
             </ResponsiveContainer>
@@ -134,9 +134,9 @@ export const Analytics = () => {
       </div>
 
       <div className="bg-ws-band px-3.5 md:px-4 xl:px-5 py-2 flex flex-wrap items-center gap-3.5">
-        <span className="font-mono text-[10px] text-ws-mid">{t('analytics.footerScope', { count: metrics.summary.total_tasks_considered })}</span>
+        <span className="text-[12px] text-ws-mid">{t('analytics.footerScope', { count: metrics.summary.total_tasks_considered })}</span>
         <span className="flex-1 min-w-2" />
-        <span className="font-mono text-[10px] text-ws-light break-all">{metrics.provenance?.scope} · $ PYTHONPATH=. python demo.py</span>
+        <span className="text-[12px] text-ws-mid break-all">{metrics.provenance?.scope} · $ PYTHONPATH=. python demo.py</span>
       </div>
     </div>
   );

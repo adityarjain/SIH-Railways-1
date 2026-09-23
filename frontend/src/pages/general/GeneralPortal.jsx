@@ -151,14 +151,14 @@ export const GeneralPortal = () => {
                   </td>
                   <td className="px-3.5 py-1.5 whitespace-nowrap">
                     <div className="font-mono text-[11px] text-ws-body">{j.section_id}</div>
-                    <div className="font-mono text-[9px] text-ws-light">{j.corridor_id}</div>
+                    <div className="text-[12px] text-ws-mid">{j.corridor_id}</div>
                   </td>
                   <td className="px-3.5 py-1.5 whitespace-nowrap">
                     <div className="font-mono text-[11px] text-ws-body">{j.execution_date}</div>
-                    <div className="font-mono text-[9px] text-ws-light">{minToHhmm(j.start_minute)}–{minToHhmm(j.end_minute)}</div>
+                    <div className="text-[12px] text-ws-mid">{minToHhmm(j.start_minute)}–{minToHhmm(j.end_minute)}</div>
                   </td>
-                  <td className="px-3.5 py-1.5 font-mono text-[10px] text-ws-mid whitespace-nowrap">{(j.block_ids || []).join(' + ')}</td>
-                  <td className="px-3.5 py-1.5 font-mono text-[10px] text-ws-mid whitespace-nowrap">{(j.assigned_teams || []).join(', ')}</td>
+                  <td className="px-3.5 py-1.5 text-[12px] text-ws-mid whitespace-nowrap">{(j.block_ids || []).join(' + ')}</td>
+                  <td className="px-3.5 py-1.5 text-[12px] text-ws-mid whitespace-nowrap">{(j.assigned_teams || []).join(', ')}</td>
                   <td className="px-3.5 py-1.5 text-right whitespace-nowrap"><Pill tone={RISK_PILL[bandTone(band)] || 'idle'} size="sm">{j.risk_score?.toFixed?.(1) ?? '—'}</Pill></td>
                   <td className="px-3.5 py-1.5 text-right whitespace-nowrap">
                     {v ? <Pill tone={RISK_PILL[VERDICT_TONE[v]] || 'idle'} size="sm">{v}</Pill> : <span className="font-ws text-[10px] text-ws-light">{t('status.awaiting')}</span>}
@@ -182,7 +182,7 @@ export const GeneralPortal = () => {
       </div>
 
       <div className="bg-ws-band px-3.5 md:px-4 xl:px-5 py-2">
-        <span className="font-mono text-[10px] text-ws-mid">{t('verification.sourceNote', { count: completedWorkJson.length })}</span>
+        <span className="text-[12px] text-ws-mid">{t('verification.sourceNote', { count: completedWorkJson.length })}</span>
       </div>
 
       <Modal
@@ -219,7 +219,7 @@ export const GeneralPortal = () => {
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder={cfg.requiresComment ? t('verification.commentPlaceholderRequired') : t('verification.commentPlaceholderOptional')}
-                className="w-full font-ws text-xs bg-ws-surface border border-ws-rule px-2.5 py-2 text-ws-ink placeholder:text-ws-light focus:outline-none focus:ring-1 focus:ring-ws-info"
+                className="w-full font-ws text-xs rounded-lg shadow-panel bg-ws-surface overflow-hidden px-2.5 py-2 text-ws-ink placeholder:text-ws-light focus:outline-none focus:ring-1 focus:ring-ws-info"
               />
             </div>
 

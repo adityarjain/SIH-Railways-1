@@ -23,7 +23,7 @@ const tone = (t) => TONES[t] || TONES.idle;
 /* ------------------------------------------------------------------ Panel */
 
 export const Panel = ({ children, className = '', flush = false }) => (
-  <div className={`bg-surface-panel rounded-lg shadow-soft ${className}`}>
+  <div className={`bg-surface-panel rounded-lg shadow-panel ${className}`}>
     {flush ? children : children}
   </div>
 );
@@ -141,24 +141,24 @@ export const MetricRow = ({ label, value, sub, tone: t, onClick }) => {
 export const Button = ({
   variant = 'secondary', size = 'md', children, className = '', ...props
 }) => {
-  // Filled or tinted, no outline: an outline plus a fill is two edges doing
-  // one job. `active:scale` gives the press a physical acknowledgement.
+  // Physical keys: raised at rest; on press they drop 2px and the shadow
+  // inverts into the surface. Safety orange is reserved for the primary key.
   const variants = {
-    primary: 'bg-status-info text-rail-950 hover:brightness-95',
-    secondary: 'bg-surface-sunken text-ws-body hover:bg-line-subtle',
-    danger: 'bg-status-critical text-rail-950 hover:brightness-95',
-    warn: 'bg-status-warn-tint text-[#E0A030] hover:brightness-[0.97]',
-    ghost: 'bg-transparent text-rail-500 hover:bg-surface-sunken',
+    primary: 'bg-accent text-accent-ink shadow-key-accent hover:bg-accent-hover',
+    secondary: 'bg-ws-surface text-ws-ink shadow-key hover:text-status-info',
+    danger: 'bg-status-critical text-white shadow-key hover:brightness-110',
+    warn: 'bg-ws-surface text-status-warn shadow-key hover:text-ws-ink',
+    ghost: 'bg-transparent text-ws-mid hover:shadow-recessed',
   };
   const sizes = {
     sm: 'text-[12px] px-2.5 py-1.5',
     md: 'text-[13px] px-3.5 py-2',
     // Ground portal: 44px minimum touch target.
-    lg: 'text-sm px-5 py-3 min-h-touch',
+    lg: 'text-sm px-6 py-3 min-h-12',
   };
   return (
     <button
-      className={`inline-flex items-center justify-center gap-1.5 font-semibold rounded-md transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`inline-flex items-center justify-center gap-1.5 font-bold uppercase tracking-[0.05em] rounded-md transition-all duration-150 ease-spring active:translate-y-[2px] active:shadow-pressed focus:outline-none focus-visible:shadow-focus disabled:opacity-40 disabled:cursor-not-allowed disabled:active:translate-y-0 ${variants[variant]} ${sizes[size]} ${className}`}
       {...props}
     >
       {children}

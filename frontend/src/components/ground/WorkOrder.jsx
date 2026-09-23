@@ -89,16 +89,16 @@ export const SectionContext = ({ task }) => {
   ].filter(Boolean);
 
   return (
-    <div className="border border-ws-rule bg-ws-surface">
+    <div className="rounded-lg shadow-panel bg-ws-surface overflow-hidden">
       <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
         <span className="font-display text-[11px] font-semibold text-ws-light">Section context</span>
-        <span className="font-mono text-[10px] text-ws-light block mt-0.5">{sec ? `${sec.section_name} · ${sec.region}` : task.section_id}</span>
+        <span className="text-[12px] text-ws-mid block mt-0.5">{sec ? `${sec.section_name} · ${sec.region}` : task.section_id}</span>
       </div>
       {rows.map((r) => (
         <div key={r.label} className="px-3 py-2 border-b border-ws-hairline last:border-b-0 flex items-center justify-between gap-3">
           <span className="min-w-0">
             <span className="block font-ws text-xs font-medium text-ws-ink">{r.label}</span>
-            <span className="block font-mono text-[9px] text-ws-light mt-0.5">source: {r.source}</span>
+            <span className="block text-[12px] text-ws-mid mt-0.5">source: {r.source}</span>
           </span>
           <span className="font-mono text-xs font-bold text-ws-ink shrink-0">{r.value}</span>
         </div>
@@ -109,10 +109,10 @@ export const SectionContext = ({ task }) => {
 
 /** Explicit data-boundary disclosure — an intentional statement, not an error. */
 export const OperationalGaps = () => (
-  <div className="border border-ws-rule bg-ws-surface">
+  <div className="rounded-lg shadow-panel bg-ws-surface overflow-hidden">
     <div className="px-3 py-2 bg-ws-tick border-b border-ws-rule">
       <span className="font-display text-[11px] font-semibold text-ws-light">Operational information not available</span>
-      <span className="font-mono text-[10px] text-ws-light block mt-0.5">Absent from the current dataset</span>
+      <span className="text-[12px] text-ws-mid block mt-0.5">Absent from the current dataset</span>
     </div>
     {[
       ['Work instructions', 'no source column in the dataset'],
@@ -183,13 +183,13 @@ export const WorkOrderHeader = ({ task, status, note }) => {
         <div className="font-display text-[11px] font-semibold text-ws-light">Work order</div>
         <div className="font-mono text-[22px] font-bold text-ws-ink mt-1 leading-none">{task.task_id}</div>
         <div className="font-ws text-[13px] font-medium text-ws-ink mt-1.5">{task.maintenance_type} · {task.department}</div>
-        <div className="font-mono text-[10px] text-ws-light mt-1">asset {task.asset_id}{task.asset_type ? ` · ${task.asset_type}` : ''}</div>
+        <div className="text-[12px] text-ws-mid mt-1">asset {task.asset_id}{task.asset_type ? ` · ${task.asset_type}` : ''}</div>
         {note && <div className="font-ws text-[11px] text-ws-warn mt-1.5">{note}</div>}
       </div>
       <div className="text-right shrink-0 space-y-1.5">
         {band && <Pill tone={RISK_PILL[bandTone(band)] || 'idle'} size="md">{band} · RISK {task.risk_score?.toFixed?.(1) ?? task.risk_score}</Pill>}
         {task.failure_probability_30d != null && (
-          <div className="font-mono text-[10px] text-ws-light">30-day failure probability {(task.failure_probability_30d * 100).toFixed(2)}%</div>
+          <div className="text-[12px] text-ws-mid">30-day failure probability {(task.failure_probability_30d * 100).toFixed(2)}%</div>
         )}
         <div><Pill tone={RISK_PILL[statusTone(status)] || 'idle'}>{status || 'Scheduled'}</Pill></div>
       </div>
@@ -209,7 +209,7 @@ export const BlockStatusBanner = ({ task, status }) => {
 
   const bg = tone === 'ok' ? 'bg-status-ok-tint' : tone === 'info' ? 'bg-ws-barPlannedBg' : 'bg-status-warn-tint';
   const fg = tone === 'ok' ? 'text-ws-ok' : tone === 'info' ? 'text-ws-info' : 'text-ws-warn';
-  const dot = tone === 'ok' ? 'bg-ws-ok' : tone === 'info' ? 'bg-ws-info' : 'bg-ws-warn';
+  const dot = tone === 'ok' ? 'bg-ws-ok' : tone === 'info' ? 'bg-ws-steel' : 'bg-ws-warn';
 
   return (
     <div className={`px-4 py-3 ${bg} border-t border-ws-rule flex items-center gap-2.5 flex-wrap`}>

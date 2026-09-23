@@ -79,7 +79,7 @@ export const CompletedWork = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 border border-ws-rule bg-ws-surface p-3.5">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 rounded-lg shadow-panel bg-ws-surface overflow-hidden p-3.5">
         <StatFigure value={deptWork.length} label="Handed back" />
         <StatFigure value={counts.verified} label="Approved" tone="text-ws-ok" />
         <StatFigure value={counts.pending} label="Awaiting verification" tone={counts.pending ? 'text-ws-warn' : 'text-ws-ok'} />
@@ -87,7 +87,7 @@ export const CompletedWork = () => {
       </div>
 
       {rows.length === 0 ? (
-        <div className="border border-ws-rule bg-ws-surface px-4 py-8 text-center">
+        <div className="rounded-lg shadow-panel bg-ws-surface overflow-hidden px-4 py-8 text-center">
           <div className="font-ws text-xs font-semibold text-ws-mid">No completed possession matches the current filters.</div>
           <div className="font-ws text-[11px] text-ws-light mt-1">Work appears here once a possession for your department has been handed back.</div>
         </div>
@@ -98,12 +98,12 @@ export const CompletedWork = () => {
             const band = bandOf(j);
             const sec = SECTION[j.section_id];
             return (
-              <div key={j.task_id} className="border border-ws-rule bg-ws-surface overflow-hidden">
+              <div key={j.task_id} className="rounded-lg shadow-panel bg-ws-surface overflow-hidden overflow-hidden">
                 <div className="px-3.5 py-3 flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="font-mono text-[14px] font-bold text-ws-ink">{j.task_id}</div>
                     <div className="font-ws text-[12px] text-ws-ink mt-0.5">{j.maintenance_type}</div>
-                    <div className="font-mono text-[10px] text-ws-light mt-0.5">asset {j.asset_id}</div>
+                    <div className="text-[12px] text-ws-mid mt-0.5">asset {j.asset_id}</div>
                   </div>
                   <div className="text-right shrink-0 space-y-1">
                     {band && <Pill tone={RISK_PILL[bandTone(band)] || 'idle'} size="sm">{band}</Pill>}
@@ -127,7 +127,7 @@ export const CompletedWork = () => {
                     <div key={k} className="bg-ws-surface px-3 py-2">
                       <div className="font-display text-[11px] font-semibold text-ws-light">{k}</div>
                       <div className="font-mono text-[11px] text-ws-ink mt-0.5">{val}</div>
-                      <div className="font-mono text-[9px] text-ws-light mt-0.5">{sub}</div>
+                      <div className="text-[12px] text-ws-mid mt-0.5">{sub}</div>
                     </div>
                   ))}
                 </div>
@@ -149,7 +149,7 @@ export const CompletedWork = () => {
         <div className="font-ws text-xs text-ws-body leading-relaxed mt-1">Completed possessions are verified by the controlling authority, not by the crew that performed the work. Verdicts shown here are session state and are not written to any external register.</div>
       </div>
 
-      <div className="font-mono text-[10px] text-ws-mid">Source: completed_work.json · {completedWork.length} possessions across all departments.</div>
+      <div className="text-[12px] text-ws-mid">Source: completed_work.json · {completedWork.length} possessions across all departments.</div>
     </div>
   );
 };

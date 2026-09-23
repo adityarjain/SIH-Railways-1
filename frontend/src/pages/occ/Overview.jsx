@@ -252,7 +252,7 @@ export const Overview = ({ onNavigate }) => {
           <span className="font-display text-[13px] font-semibold text-ws-body">
             {t('overview.planHorizonTasks')}
           </span>
-          <span className="font-mono text-[10px] text-ws-light ml-auto">
+          <span className="text-[12px] text-ws-mid ml-auto">
             {t('scope.demoScenarioTasks', { count: scenario.summary.total_tasks_considered })}
           </span>
         </div>
@@ -268,29 +268,29 @@ export const Overview = ({ onNavigate }) => {
                 key={o.date}
                 onClick={() => setSelectedDate(o.date)}
                 aria-pressed={active}
-                className={`flex-1 min-w-[58px] rounded-lg px-1.5 pt-2.5 pb-3 text-center transition-colors ${
+                className={`flex-1 min-w-[58px] rounded-md px-1.5 pt-2.5 pb-3 text-center transition-all duration-150 ${
                   active
-                    ? 'bg-ws-info'
+                    ? 'bg-accent translate-y-[1px] shadow-[inset_3px_3px_6px_rgba(150,50,0,0.45),inset_-2px_-2px_4px_rgba(255,170,120,0.5)]'
                     : weekend
-                    ? 'bg-ws-band hover:bg-ws-tick'
-                    : 'bg-ws-surface hover:bg-ws-tick'
+                    ? 'bg-ws-tick shadow-key hover:text-status-info'
+                    : 'bg-ws-surface shadow-key hover:text-status-info'
                 }`}
               >
-                <span className={`block font-display text-[10px] font-semibold ${active ? 'text-rail-950/70' : 'text-ws-light'}`}>
+                <span className={`block font-display text-[10px] font-semibold ${active ? 'text-accent-ink/80' : 'text-ws-light'}`}>
                   {weekday}
                 </span>
-                <span className={`block font-mono text-[20px] font-semibold leading-none mt-1 tracking-[-0.02em] ${active ? 'text-rail-950' : 'text-ws-ink'}`}>
+                <span className={`block font-mono text-[20px] font-semibold leading-none mt-1 tracking-[-0.02em] ${active ? 'text-accent-ink' : 'text-ws-ink'}`}>
                   {day}
                 </span>
-                <span className={`block h-[3px] rounded-full mt-2.5 ${active ? 'bg-rail-950/25' : 'bg-ws-tick'}`}>
+                <span className={`block h-[3px] rounded-full mt-2.5 ${active ? 'bg-accent-ink/20' : 'bg-ws-tick'}`}>
                   {o.count > 0 && (
                     <span
-                      className={`block h-full rounded-full ${active ? 'bg-rail-950/70' : 'bg-ws-info/60'}`}
+                      className={`block h-full rounded-full ${active ? 'bg-accent-ink' : 'bg-ws-steel/70'}`}
                       style={{ width: `${Math.max(10, (o.count / maxDayCount) * 100)}%` }}
                     />
                   )}
                 </span>
-                <span className={`block font-mono text-[11px] mt-1.5 ${active ? 'text-rail-950/85' : o.count ? 'text-ws-mid' : 'text-ws-disabled'}`}>
+                <span className={`block font-mono text-[11px] mt-1.5 ${active ? 'text-accent-ink' : o.count ? 'text-ws-mid' : 'text-ws-disabled'}`}>
                   {o.count || '0'}
                 </span>
               </button>
@@ -314,8 +314,8 @@ export const Overview = ({ onNavigate }) => {
       {/* Recommendation + attention ledger. Two cards side by side rather than
           two panes divided by a rule: the 3px ink band that used to cap this
           row was the heaviest line on the page. */}
-      <div className="grid grid-cols-1 lg:grid-cols-[60fr_40fr] xl:grid-cols-[64fr_36fr] gap-4 px-4 md:px-5 xl:px-6 pt-4">
-        <div className="bg-ws-surface rounded-lg shadow-soft px-5 pt-5 pb-6 min-w-0">
+      <div className="grid grid-cols-1 lg:grid-cols-[60fr_40fr] xl:grid-cols-[64fr_36fr] gap-6 px-4 md:px-5 xl:px-6 pt-6">
+        <div className="bg-ws-surface rounded-lg shadow-panel px-6 pt-6 pb-7 min-w-0">
           <RegionHeader
             title={t('overview.recommendation')}
             meta={`${dReq.task_id} · ${dReq.section_id} · ${t('overview.pendingAuthorityDecision')}`}
@@ -323,11 +323,17 @@ export const Overview = ({ onNavigate }) => {
 
           <div className="flex items-end gap-5 pt-0.5 pb-3 border-b border-ws-rule flex-wrap">
             <div>
-              <div className={`font-display text-[13px] font-bold ${uc} ${tr} text-ws-ok`}>{t('overview.recommendedWindow')}</div>
-              <div className="font-mono text-[36px] font-bold text-ws-ink leading-[1.05] tracking-[-0.02em] mt-0.5">
-                {dSel.window || '—'}
+              {/* The one number a controller acts on, set as an instrument readout. */}
+              <div className="crt px-5 pt-3 pb-4 min-w-[260px]">
+                <div className="flex items-center gap-2">
+                  <span className="led bg-[#22C55E] shadow-led-ok" aria-hidden="true" />
+                  <span className={`font-mono text-[11px] font-bold ${uc} ${tr} text-[#A8B2D1]`}>{t('overview.recommendedWindow')}</span>
+                </div>
+                <div className="crt-glow font-mono text-[40px] font-bold leading-[1.1] tracking-[-0.02em] mt-2">
+                  {dSel.window || '—'}
+                </div>
+                <div className="font-mono text-xs text-[#A8B2D1] mt-1">{dSel.date}</div>
               </div>
-              <div className="font-mono text-xs text-ws-mid mt-0.5">{dSel.date}</div>
             </div>
             <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2.5 flex-1 min-w-[280px]">
               <span className={`font-display text-xs font-semibold ${uc} ${tr} text-ws-light`}>{t('common.blocks')}</span>
@@ -381,13 +387,13 @@ export const Overview = ({ onNavigate }) => {
           <div className="flex items-center gap-2.5 pt-[15px] flex-wrap">
             <button
               onClick={() => onNavigate && onNavigate('decision-trace')}
-              className="px-4 py-2 rounded-md font-display text-[13px] font-semibold text-rail-950 bg-ws-info hover:brightness-95 active:scale-[0.98] transition-all"
+              className="px-4 py-2 rounded-md font-display text-[13px] font-semibold text-accent-ink bg-accent shadow-key-accent hover:bg-accent-hover active:translate-y-[1px] active:shadow-pressed transition-all"
             >
               {t('overview.openDecisionTrace')}
             </button>
             <button
               onClick={() => onNavigate && onNavigate('block-planning')}
-              className="px-4 py-2 rounded-md font-display text-[13px] font-semibold text-ws-body bg-ws-tick hover:bg-ws-band active:scale-[0.98] transition-all"
+              className="px-4 py-2 rounded-md font-display text-[13px] font-semibold text-ws-ink bg-ws-surface shadow-key hover:text-status-info active:translate-y-[1px] active:shadow-pressed transition-all duration-150"
             >
               {t('overview.goToBlockPlanning')}
             </button>
@@ -397,7 +403,7 @@ export const Overview = ({ onNavigate }) => {
         </div>
 
         {/* Attention ledger + next out */}
-        <div className="bg-ws-surface rounded-lg shadow-soft px-5 pt-5 pb-6 min-w-0">
+        <div className="bg-ws-surface rounded-lg shadow-panel px-6 pt-6 pb-7 min-w-0">
           <RegionHeader
             title={t('overview.requiresAttention')}
             meta={t('overview.rankedBySeverity', { count: attention.length })}
@@ -424,7 +430,7 @@ export const Overview = ({ onNavigate }) => {
                       <span className="flex items-baseline gap-2">
                         <span className={`font-display text-xs font-bold ${uc} ${tr} ${color}`}>{a.kind}</span>
                         <span className="flex-1" />
-                        <span className="font-mono text-[10px] text-ws-light">{a.right}</span>
+                        <span className="text-[12px] text-ws-mid">{a.right}</span>
                       </span>
                       <span className="block font-ws text-[15px] font-medium text-ws-ink leading-[1.3] mt-0.5">{a.title}</span>
                       <span className="block font-ws text-xs text-ws-mid leading-[1.4] mt-0.5">{a.meta}</span>
@@ -480,7 +486,7 @@ export const Overview = ({ onNavigate }) => {
       </div>
 
       {/* Corridor situation */}
-      <div className="bg-ws-surface rounded-lg shadow-soft mx-4 md:mx-5 xl:mx-6 mt-4 px-5 pt-5 pb-5">
+      <div className="bg-ws-surface rounded-lg shadow-panel mx-4 md:mx-5 xl:mx-6 mt-6 px-6 pt-6 pb-6">
         <RegionHeader
           title={t('overview.corridorSituation')}
           meta={`${activeDate} · ${tasksOnDate.length} / ${corridorStats.length}`}
@@ -502,7 +508,7 @@ export const Overview = ({ onNavigate }) => {
                 </span>
                 <span className="font-ws text-xs text-ws-mid overflow-hidden text-ellipsis whitespace-nowrap">{c.name}</span>
               </span>
-              <span className="font-mono text-[10px] text-ws-light text-right">{c.poss} · {c.crit} · {c.sec}</span>
+              <span className="text-[12px] text-ws-mid text-right">{c.poss} · {c.crit} · {c.sec}</span>
             </button>
           ))}
         </div>
@@ -526,7 +532,7 @@ export const Overview = ({ onNavigate }) => {
 
       {/* footer */}
       <div className="px-4 md:px-5 xl:px-6 pt-4 pb-5 mt-2 flex flex-wrap items-center gap-3.5">
-        <span className="font-mono text-[10px] text-ws-mid">
+        <span className="text-[12px] text-ws-mid">
           {t('overview.headlineScope', {
             full: metrics.summary.total_tasks_considered.toLocaleString(),
             scheduled: metrics.summary.total_scheduled.toLocaleString(),
@@ -535,7 +541,7 @@ export const Overview = ({ onNavigate }) => {
           })}
         </span>
         <span className="flex-1 min-w-2" />
-        <span className="font-mono text-[10px] text-ws-light break-all">
+        <span className="text-[12px] text-ws-mid break-all">
           {prov.scope} · $ {prov.command}
         </span>
       </div>

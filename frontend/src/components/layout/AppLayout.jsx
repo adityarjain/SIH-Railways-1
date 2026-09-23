@@ -1,22 +1,15 @@
 import React from 'react';
 import { useAuth, ROLES } from '../../context/AuthContext';
 import { useI18n } from '../../i18n';
+import { usePlan } from '../../context/PlanContext';
 import { NAV_SECTIONS_BY_ROLE } from './Sidebar';
 import { RoleSwitch } from './Header';
-import { InstitutionalHeader, AppIdentity } from './InstitutionalHeader';
+import { TopBar, SideNav, MobileNav, AppFooter } from './InstitutionalHeader';
 import { WorksheetHeader } from './WorksheetHeader';
 
 /**
- * Authority shell — the "industrial worksheet" (design 2A) chrome, sitewide.
- * Every Authority tab shares the same full-bleed provenance strip, masthead
- * and horizontal nav. Overview renders its own copy of that same
- * `WorksheetHeader` directly (it needs a day-sheet-specific masthead
- * subtitle the other tabs don't have), so the shell skips rendering it a
- * second time for that one tab only.
- *
- * Pages that compose their own dense, edge-to-edge worksheet regions (rather
- * than sitting inside the padded panel-grid column) own their own padding
- * and background, so the shell renders them full-bleed too.
+ * Pages that compose their own edge-to-edge regions own their padding and
+ * background, so the shell renders them full-bleed.
  */
 const FULL_BLEED_TABS = new Set([
   'overview', 'replanning', 'maintenance-blocks', 'block-planning', 'train-impact',
@@ -24,85 +17,59 @@ const FULL_BLEED_TABS = new Set([
   'live-ops', 'demand', 'analytics', 'general-verify',
 ]);
 
-const AuthorityShell = ({ activeTab, onTabChange, children }) => (
-  <div className="min-h-screen bg-surface-base flex flex-col">
-    {activeTab !== 'overview' && <WorksheetHeader activeTab={activeTab} onNavigate={onTabChange} />}
-    <main className={FULL_BLEED_TABS.has(activeTab) ? 'flex-1 min-w-0' : 'flex-1 p-5 space-y-4 min-w-0'}>
-      {children}
-    </main>
-  </div>
-);
-
-/**
- * Ground shell — tablet-first field tool. No nav rail: a top tab strip and a
- * single content column, so the work order is the page rather than one widget
- * inside a dashboard.
- */
-const GroundShell = ({ activeTab, onTabChange, children }) => {
-  const { currentUser } = useAuth();
-  const { t } = useI18n();
-  const sections = NAV_SECTIONS_BY_ROLE[ROLES.GROUND];
-
-  return (
-    <div className="min-h-screen bg-surface-base flex flex-col">
-      <InstitutionalHeader />
-
-      {/* Header and tabs stick as one block, so the tab bar needs no hardcoded
-          offset to sit under a header whose height can change. */}
-      <div className="sticky top-0 z-header">
-        {/* Below sm the role switch wraps to its own row rather than squeezing
-            the identity down to a few letters. */}
-        <header className="bg-rail-900 border-b border-rail-800 px-5 py-2.5 flex items-center gap-x-4 gap-y-2 flex-wrap">
-          <AppIdentity sub={t('role.ground')} />
-          <div className="flex-1 hidden sm:block" />
-          <div className="min-w-0 truncate hidden sm:block">
-            <span className="text-[11px] font-semibold text-white">{currentUser?.department}</span>
-            <span className="font-mono text-[9px] text-rail-400"> · {currentUser?.name}</span>
-          </div>
-          <RoleSwitch onNavigate={onTabChange} />
-        </header>
-
-        {/* Single row: every page is one tap away, groups marked by a rule
-            rather than a second row. Previously a group tab only jumped to
-            its first item, so reaching e.g. Completion took two taps
-            (Reporting, then Completion) — every button here is a real leaf
-            page now, so that's a tap saved as well as a row saved. */}
-        <div className="bg-surface-panel border-b border-line px-5 overflow-x-auto custom-scrollbar">
-          <div className="flex items-stretch">
-            {sections.map((s, si) => (
-              <React.Fragment key={s.groupKey}>
-                {si > 0 && <span className="w-px my-2.5 bg-line shrink-0" aria-hidden="true" />}
-                {s.items.map((i) => {
-                  const active = i.id === activeTab;
-                  return (
-                    <button
-                      key={i.id}
-                      onClick={() => onTabChange(i.id)}
-                      className={`shrink-0 px-3.5 py-3 font-display text-[11px] font-semibold whitespace-nowrap border-b-2 -mb-px transition-colors ${
-                        active ? 'border-status-info text-ws-ink' : 'border-transparent text-rail-500 hover:text-ws-body hover:border-line'
-                      }`}
-                    >
-                      {t(i.labelKey)}
-                    </button>
-                  );
-                })}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <main className="flex-1 px-5 py-4 space-y-4 max-w-[1400px] w-full mx-auto">{children}</main>
-    </div>
-  );
+const ROLE_SUB = {
+  [ROLES.AUTHORITY]: 'role.authority',
+  [ROLES.GROUND]: 'role.ground',
+  [ROLES.ADMIN]: 'role.admin',
 };
 
+/**
+ * One shell for every role: sidebar on the left, top bar and page on the
+ * right. Overview renders its own WorksheetHeader (it passes a day-sheet
+ * subtitle), so the shell skips it for that tab.
+ */
 export const AppLayout = ({ activeTab, onTabChange, children }) => {
   const { currentUser } = useAuth();
-  const Shell = currentUser?.role === ROLES.GROUND ? GroundShell : AuthorityShell;
+  const { t } = useI18n();
+  const { baselineMetrics } = usePlan();
+  const solver = baselineMetrics?.summary?.solver_status;
+  const solverOk = solver === 'FEASIBLE' || solver === 'OPTIMAL';
+  const role = currentUser?.role;
+  const isGround = role === ROLES.GROUND;
+  const groups = (NAV_SECTIONS_BY_ROLE[role] || []).map((s) => ({
+    label: t(s.groupKey),
+    items: s.items.map((i) => ({ id: i.id, label: t(i.labelKey) })),
+  }));
+
+  const mainCls = isGround
+    ? 'flex-1 px-4 md:px-6 py-6 space-y-4 max-w-[1200px] w-full mx-auto'
+    : FULL_BLEED_TABS.has(activeTab) ? 'flex-1 min-w-0' : 'flex-1 p-6 space-y-4 min-w-0';
+
   return (
-    <Shell activeTab={activeTab} onTabChange={onTabChange}>
-      {children}
-    </Shell>
+    <div className="min-h-screen bg-ws-paper flex">
+      <SideNav groups={groups} activeId={activeTab} onSelect={onTabChange} sub={t(ROLE_SUB[role] || 'role.authority')} />
+      <div className="flex-1 min-w-0 flex flex-col">
+        <TopBar>
+          {solver && (
+            <span className="hidden md:inline-flex items-center gap-2 t-stamp">
+              <span className={`led ${solverOk ? 'bg-[#22C55E] shadow-led-ok' : 'bg-[#D63031] shadow-led-critical'}`} aria-hidden="true" />
+              {t('header.solver')} {solver}
+            </span>
+          )}
+          {isGround && (
+            <span className="hidden md:inline text-ws-mid truncate">
+              <span className="text-ws-ink font-medium">{currentUser?.department}</span> · {currentUser?.name}
+            </span>
+          )}
+          <RoleSwitch onNavigate={onTabChange} tone="ws" />
+        </TopBar>
+        <MobileNav groups={groups} activeId={activeTab} onSelect={onTabChange} />
+        {!isGround && activeTab !== 'overview' && <WorksheetHeader activeTab={activeTab} onNavigate={onTabChange} />}
+        <main id={isGround ? 'main-content' : undefined} tabIndex={isGround ? -1 : undefined} className={`${mainCls} outline-none`}>
+          {children}
+        </main>
+        <AppFooter />
+      </div>
+    </div>
   );
 };

@@ -67,7 +67,7 @@ export const Performance = () => {
                   <tr key={r.key} className="border-b border-ws-hairline last:border-b-0">
                     <td className="py-1.5">
                       <div className="font-ws text-xs text-ws-ink">{REASON_KEY[r.key] ? t(REASON_KEY[r.key]) : r.key}</div>
-                      <div className="font-mono text-[9px] text-ws-light mt-0.5">{r.key}</div>
+                      <div className="text-[12px] text-ws-mid mt-0.5">{r.key}</div>
                     </td>
                     <td className="py-1.5">
                       {GENUINE_EXHAUSTION.has(r.key)
@@ -109,7 +109,7 @@ export const Performance = () => {
       </div>
 
       <div className="bg-ws-band px-3.5 md:px-4 xl:px-5 py-2 flex flex-wrap items-center gap-3.5">
-        <span className="font-mono text-[10px] text-ws-light break-all">{prov.scope} · $ {prov.command}</span>
+        <span className="text-[12px] text-ws-mid break-all">{prov.scope} · $ {prov.command}</span>
         <span className="flex-1 min-w-2" />
         <span className="font-ws text-xs text-ws-mid">{t('performance.provenanceNote')}</span>
       </div>

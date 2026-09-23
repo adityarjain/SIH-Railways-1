@@ -77,7 +77,7 @@ export const SystemVerification = () => {
                 </div>
                 <Pill tone="idle" size="sm">{a.scope}</Pill>
               </div>
-              <div className="font-mono text-[9px] text-ws-light mt-1 break-all">$ {a.cmd}</div>
+              <div className="text-[12px] text-ws-mid mt-1 break-all">$ {a.cmd}</div>
             </div>
           ))}
         </div>
@@ -119,11 +119,11 @@ export const SystemVerification = () => {
       </div>
 
       <div className="bg-ws-band px-3.5 md:px-4 xl:px-5 py-2 flex flex-wrap items-center gap-3.5">
-        <span className="font-mono text-[10px] text-ws-light break-all">{prov.scope} · $ {prov.command}</span>
+        <span className="text-[12px] text-ws-mid break-all">{prov.scope} · $ {prov.command}</span>
         {scenarioProvenance?.dataset && (
           <>
             <span className="flex-1 min-w-2" />
-            <span className="font-mono text-[10px] text-ws-mid">{t('systemVerification.scenarioDataset', { value: scenarioProvenance.dataset })}</span>
+            <span className="text-[12px] text-ws-mid">{t('systemVerification.scenarioDataset', { value: scenarioProvenance.dataset })}</span>
           </>
         )}
       </div>

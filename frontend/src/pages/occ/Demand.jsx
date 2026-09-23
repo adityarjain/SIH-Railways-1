@@ -70,7 +70,7 @@ export const Demand = ({ onNavigate }) => {
     <div className="bg-ws-band min-h-full">
       <div className="bg-ws-paper border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-2.5 flex items-center justify-between gap-4 flex-wrap">
         <p className="font-ws text-xs text-ws-mid max-w-3xl leading-relaxed flex-1 min-w-[240px]">{t('demand.subtitle')}</p>
-        <span className="font-mono text-[10px] text-ws-light shrink-0">
+        <span className="text-[12px] text-ws-mid shrink-0">
           {filtered.length} {t('common.of')} {tasksInventory.length} · {baselineMetrics.summary.total_tasks_considered.toLocaleString()}-task inventory
         </span>
       </div>
@@ -171,7 +171,7 @@ export const Demand = ({ onNavigate }) => {
               {filtered.map((tk) => {
                 const v = Math.min(tk.risk_score ?? 0, 100);
                 const b = bandOf(tk);
-                const bg = b === 'CRITICAL' ? 'bg-ws-critical' : b === 'HIGH' ? 'bg-ws-warn' : b === 'MODERATE' ? 'bg-ws-info' : 'bg-ws-ok';
+                const bg = b === 'CRITICAL' ? 'bg-ws-critical' : b === 'HIGH' ? 'bg-ws-warn' : b === 'MODERATE' ? 'bg-ws-steel' : 'bg-ws-ok';
                 return (
                   <tr key={`${tk.asset_id}-${tk.task_id}`} onClick={() => setSelected(tk)} className="border-b border-ws-hairline last:border-b-0 hover:bg-ws-paper cursor-pointer">
                     <td className="px-3.5 py-1.5 whitespace-nowrap">

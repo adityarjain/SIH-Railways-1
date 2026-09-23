@@ -85,7 +85,7 @@ export const MyTasks = ({ onNavigate }) => {
       </div>
 
       {tasks.length === 0 ? (
-        <div className="border border-ws-rule bg-ws-surface px-4 py-8 text-center font-ws text-xs font-semibold text-ws-mid">
+        <div className="rounded-lg shadow-panel bg-ws-surface overflow-hidden px-4 py-8 text-center font-ws text-xs font-semibold text-ws-mid">
           No work order matches the current filters.
         </div>
       ) : (
@@ -98,12 +98,12 @@ export const MyTasks = ({ onNavigate }) => {
             const sec = SECTION[t.section_id];
 
             return (
-              <div key={t.task_id} className={`border border-ws-rule bg-ws-surface overflow-hidden ${started ? 'border-l-4 border-l-ws-info' : ''}`}>
+              <div key={t.task_id} className={`rounded-lg shadow-panel bg-ws-surface overflow-hidden overflow-hidden ${started ? 'border-l-4 border-l-ws-info' : ''}`}>
                 <div className="px-3.5 py-3 flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="font-mono text-[15px] font-bold text-ws-ink">{t.task_id}</div>
                     <div className="font-ws text-[12px] font-medium text-ws-ink mt-0.5">{t.maintenance_type}</div>
-                    <div className="font-mono text-[10px] text-ws-light mt-0.5">{t.section_id}{sec ? ` · ${sec.section_name}` : ''} · asset {t.asset_id}</div>
+                    <div className="text-[12px] text-ws-mid mt-0.5">{t.section_id}{sec ? ` · ${sec.section_name}` : ''} · asset {t.asset_id}</div>
                   </div>
                   <div className="text-right shrink-0 space-y-1">
                     {band && <Pill tone={RISK_PILL[bandTone(band)] || 'idle'} size="sm">{band} · {t.risk_score?.toFixed?.(1)}</Pill>}
@@ -117,17 +117,17 @@ export const MyTasks = ({ onNavigate }) => {
                     <div className={`font-mono text-[11px] mt-0.5 ${scheduled ? 'text-ws-ink' : 'text-ws-warn'}`}>
                       {scheduled ? `${minToHhmm(t.start_minute)}–${minToHhmm(t.end_minute)}` : 'Not scheduled'}
                     </div>
-                    <div className="font-mono text-[9px] text-ws-light mt-0.5">{scheduled ? t.scheduled_date : `due ${t.deadline}`}</div>
+                    <div className="text-[12px] text-ws-mid mt-0.5">{scheduled ? t.scheduled_date : `due ${t.deadline}`}</div>
                   </div>
                   <div className="bg-ws-surface px-3 py-2">
                     <div className="font-display text-[11px] font-semibold text-ws-light">Block</div>
                     <div className="font-mono text-[11px] text-ws-ink mt-0.5">{(t.block_ids || []).join(' + ') || '—'}</div>
-                    <div className="font-mono text-[9px] text-ws-light mt-0.5">{t.required_duration_minutes} min</div>
+                    <div className="text-[12px] text-ws-mid mt-0.5">{t.required_duration_minutes} min</div>
                   </div>
                   <div className="bg-ws-surface px-3 py-2">
                     <div className="font-display text-[11px] font-semibold text-ws-light">Crew</div>
                     <div className="font-mono text-[11px] text-ws-ink mt-0.5">{(t.assigned_teams || []).join(', ') || '—'}</div>
-                    <div className="font-mono text-[9px] text-ws-light mt-0.5">{t.required_team_size} required</div>
+                    <div className="text-[12px] text-ws-mid mt-0.5">{t.required_team_size} required</div>
                   </div>
                 </div>
 

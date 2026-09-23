@@ -34,7 +34,7 @@ const blockTone = (task, replannedTaskId) => {
   }
   if (task.is_bundled) return { bg: 'bg-ws-bundle', text: 'text-white' };
   if (bandOf(task) === 'CRITICAL') return { bg: 'bg-ws-critical', text: 'text-white' };
-  return { bg: 'bg-ws-info', text: 'text-white' };
+  return { bg: 'bg-ws-steel', text: 'text-white' };
 };
 
 const LegendSwatch = ({ className, h = 10, hatch }) => (
@@ -146,7 +146,7 @@ export const BlockTrainGantt = ({
   ];
 
   return (
-    <div className="bg-ws-surface border border-ws-rule">
+    <div className="rounded-lg shadow-panel bg-ws-surface overflow-hidden">
       {/* header */}
       <div className="px-3.5 py-2.5 bg-ws-tick border-b border-ws-rule flex items-start justify-between gap-3 flex-wrap">
         <div className="min-w-0">
@@ -156,7 +156,7 @@ export const BlockTrainGantt = ({
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          {scope && <span className="font-mono text-[10px] text-ws-light uppercase">{scope}</span>}
+          {scope && <span className="text-[12px] text-ws-mid uppercase">{scope}</span>}
           <SegmentedControl options={DOMAIN_OPTIONS} value={domainId} onChange={setDomainId} isHindi={isHindi} size="sm" />
         </div>
       </div>
@@ -164,7 +164,7 @@ export const BlockTrainGantt = ({
       {/* legend */}
       <div className="px-3.5 py-2 border-b border-ws-rule flex flex-wrap items-center gap-x-4 gap-y-1.5">
         {[
-          [tx('gantt.legendBlock'), 'bg-ws-info', 10],
+          [tx('gantt.legendBlock'), 'bg-ws-steel', 10],
           [tx('gantt.legendCritical'), 'bg-ws-critical', 10],
           [tx('gantt.legendBundled'), 'bg-ws-bundle', 10],
           [tx('gantt.legendReplanned'), 'bg-ws-warn', 10],
@@ -197,7 +197,7 @@ export const BlockTrainGantt = ({
                 {ticks.map((t) => (
                   <span
                     key={t.minute}
-                    className="absolute font-mono text-[9px] text-ws-light -translate-x-1/2"
+                    className="absolute text-[12px] text-ws-mid -translate-x-1/2"
                     style={{ left: `${t.percent}%` }}
                   >
                     {t.label}

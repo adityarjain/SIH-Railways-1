@@ -75,7 +75,7 @@ export const DecisionTrace = ({ onNavigate }) => {
             <FieldRow label={t('risk.failureProb30')} value={risk.failure_probability_30d != null ? `${(risk.failure_probability_30d * 100).toFixed(2)}%` : '—'} />
             <FieldRow label={t('common.priority')} value={risk.priority_score} />
           </div>
-          <div className="font-mono text-[9px] text-ws-light break-all pt-2">
+          <div className="text-[12px] text-ws-mid break-all pt-2">
             {t('common.source')}: {risk.source?.match(/\(([^)]+)\)/)?.[1] || 'neev_predictions_for_optimizer.csv'}
           </div>
         </div>
@@ -148,7 +148,7 @@ export const DecisionTrace = ({ onNavigate }) => {
       </div>
 
       <div className="bg-ws-band px-3.5 md:px-4 xl:px-5 py-2">
-        <span className="font-mono text-[10px] text-ws-light break-all">
+        <span className="text-[12px] text-ws-mid break-all">
           {trace.provenance?.dataset} · $ PYTHONPATH=. python scripts/generate_decision_trace.py {req.task_id}
         </span>
       </div>
