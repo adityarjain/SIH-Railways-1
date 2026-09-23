@@ -326,7 +326,7 @@ export const Overview = ({ onNavigate }) => {
               {/* The one number a controller acts on, set as the page's display figure. */}
               <div className="min-w-[240px] border-l-2 border-accent-bright pl-5 py-1">
                 <div className={`t-stamp !text-accent ${uc} ${tr}`}>{t('overview.recommendedWindow')}</div>
-                <div className="font-serif text-[46px] md:text-[54px] leading-none tracking-[-0.01em] text-ws-ink mt-3">
+                <div className="font-serif text-[34px] sm:text-[46px] md:text-[54px] leading-none whitespace-nowrap tracking-[-0.01em] text-ws-ink mt-3">
                   {dSel.window || '—'}
                 </div>
                 <div className="t-scope mt-3">{dSel.date}</div>
