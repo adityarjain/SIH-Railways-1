@@ -107,15 +107,15 @@ export const Issues = ({ onNavigate }) => {
         ) : (
           <div>
             {reportable.map((tk) => (
-              <div key={tk.task_id} className="px-3 py-2.5 flex flex-wrap items-center justify-between gap-3 border-b border-ws-hairline last:border-b-0">
-                <div className="min-w-0">
+              <div key={tk.task_id} className="px-3 py-2.5 flex items-center justify-between gap-3 border-b border-ws-hairline last:border-b-0">
+                <div className="min-w-0 flex-1">
                   <div className="font-mono text-[12px] font-semibold text-ws-ink">{tk.task_id}</div>
                   <div className="font-ws text-[11px] text-ws-mid mt-0.5">
                     {tk.maintenance_type} · {tk.section_id}
                     {tk.start_minute != null && ` · ${minToHhmm(tk.start_minute)}–${minToHhmm(tk.end_minute)}`}
                   </div>
                 </div>
-                <Button size="md" variant="warn" onClick={() => setTarget(tk)}>{t('taskAction.issueConfirm')}</Button>
+                <Button size="md" variant="warn" className="shrink-0" onClick={() => setTarget(tk)}>{t('taskAction.issueConfirm')}</Button>
               </div>
             ))}
           </div>

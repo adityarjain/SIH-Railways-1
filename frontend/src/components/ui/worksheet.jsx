@@ -36,7 +36,7 @@ export const FieldRow = ({ label, value, tone, onClick }) => {
       }`}
     >
       <span className="text-[13px] text-ws-mid shrink-0">{label}</span>
-      <span className={`font-mono text-[12px] text-right ${tone || 'text-ws-ink'}`}>{value}</span>
+      <span className={`font-mono text-[12px] text-right min-w-0 break-words ${tone || 'text-ws-ink'}`}>{value}</span>
     </Tag>
   );
 };

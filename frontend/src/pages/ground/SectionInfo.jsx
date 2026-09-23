@@ -80,13 +80,15 @@ export const SectionInfo = () => {
                 <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.sectionRecord')}</span>
                 <span className="text-[12px] text-ws-mid block mt-0.5">corridors_sections.csv</span>
               </div>
-              <FieldRow label={t('common.section')} value={`${sec.section_id} · ${sec.section_name}`} />
-              <FieldRow label={t('common.corridor')} value={`${sec.corridor_id} · ${sec.corridor_name}`} />
-              <FieldRow label={t('ground.region')} value={sec.region} />
-              <FieldRow label={t('ground.trackType')} value={sec.track_type} />
-              <FieldRow label={t('ground.electrified')} value={sec.electrified ? 'Yes' : 'No'} />
-              <FieldRow label={t('ground.maximumSpeed')} value={`${sec.maximum_speed_kmph} kmph`} />
-              <FieldRow label={t('ground.length')} value={`${sec.section_length_km} km`} />
+              <div className="px-3">
+                <FieldRow label={t('common.section')} value={`${sec.section_id} · ${sec.section_name}`} />
+                <FieldRow label={t('common.corridor')} value={`${sec.corridor_id} · ${sec.corridor_name}`} />
+                <FieldRow label={t('ground.region')} value={sec.region} />
+                <FieldRow label={t('ground.trackType')} value={sec.track_type} />
+                <FieldRow label={t('ground.electrified')} value={sec.electrified ? 'Yes' : 'No'} />
+                <FieldRow label={t('ground.maximumSpeed')} value={`${sec.maximum_speed_kmph} kmph`} />
+                <FieldRow label={t('ground.length')} value={`${sec.section_length_km} km`} />
+              </div>
             </div>
 
             <div className="space-y-4">
@@ -96,11 +98,13 @@ export const SectionInfo = () => {
                     <span className="font-display text-[11px] font-semibold text-ws-light">{t('ground.trafficProfile')}</span>
                     <span className="text-[12px] text-ws-mid block mt-0.5">section_traffic.json · {traffic.date}</span>
                   </div>
-                  <FieldRow label={t('ground.passengerServices')} value={traffic.passenger_trains} />
-                  <FieldRow label={t('ground.freightServices')} value={traffic.expected_freight_trains ?? traffic.freight_trains} />
-                  <FieldRow label={t('ground.busiestHour')} value={traffic.busiest_hour} tone="text-ws-warn font-bold" />
-                  <FieldRow label={t('ground.peakLoad')} value={`${traffic.peak_passenger_load_percent}%`} />
-                  <FieldRow label={t('ground.blockWindowsAvailable')} value={`${traffic.available_block_windows} / ${traffic.total_block_windows}`} tone="text-ws-ok font-bold" />
+                  <div className="px-3">
+                    <FieldRow label={t('ground.passengerServices')} value={traffic.passenger_trains} />
+                    <FieldRow label={t('ground.freightServices')} value={traffic.expected_freight_trains ?? traffic.freight_trains} />
+                    <FieldRow label={t('ground.busiestHour')} value={traffic.busiest_hour} tone="text-ws-warn font-bold" />
+                    <FieldRow label={t('ground.peakLoad')} value={`${traffic.peak_passenger_load_percent}%`} />
+                    <FieldRow label={t('ground.blockWindowsAvailable')} value={`${traffic.available_block_windows} / ${traffic.total_block_windows}`} tone="text-ws-ok font-bold" />
+                  </div>
                 </div>
               ) : (
                 <div className="rounded-lg shadow-panel bg-ws-surface overflow-hidden">
