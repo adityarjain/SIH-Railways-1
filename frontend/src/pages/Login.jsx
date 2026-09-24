@@ -4,23 +4,37 @@ import { useI18n } from '../i18n';
 import { usePlan } from '../context/PlanContext';
 import { InstitutionalHeader, AppFooter } from '../components/layout/InstitutionalHeader';
 import { Button, Select } from '../components/ui';
+import { RegionHeader, wsCase } from '../components/ui/worksheet';
 
 /**
- * Role selection for the demonstration. This is not authentication and does not
- * claim to be: no credential is checked, and the form exists so an evaluator can
- * enter any of the three experiences directly.
+ * Role selection (Ground also picks its department). Not authentication: no
+ * credential is checked. With the Operations API running the choice opens a
+ * saved, department-scoped session; without it, nothing is saved and the
+ * note below says so.
  *
- * The figures are the full-run artifact's own values, not decoration.
+ * The run-state ledger beside it shows the full-run artifact's own values, not
+ * decoration: solver status, runtime, validation checks and scheduled count.
  */
 export const Login = ({ onLoginSuccess }) => {
-  const { login, selectedDept, setSelectedDept } = useAuth();
+  const { mode, login, selectedDept, setSelectedDept } = useAuth();
   const { t, isHindi } = useI18n();
   const { baselineMetrics: m } = usePlan();
   const [role, setRole] = useState(ROLES.AUTHORITY);
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const { uc, tr } = wsCase(isHindi);
 
-  const enter = (selectedRole) => {
-    login(selectedRole, '', selectedDept);
-    if (onLoginSuccess) onLoginSuccess(selectedRole);
+  const enter = async (selectedRole) => {
+    setBusy(true);
+    setError('');
+    try {
+      await login(selectedRole, '', selectedDept);
+      if (onLoginSuccess) onLoginSuccess(selectedRole);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
   };
 
   const options = [
@@ -29,77 +43,66 @@ export const Login = ({ onLoginSuccess }) => {
     { value: ROLES.ADMIN, title: t('role.admin'), desc: t('role.adminDesc') },
   ];
 
-  const s = m?.summary;
-  const checks = (m?.provenance?.post_solve_validation || '').match(/(\d+\/\d+)/)?.[1];
-  const figures = [
-    s && [s.total_scheduled.toLocaleString(), `${t('status.scheduled')} / ${s.total_tasks_considered.toLocaleString()}`],
-    checks && [checks, t('overview.checksLabel')],
-    s && [`${s.runtime_seconds}s`, `${t('header.solver')} · ${s.solver_status}`],
-  ].filter(Boolean);
+  const prov = m?.provenance || {};
+  const horizon = (prov.planning_horizon || '').replace(/\s*\.\.\s*/, ' → ');
+  const checks = (prov.post_solve_validation || '').match(/(\d+\/\d+)/)?.[1];
+  const solver = m?.summary?.solver_status;
+  const solverOk = solver === 'FEASIBLE' || solver === 'OPTIMAL';
+  const readout = [
+    [t('header.solver'), solver ? `${solver} · ${m.summary.runtime_seconds}s` : null],
+    [t('overview.checksLabel'), checks],
+    [t('status.scheduled'), m?.summary ? `${m.summary.total_scheduled.toLocaleString()} / ${m.summary.total_tasks_considered.toLocaleString()}` : null],
+    [t('header.planHorizon'), horizon || null],
+  ].filter(([, v]) => v);
 
   return (
-    <div className="min-h-screen bg-surface-base flex flex-col">
+    <div className="min-h-screen bg-ws-paper flex flex-col">
       <InstitutionalHeader />
 
-      <main id="main-content" tabIndex={-1} className="flex-1 w-full max-w-5xl mx-auto px-5 md:px-8 outline-none">
-        {/* Masthead */}
-        <header className="pt-20 md:pt-32 pb-16 md:pb-20 text-center">
-          <div className="t-section-label max-w-md mx-auto">{t('institution.appSub')}</div>
-          <h1 className={`font-serif text-ws-ink leading-[1.1] tracking-[-0.02em] mt-8 ${isHindi ? 'text-[38px] md:text-[56px]' : 'text-[40px] md:text-[72px]'}`}>
-            {t('institution.appName')}
-          </h1>
-        </header>
+      {/* Masthead on the paper ground, as on every worksheet screen. */}
+      <header className="bg-ws-paper border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-8 md:pt-12 pb-6">
+        <h1 className={`font-display font-semibold text-ws-ink leading-[1.1] max-w-3xl ${isHindi ? 'text-[34px] md:text-[44px]' : 'text-[36px] md:text-[52px]'}`}>
+          {t('institution.appName')}
+        </h1>
+        <p className="text-[15px] text-ws-mid mt-2">{t('institution.appSub')}</p>
+      </header>
 
-        {/* Figures from the last full run */}
-        {figures.length > 0 && (
-          <section aria-label={t('scope.fullRun')} className="border-y border-ws-rule py-10">
-            <div className="t-scope text-center mb-8">{t('scope.fullRun')}</div>
-            <dl className="grid grid-cols-1 sm:grid-cols-3 gap-y-8 sm:divide-x divide-ws-rule">
-              {figures.map(([value, label]) => (
-                <div key={label} className="text-center px-4">
-                  <dd className="font-serif text-[40px] md:text-[48px] leading-none text-ws-ink">{value}</dd>
-                  <dt className="t-scope mt-3">{label}</dt>
-                </div>
-              ))}
-            </dl>
-          </section>
-        )}
-
-        {/* Role selection */}
-        <section className="py-20 md:py-28 grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-10 lg:gap-16 items-start">
-          <div>
-            <h2 className="font-serif text-[30px] md:text-[36px] leading-[1.2] tracking-[-0.01em] text-ws-ink">
-              {t('login.selectRole')}
-            </h2>
-            <p className="text-[15px] text-ws-mid leading-[1.75] mt-5 max-w-sm">
-              {t('login.notAuthBody')}
-            </p>
-          </div>
-
+      <main id="main-content" tabIndex={-1} className="flex-1 w-full outline-none">
+        <div className="grid grid-cols-1 lg:grid-cols-[64fr_36fr] gap-px bg-ws-rule border-b border-ws-rule">
+          {/* 01 Role selection: the decision surface, under a 3px ink rule. */}
+          {mode !== 'checking' ? (
           <form
-            className="bg-ws-surface rounded-lg shadow-panel border-t-2 border-t-accent-bright px-6 md:px-9 pt-4 pb-9"
+            className="bg-ws-dossier border-t-[3px] border-ws-ink px-3.5 md:px-4 xl:px-5 pt-4 pb-6 min-w-0"
             onSubmit={(e) => { e.preventDefault(); enter(role); }}
           >
+            <RegionHeader number="01" title={t('login.selectRole')} />
             <fieldset>
               <legend className="sr-only">{t('login.selectRole')}</legend>
-              <div className="divide-y divide-ws-rule">
+              <div className="border-t border-ws-rule">
                 {options.map((o) => {
                   const on = role === o.value;
                   return (
-                    <label key={o.value} className="flex gap-4 items-start py-5 cursor-pointer touch-manipulation group">
+                    <label
+                      key={o.value}
+                      className={`grid grid-cols-[24px_minmax(0,1fr)] gap-2.5 px-1 py-3 border-b border-ws-hairline border-l-[3px] cursor-pointer transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ws-ink ${
+                        on ? 'bg-ws-selected border-l-ws-ink' : 'border-l-transparent hover:bg-ws-paper'
+                      }`}
+                    >
                       <input
                         type="radio"
                         name="role"
                         value={o.value}
                         checked={on}
                         onChange={() => setRole(o.value)}
-                        className="mt-2 h-4 w-4 accent-[#8F6A08] focus:outline-none focus-visible:shadow-focus"
+                        className="sr-only"
                       />
-                      <span>
-                        <span className={`block font-serif text-[20px] leading-[1.3] transition-colors duration-200 ${on ? 'text-ws-ink' : 'text-ws-body group-hover:text-ws-ink'}`}>
-                          {o.title}
-                        </span>
-                        <span className="block text-[14px] text-ws-mid mt-1 leading-[1.6]">{o.desc}</span>
+                      <span
+                        className={`mt-1 h-3.5 w-3.5 rounded-full border-2 ${on ? 'border-ws-ink bg-ws-ink shadow-[inset_0_0_0_2px_#FFFFFF]' : 'border-ws-rule bg-ws-surface'}`}
+                        aria-hidden="true"
+                      />
+                      <span className="min-w-0">
+                        <span className={`block font-display text-[16px] font-semibold ${uc} ${tr} text-ws-ink`}>{o.title}</span>
+                        <span className="block text-[13px] text-ws-mid mt-0.5 leading-[1.45]">{o.desc}</span>
                       </span>
                     </label>
                   );
@@ -108,7 +111,7 @@ export const Login = ({ onLoginSuccess }) => {
             </fieldset>
 
             {role === ROLES.GROUND && (
-              <div className="mt-2">
+              <div className="mt-4 max-w-sm">
                 <Select
                   label={t('login.department')}
                   value={selectedDept}
@@ -122,11 +125,38 @@ export const Login = ({ onLoginSuccess }) => {
               </div>
             )}
 
-            <Button type="submit" size="lg" variant="primary" className="w-full mt-7">
+            {error && <p role="alert" className="mt-3 text-[13px] text-ws-critical">{error}</p>}
+            <Button type="submit" size="lg" variant="primary" disabled={busy} className="mt-5 min-w-[220px]">
               {t('login.enter')}
             </Button>
           </form>
-        </section>
+          ) : (
+            <div className="bg-ws-dossier border-t-[3px] border-ws-ink px-3.5 md:px-4 xl:px-5 pt-4 pb-6 text-[13px] text-ws-mid">
+              {t('login.checking')}
+            </div>
+          )}
+
+          {/* 02 Run state: the full-run artifact's own values, as a ledger. */}
+          <div className="bg-ws-surface px-3.5 md:px-4 xl:px-5 pt-4 pb-6 min-w-0">
+            <RegionHeader number="02" title={t('overview.runState')} meta={t('scope.fullRun')} />
+            <dl className="border-t border-ws-rule">
+              {readout.map(([k, v]) => (
+                <div key={k} className="flex items-baseline justify-between gap-4 py-2.5 border-b border-ws-hairline">
+                  <dt className="t-stamp">{k}</dt>
+                  <dd className={`font-mono text-[13px] font-bold text-right ${k === t('header.solver') ? (solverOk ? 'text-ws-ok' : 'text-ws-critical') : 'text-ws-ink'}`}>{v}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+
+        <p className="text-[13px] text-ws-mid leading-relaxed px-3.5 md:px-4 xl:px-5 mt-5 max-w-3xl">
+          {mode === 'api' ? (
+            <><span className="font-semibold text-ws-body">{t('login.apiTitle')}.</span> {t('login.apiNote')}</>
+          ) : (
+            <><span className="font-semibold text-ws-body">{t('login.localTitle')}.</span> {t('login.localNote')}</>
+          )}
+        </p>
       </main>
       <AppFooter />
     </div>

@@ -60,26 +60,26 @@ export const RecommendationActions = ({ taskId = 'TASK-000005' }) => {
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => approveRecommendation(taskId)}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-ws-ok text-white shadow-key hover:brightness-110 transition-all"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-ws-ok text-white shadow-key hover:brightness-110 active:translate-y-[1px] active:shadow-pressed transition-all"
         >
           <CheckCircle2 size={14} /> {t('recommendationActions.approve')}
         </button>
         <button
           onClick={() => setNoteFor('MODIFIED')}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-status-warn-tint text-status-warn shadow-key hover:brightness-[0.98] transition-all"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-status-warn-tint text-status-warn shadow-key hover:brightness-[0.98] active:translate-y-[1px] active:shadow-pressed transition-all"
         >
           <PencilLine size={14} /> {t('recommendationActions.requestModification')}
         </button>
         <button
           onClick={() => setNoteFor('REJECTED')}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-ws-barCriticalBg text-ws-barCriticalLabel shadow-key hover:brightness-[0.98] transition-all"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-ws-barCriticalBg text-ws-barCriticalLabel shadow-key hover:brightness-[0.98] active:translate-y-[1px] active:shadow-pressed transition-all"
         >
           <XCircle size={14} /> {t('recommendationActions.reject')}
         </button>
         <button
           onClick={() => reoptimize(taskId)}
           disabled={isReplanned}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-accent text-accent-ink shadow-key-accent hover:bg-accent-hover disabled:bg-ws-tick disabled:text-ws-disabled disabled:active:scale-100 transition-all"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-accent text-accent-ink shadow-key-accent hover:bg-accent-hover active:translate-y-[1px] active:shadow-pressed disabled:bg-ws-tick disabled:text-ws-disabled disabled:active:scale-100 transition-all"
           title={t('recommendationActions.reoptimizeHint')}
         >
           <RefreshCw size={14} /> {isReplanned ? t('recommendationActions.replanApplied') : t('recommendationActions.reoptimize')}
@@ -102,7 +102,7 @@ export const RecommendationActions = ({ taskId = 'TASK-000005' }) => {
             <button
               onClick={submitNote}
               disabled={!note.trim()}
-              className="px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-accent text-accent-ink shadow-key-accent hover:bg-accent-hover disabled:bg-ws-rule disabled:text-ws-disabled disabled:active:scale-100 transition-all"
+              className="px-3.5 py-2 rounded-md font-display text-[13px] font-semibold bg-accent text-accent-ink shadow-key-accent hover:bg-accent-hover active:translate-y-[1px] active:shadow-pressed disabled:bg-ws-rule disabled:text-ws-disabled disabled:active:scale-100 transition-all"
             >
               {t('common.submit')}
             </button>

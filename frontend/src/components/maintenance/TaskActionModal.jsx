@@ -3,6 +3,8 @@ import { Modal } from '../common/Modal';
 import { StatusBadge, Button, Alert } from '../ui';
 import { minToHhmm } from '../../utils/time';
 import { bandOf, bandTone } from '../../utils/risk';
+import { usePlan } from '../../context/PlanContext';
+import { shrinkPhoto } from '../../utils/photo';
 
 /**
  * Crew action on a work order.
@@ -29,6 +31,14 @@ const CONFIG = {
     confirm: 'Mark complete',
     variant: 'primary',
     blurb: 'Confirm the work is finished and the site is clear. The possession is recorded for verification by the controlling authority.',
+    evidence: true,
+  },
+  handoff: {
+    title: 'Handoff record',
+    confirm: 'Record handoff',
+    variant: 'primary',
+    blurb: 'Record that the work is complete and the section is handed back. The note and photo go to the controlling authority with the verification request.',
+    evidence: true,
   },
   pause: {
     title: 'Pause work',
@@ -75,15 +85,39 @@ export const TaskActionModal = ({ isOpen, onClose, task, actionType, onSubmit })
   const [reason, setReason] = useState(REASONS[0]);
   const [notes, setNotes] = useState('');
   const [proposedDate, setProposedDate] = useState('');
+  const [photo, setPhoto] = useState(null);
+  const [photoError, setPhotoError] = useState('');
+  const [saving, setSaving] = useState(false);
+  const { addEvidence } = usePlan();
 
   if (!task || !actionType) return null;
 
   const cfg = CONFIG[actionType] || CONFIG.accept;
   const blocked = cfg.needsReason && reason === 'Other' && !notes.trim();
 
-  const submit = (e) => {
+  const pickPhoto = async (e) => {
+    const file = e.target.files?.[0];
+    setPhotoError('');
+    if (!file) { setPhoto(null); return; }
+    try {
+      setPhoto(await shrinkPhoto(file));
+    } catch (err) {
+      setPhoto(null);
+      setPhotoError(err.message);
+    }
+  };
+
+  const submit = async (e) => {
     e.preventDefault();
-    if (blocked) return;
+    if (blocked || saving) return;
+    // Completion evidence is saved first, so the "Completed" status never
+    // lands without the note and photo the crew attached to it.
+    if (cfg.evidence && (photo || notes.trim())) {
+      setSaving(true);
+      const ok = await addEvidence(task.task_id, { note: notes.trim(), photo });
+      setSaving(false);
+      if (!ok) return;
+    }
     const finalReason = cfg.needsReason
       ? (reason === 'Other' ? notes.trim() : `${reason}${notes.trim() ? ` — ${notes.trim()}` : ''}`)
       : '';
@@ -170,9 +204,39 @@ export const TaskActionModal = ({ isOpen, onClose, task, actionType, onSubmit })
           <Alert tone="info">{cfg.blurb}</Alert>
         )}
 
+        {cfg.evidence && (
+          <div className="space-y-2.5">
+            <div>
+              <label className="t-label block mb-1" htmlFor="completion-note">Completion note · optional</label>
+              <textarea
+                id="completion-note"
+                rows={3}
+                maxLength={500}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="What was done, readings taken, anything left for the next shift"
+                className="w-full text-xs bg-surface-panel border border-line rounded-sm px-2.5 py-2 text-ws-ink placeholder:text-rail-400"
+              />
+            </div>
+            <div>
+              <label className="t-label block mb-1" htmlFor="completion-photo">Site photo · optional</label>
+              <input
+                id="completion-photo"
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={pickPhoto}
+                className="block w-full text-xs text-ws-mid file:mr-3 file:px-3 file:py-1.5 file:border file:border-ws-ink file:bg-ws-surface file:font-display file:font-bold file:uppercase file:text-[11px] file:text-ws-ink"
+              />
+              {photoError && <p className="text-[12px] text-ws-critical mt-1">{photoError}</p>}
+              {photo && <img src={photo.dataUrl} alt="Selected site photo" className="mt-2 max-h-40 border border-ws-rule" />}
+            </div>
+          </div>
+        )}
+
         <div className="flex justify-end gap-2 pt-1">
           <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
-          <Button type="submit" variant={cfg.variant} disabled={blocked}>{cfg.confirm}</Button>
+          <Button type="submit" variant={cfg.variant} disabled={blocked || saving}>{saving ? 'Saving…' : cfg.confirm}</Button>
         </div>
       </form>
     </Modal>

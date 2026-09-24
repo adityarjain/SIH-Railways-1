@@ -61,3 +61,6 @@ yarn-error.log*
 .vscode/
 *.swp
 *.swo
+
+# Operations API database (demo accounts, saved actions, photos)
+api_data/

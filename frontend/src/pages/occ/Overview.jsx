@@ -2,13 +2,15 @@ import React, { useMemo, useState } from 'react';
 import { usePlan } from '../../context/PlanContext';
 import { ROLES } from '../../context/AuthContext';
 import { useI18n } from '../../i18n';
-import { WorksheetHeader } from '../../components/layout/WorksheetHeader';
+import { useMastheadSubtitle } from '../../components/layout/WorksheetHeader';
 import { NAV_ITEMS_BY_ROLE } from '../../components/layout/Sidebar';
 import { DaySheet } from '../../components/timeline/DaySheet';
-import { RegionHeader, wsCase } from '../../components/ui/worksheet';
+import { RegionHeader, StatFigure, wsCase } from '../../components/ui/worksheet';
+import { Button, NotAvailable } from '../../components/ui';
 import { bandOf } from '../../utils/risk';
 import corridorsSectionsData from '../../data/corridors_sections.json';
 import teamsData from '../../data/teams.json';
+import networkStats from '../../data/network_stats.json';
 import decisionTrace from '../../data/live/decisionTrace';
 import { LIVE_DATES, TODAY } from '../../utils/dateShift';
 
@@ -88,9 +90,6 @@ export const Overview = ({ onNavigate }) => {
     () => LIVE_DATES.map((date) => ({ date, count: taskCounts[date] || 0 })),
     [taskCounts],
   );
-
-  // Busiest day in the horizon — the calendar's load bars are drawn relative to it.
-  const maxDayCount = Math.max(1, ...dateOptions.map((o) => o.count));
 
   const tasksOnDate = useMemo(
     () => scheduledTasks.filter((task) => task.date === activeDate),
@@ -185,12 +184,12 @@ export const Overview = ({ onNavigate }) => {
   }, [activeEvent, isReplanned, replanRequest, replanScenario, replannedRecord, t]);
 
   const nextOut = useMemo(
-    () => [...tasksOnDate].sort((a, b) => a.start_minute - b.start_minute).slice(0, 4),
+    () => [...tasksOnDate].sort((a, b) => a.start_minute - b.start_minute).slice(0, 6),
     [tasksOnDate],
   );
 
   // Corridor situation — every corridor touched on the active date, ranked by
-  // possession count. Only the top 6 are drawn; the rest are named in the
+  // possession count. Only the top 12 are drawn, in two columns; the rest are named in the
   // footnote so the count is never silently dropped.
   const corridorStats = useMemo(() => {
     const map = new Map();
@@ -207,8 +206,8 @@ export const Overview = ({ onNavigate }) => {
   }, [tasksOnDate]);
 
   const maxPoss = Math.max(1, corridorStats[0]?.poss || 1);
-  const shownCorridors = corridorStats.slice(0, 6);
-  const hiddenCorridors = corridorStats.slice(6);
+  const shownCorridors = corridorStats.slice(0, 12);
+  const hiddenCorridors = corridorStats.slice(12);
   const allHiddenSingle = hiddenCorridors.length > 0 && hiddenCorridors.every((c) => c.poss === 1);
 
   // Decision basis — four clauses, each derived from a real decision_trace.json
@@ -222,14 +221,18 @@ export const Overview = ({ onNavigate }) => {
   const offeredMinutes = windowSpanMinutes(selectedCandidate?.window);
   const primaryCrew = (dSel.teams || [])[0];
   const conflictingCount = (dImpact.conflicting || []).length;
+  const dSum = decisionTrace.candidate_summary || {};
+  const ruleMeta = Object.entries(dSum.rejected_by_rule || {})
+    .sort((x, y) => y[1] - x[1])
+    .map(([rule, count]) => `${rule} ×${count}`)
+    .join(' · ');
 
-  // Masthead subtitle date range — the shared WorksheetHeader computes its
-  // own run-state line (full-run scope, static); this is the day-sheet's
-  // own live horizon and must track the rolling window, not that one.
+  // Masthead scope line: this page's day sheet and live horizon, which must
+  // track the rolling window rather than the artifact's frozen dates.
   const horizonStart = dateOptions[0]?.date;
   const horizonEnd = dateOptions[dateOptions.length - 1]?.date;
 
-  const overviewSubtitle = (
+  useMastheadSubtitle(
     <>
       {t('overview.daySheetWord')}{' '}
       <span className="font-mono text-xs text-ws-body">{activeDate}</span>
@@ -237,69 +240,48 @@ export const Overview = ({ onNavigate }) => {
       <span className="font-mono text-xs text-ws-body">{horizonStart} → {horizonEnd}</span>
       {' · '}<span className="font-mono text-xs text-ws-body">{scenario.summary.total_scheduled}</span> {t('status.scheduled').toLowerCase()},{' '}
       <span className="font-mono text-xs text-ws-body">{scenario.summary.total_deferred}</span> {t('status.deferred').toLowerCase()} {t('scope.demoScenario').toLowerCase()}
-    </>
+    </>,
+    [activeDate, horizonStart, horizonEnd, scenario, t],
   );
 
-  return (
-    <div className="bg-ws-band min-h-full">
-      <WorksheetHeader activeTab="overview" onNavigate={onNavigate} subtitle={overviewSubtitle} />
+  const pad = 'px-3.5 md:px-4 xl:px-5';
+  const fieldLabel = `font-display text-[12px] font-semibold ${uc} ${tr} text-ws-light`;
+  const hhmm = (m) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
 
-      {/* Horizon calendar. Separate cards rather than a single ruled grid:
-          each day is a target, and the grid lines were doing no work that the
-          gaps don't. The active day is a filled accent chip, not a black block. */}
-      <div className="bg-ws-paper px-4 md:px-5 xl:px-6 pt-4 pb-5">
-        <div className="flex items-baseline gap-3 pb-2.5 flex-wrap">
-          <span className="font-display text-[13px] font-semibold text-ws-body">
-            {t('overview.planHorizonTasks')}
-          </span>
-          <span className="text-[12px] text-ws-mid ml-auto">
-            {t('scope.demoScenarioTasks', { count: scenario.summary.total_tasks_considered })}
-          </span>
+  return (
+    <div className="bg-ws-paper">
+      {/* Horizon strip: one flexible cell per plan date. */}
+      <div className="bg-ws-band border-b border-ws-rule flex items-stretch">
+        <div className={`hidden lg:flex items-center shrink-0 w-[150px] xl:w-[172px] ${pad} font-display text-[12px] font-semibold ${uc} ${tr} text-ws-light leading-tight`}>
+          {t('overview.planHorizonTasks')}
         </div>
-        <div className="flex gap-1.5 overflow-x-auto custom-scrollbar pb-1">
+        <div className="flex flex-1 min-w-0 overflow-x-auto custom-scrollbar">
           {dateOptions.map((o) => {
             const d = new Date(`${o.date}T00:00:00`);
             const weekday = d.toLocaleDateString('en-US', { weekday: 'short' });
-            const weekend = d.getDay() === 0 || d.getDay() === 6;
-            const day = o.date.slice(8, 10);
             const active = o.date === activeDate;
             return (
               <button
                 key={o.date}
                 onClick={() => setSelectedDate(o.date)}
                 aria-pressed={active}
-                className={`flex-1 min-w-[58px] rounded-md px-1.5 pt-2.5 pb-3 text-center touch-manipulation transition-colors duration-200 ease-out ${
-                  active
-                    ? 'bg-ws-ink'
-                    : weekend
-                    ? 'bg-ws-tick hover:text-accent'
-                    : 'bg-ws-surface shadow-key hover:text-accent'
+                className={`flex-1 min-w-[48px] border-l border-ws-rule px-1 pt-1.5 pb-2 text-center transition-colors ${
+                  active ? 'bg-ws-surface shadow-[inset_0_-3px_0_#1F1C17]' : 'hover:bg-ws-surface'
                 }`}
               >
-                <span className={`block font-mono text-[10px] uppercase tracking-[0.12em] ${active ? 'text-white/70' : 'text-ws-light'}`}>
-                  {weekday}
-                </span>
-                <span className={`block font-serif text-[24px] leading-none mt-1.5 ${active ? 'text-white' : 'text-ws-ink'}`}>
-                  {day}
-                </span>
-                <span className={`block h-[3px] rounded-full mt-2.5 ${active ? 'bg-white/20' : 'bg-ws-tick'}`}>
-                  {o.count > 0 && (
-                    <span
-                      className={`block h-full rounded-full ${active ? 'bg-accent-soft' : 'bg-ws-steel/60'}`}
-                      style={{ width: `${Math.max(10, (o.count / maxDayCount) * 100)}%` }}
-                    />
-                  )}
-                </span>
-                <span className={`block font-mono text-[11px] mt-1.5 ${active ? 'text-white/85' : o.count ? 'text-ws-mid' : 'text-ws-disabled'}`}>
-                  {o.count || '0'}
-                </span>
+                <span className={`block font-mono text-[11px] ${active ? 'font-bold text-ws-ink' : 'font-medium text-ws-body'}`}>{o.date.slice(8, 10)}</span>
+                <span className="block text-[9px] uppercase text-ws-light">{weekday}</span>
+                <span className={`block font-mono text-[9px] ${o.count ? 'text-ws-mid' : 'text-ws-disabled'}`}>{o.count || '—'}</span>
               </button>
             );
           })}
         </div>
+        <div className="hidden 2xl:flex items-center shrink-0 border-l border-ws-rule px-5 font-mono text-[10px] uppercase text-ws-light">
+          {t('scope.demoScenarioTasks', { count: scenario.summary.total_tasks_considered })}
+        </div>
       </div>
 
-      {/* day sheet (region 01 of the design, rendered by DaySheet itself) */}
+      {/* 01 — day sheet, the hero */}
       <DaySheet
         corridorOptions={corridorOptions}
         corridorId={activeCorridor}
@@ -311,43 +293,39 @@ export const Overview = ({ onNavigate }) => {
         onSelectTask={() => onNavigate && onNavigate('block-planning')}
       />
 
-      {/* Recommendation + attention ledger. Two cards side by side rather than
-          two panes divided by a rule: the 3px ink band that used to cap this
-          row was the heaviest line on the page. */}
-      <div className="grid grid-cols-1 lg:grid-cols-[60fr_40fr] xl:grid-cols-[64fr_36fr] gap-6 px-4 md:px-5 xl:px-6 pt-6">
-        <div className="bg-ws-surface rounded-lg shadow-panel px-6 pt-6 pb-7 min-w-0">
+      {/* 02 recommendation dossier + 03 attention ledger */}
+      <div className="grid grid-cols-1 lg:grid-cols-[60fr_40fr] xl:grid-cols-[64fr_36fr] gap-px bg-ws-rule border-b border-ws-rule">
+        <div className={`bg-ws-dossier border-t-[3px] border-ws-ink ${pad} pt-4 pb-4 min-w-0`}>
           <RegionHeader
+            number="02"
             title={t('overview.recommendation')}
             meta={`${dReq.task_id} · ${dReq.section_id} · ${t('overview.pendingAuthorityDecision')}`}
           />
 
-          <div className="flex items-end gap-5 pt-0.5 pb-3 border-b border-ws-rule flex-wrap">
-            <div>
-              {/* The one number a controller acts on, set as the page's display figure. */}
-              <div className="min-w-[240px] border-l-2 border-accent-bright pl-5 py-1">
-                <div className={`t-stamp !text-accent ${uc} ${tr}`}>{t('overview.recommendedWindow')}</div>
-                <div className="font-serif text-[34px] sm:text-[46px] md:text-[54px] leading-none whitespace-nowrap tracking-[-0.01em] text-ws-ink mt-3">
-                  {dSel.window || '—'}
-                </div>
-                <div className="t-scope mt-3">{dSel.date}</div>
+          <div className="flex items-start gap-x-8 gap-y-3 pb-3 border-b border-ws-rule flex-wrap">
+            <div className="shrink-0">
+              <div className={`font-display text-[12px] font-bold ${uc} ${tr} text-ws-ok`}>{t('overview.recommendedWindow')}</div>
+              <div className="font-mono text-[30px] md:text-[36px] font-bold leading-[1.1] tracking-[-0.02em] text-ws-ink whitespace-nowrap">
+                {dSel.window || '—'}
               </div>
+              <div className="font-mono text-[12px] text-ws-mid">{dSel.date}</div>
             </div>
-            <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2.5 flex-1 min-w-[280px]">
-              <span className={`font-display text-xs font-semibold ${uc} ${tr} text-ws-light`}>{t('common.blocks')}</span>
-              <span className="font-mono text-xs text-ws-ink">{(dSel.block_ids || []).join(' + ')}</span>
-              <span className={`font-display text-xs font-semibold ${uc} ${tr} text-ws-light`}>{t('common.crew')}</span>
-              <span className="font-mono text-xs text-ws-ink">
+            <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1.5 flex-1 min-w-[260px] pt-1">
+              <span className={fieldLabel}>{t('common.blocks')}</span>
+              <span className="font-mono text-[12px] text-ws-ink">{(dSel.block_ids || []).join(' + ')}</span>
+              <span className={fieldLabel}>{t('common.crew')}</span>
+              <span className="font-mono text-[12px] text-ws-ink">
                 {primaryCrew ? t('overview.crewSummary', {
                   team: primaryCrew.team_id, size: primaryCrew.team_size ?? '—',
                   required: dReq.required_team_size ?? '—', shift: primaryCrew.shift || '—',
                 }) : '—'}
               </span>
-              <span className={`font-display text-xs font-semibold ${uc} ${tr} text-ws-light`}>{t('common.risk')}</span>
-              <span className="font-mono text-xs text-ws-critical">
+              <span className={fieldLabel}>{t('common.risk')}</span>
+              <span className="font-mono text-[12px] text-ws-critical">
                 {dRisk.risk_score?.toFixed?.(1) ?? dRisk.risk_score} {dRisk.risk_level} · p(fail 30d) {dRisk.failure_probability_30d}
               </span>
-              <span className={`font-display text-xs font-semibold ${uc} ${tr} text-ws-light`}>{t('common.trains')}</span>
-              <span className="font-mono text-xs text-ws-ink">
+              <span className={fieldLabel}>{t('common.trains')}</span>
+              <span className="font-mono text-[12px] text-ws-ink">
                 {t('overview.trainsField', {
                   conflicting: conflictingCount, adjacent: (dImpact.adjacent || []).length,
                   min: dImpact.adjacency_buffer_minutes ?? 60,
@@ -356,24 +334,25 @@ export const Overview = ({ onNavigate }) => {
             </div>
           </div>
 
-          <div className="pt-3.5 pb-0.5">
-            <div className={`font-display text-sm font-semibold ${uc} ${tr} text-ws-ink mb-1.5`}>{t('overview.decisionBasis')}</div>
-            <div className="grid grid-cols-[22px_minmax(0,1fr)] gap-x-2.5 gap-y-2.5 font-ws text-[13px] text-ws-body leading-[1.5]">
-              <span className="font-mono text-[11px] text-ws-light">01</span>
+          {/* Decision basis: hanging numerals, each clause from a trace field. */}
+          <div className="pt-3">
+            <div className={`font-display text-[14px] font-semibold ${uc} ${tr} text-ws-ink mb-1.5`}>{t('overview.decisionBasis')}</div>
+            <div className="grid grid-cols-[22px_minmax(0,1fr)] gap-x-2 gap-y-1.5 text-[13px] text-ws-body leading-[1.45]">
+              <span className="font-mono text-[11px] text-ws-light pt-px">01</span>
               <span>{t('overview.decisionBasis1', {
                 score: dRisk.risk_score?.toFixed?.(1) ?? dRisk.risk_score,
                 band: dRisk.risk_level, threshold: 80,
               })}</span>
-              <span className="font-mono text-[11px] text-ws-light">02</span>
+              <span className="font-mono text-[11px] text-ws-light pt-px">02</span>
               <span>{t('overview.decisionBasis2', {
                 required: dReq.required_duration_minutes, offered: offeredMinutes ?? '—',
                 blocks: (dSel.block_ids || []).join(' + '),
               })}</span>
-              <span className="font-mono text-[11px] text-ws-light">03</span>
+              <span className="font-mono text-[11px] text-ws-light pt-px">03</span>
               <span>{conflictingCount === 0
                 ? t('overview.decisionBasis3', { buffer: dImpact.adjacency_buffer_minutes ?? 60 })
                 : t('overview.decisionBasis3Alt', { count: conflictingCount })}</span>
-              <span className="font-mono text-[11px] text-ws-light">04</span>
+              <span className="font-mono text-[11px] text-ws-light pt-px">04</span>
               <span>{primaryCrew ? t('overview.decisionBasis4', {
                 team: primaryCrew.team_id, available: primaryCrew.team_size ?? '—',
                 required: dReq.required_team_size ?? '—',
@@ -381,57 +360,84 @@ export const Overview = ({ onNavigate }) => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 pt-[15px] flex-wrap">
-            <button
-              onClick={() => onNavigate && onNavigate('decision-trace')}
-              className="px-4 py-2 rounded-md font-display text-[13px] font-semibold text-accent-ink bg-accent shadow-key-accent hover:bg-accent-hover transition-all"
-            >
+          {/* Constraint check: every candidate window and the rule that decided it. */}
+          <div className="pt-3.5">
+            <div className="flex items-baseline gap-2.5 mb-1.5 flex-wrap">
+              <span className={`font-display text-[14px] font-semibold ${uc} ${tr} text-ws-ink`}>{t('overview.constraintCheck')}</span>
+              <span className="font-mono text-[11px] text-ws-mid">
+                {t('overview.constraintSummary', { considered: dSum.block_windows_considered, rejected: dSum.rejected, feasible: dSum.feasible })}
+              </span>
+              <span className="flex-1 min-w-2" />
+              <span className="font-mono text-[10px] text-ws-light">{ruleMeta}</span>
+            </div>
+            <div className="overflow-x-auto custom-scrollbar">
+              <div className="min-w-[520px] bg-ws-surface border-t border-ws-rule">
+                {dCandidates.map((c, i) => {
+                  const color = c.status === 'SELECTED' ? 'text-ws-info' : c.status === 'FEASIBLE' ? 'text-ws-ok' : 'text-ws-critical';
+                  const verdict = c.status === 'SELECTED' ? t('decisionTrace.selected') : c.status === 'FEASIBLE' ? t('decisionTrace.feasible') : t('decisionTrace.rejected');
+                  return (
+                    <div
+                      key={`${(c.block_ids || []).join('-')}-${c.window}-${i}`}
+                      className={`grid ${isHindi ? 'grid-cols-[86px_78px_72px_minmax(0,1fr)]' : 'grid-cols-[86px_70px_72px_minmax(0,1fr)]'} items-center gap-2 px-2 py-1 border-b border-ws-hairline last:border-b-0 ${
+                        c.status === 'SELECTED' ? 'bg-ws-selected' : 'hover:bg-ws-surface'
+                      }`}
+                    >
+                      <span className={`font-mono text-[11px] text-ws-ink ${c.status === 'SELECTED' ? 'font-bold' : 'font-medium'}`}>{c.window}</span>
+                      <span className={`font-display text-[12px] font-bold ${uc} ${tr} ${color}`}>{verdict}</span>
+                      <span className={`font-mono text-[10px] ${c.rule ? color : 'text-ws-disabled'}`}>{c.rule || '—'}</span>
+                      <span className="font-mono text-[10px] text-ws-mid overflow-hidden text-ellipsis whitespace-nowrap" title={c.reason}>{c.reason}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 pt-4 flex-wrap">
+            <Button variant="primary" onClick={() => onNavigate && onNavigate('decision-trace')}>
               {t('overview.openDecisionTrace')}
-            </button>
-            <button
-              onClick={() => onNavigate && onNavigate('block-planning')}
-              className="px-4 py-2 rounded-md font-display text-[13px] font-semibold text-ws-ink bg-ws-surface shadow-key hover:text-status-info transition-all duration-150"
-            >
+            </Button>
+            <Button variant="secondary" onClick={() => onNavigate && onNavigate('block-planning')}>
               {t('overview.goToBlockPlanning')}
-            </button>
+            </Button>
             <span className="flex-1 min-w-2" />
-            <span className="font-ws text-xs text-ws-light">{t('overview.decisionRecordedNote')}</span>
+            <span className="text-[12px] text-ws-light">{t('overview.decisionRecordedNote')}</span>
           </div>
         </div>
 
-        {/* Attention ledger + next out */}
-        <div className="bg-ws-surface rounded-lg shadow-panel px-6 pt-6 pb-7 min-w-0">
+        <div className={`bg-ws-surface ${pad} pt-4 pb-4 min-w-0`}>
           <RegionHeader
+            number="03"
             title={t('overview.requiresAttention')}
             meta={t('overview.rankedBySeverity', { count: attention.length })}
           />
 
           {attention.length === 0 ? (
             <div className="py-6">
-              <div className="font-ws text-xs font-semibold text-ws-mid">{t('overview.nothingRequiresAttention')}</div>
-              <div className="font-ws text-[11px] text-ws-light mt-1 leading-relaxed">{t('overview.nothingRequiresAttentionBody')}</div>
+              <div className="text-[13px] font-semibold text-ws-mid">{t('overview.nothingRequiresAttention')}</div>
+              <div className="text-[12px] text-ws-light mt-1 leading-relaxed">{t('overview.nothingRequiresAttentionBody')}</div>
             </div>
           ) : (
             <div className="border-t border-ws-rule">
               {attention.map((a, i) => {
                 const color = a.tone === 'critical' ? 'text-ws-critical' : a.tone === 'warn' ? 'text-ws-warn' : 'text-ws-idle';
-                const borderHover = a.tone === 'critical' ? 'hover:border-l-ws-critical' : a.tone === 'warn' ? 'hover:border-l-ws-warn' : 'hover:border-l-ws-idle';
+                const rule = a.tone === 'critical' ? 'hover:border-l-ws-critical' : a.tone === 'warn' ? 'hover:border-l-ws-warn' : 'hover:border-l-ws-idle';
                 return (
                   <button
                     key={`${a.kind}-${i}`}
                     onClick={() => onNavigate && onNavigate(a.go)}
-                    className={`grid grid-cols-[24px_minmax(0,1fr)] gap-2.5 w-full text-left py-3 px-1.5 border-b border-ws-hairline border-l-[3px] border-l-transparent last:border-b-0 hover:bg-ws-paper transition-colors ${borderHover}`}
+                    className={`grid grid-cols-[24px_minmax(0,1fr)] gap-2 w-full text-left pt-2.5 pb-[11px] px-1 border-b border-ws-hairline border-l-[3px] border-l-transparent last:border-b-0 hover:bg-ws-paper transition-colors ${rule}`}
                   >
                     <span className={`font-mono text-[17px] font-bold leading-none ${color}`}>{String(i + 1).padStart(2, '0')}</span>
                     <span className="min-w-0">
                       <span className="flex items-baseline gap-2">
-                        <span className={`font-display text-xs font-bold ${uc} ${tr} ${color}`}>{a.kind}</span>
+                        <span className={`font-display text-[12px] font-bold ${uc} ${tr} ${color}`}>{a.kind}</span>
                         <span className="flex-1" />
-                        <span className="text-[12px] text-ws-mid">{a.right}</span>
+                        <span className="font-mono text-[10px] uppercase text-ws-light">{a.right}</span>
                       </span>
-                      <span className="block font-ws text-[15px] font-medium text-ws-ink leading-[1.3] mt-0.5">{a.title}</span>
-                      <span className="block font-ws text-xs text-ws-mid leading-[1.4] mt-0.5">{a.meta}</span>
-                      <span className={`block font-display text-[11px] font-semibold ${uc} tracking-[0.08em] text-ws-light mt-1`}>
+                      <span className="block text-[15px] font-medium text-ws-ink leading-[1.3] mt-0.5 [text-wrap:pretty]">{a.title}</span>
+                      <span className="block text-[12px] text-ws-mid leading-[1.4] mt-0.5">{a.meta}</span>
+                      <span className={`block font-display text-[11px] font-semibold ${uc} ${tr} text-ws-light mt-1`}>
                         → {t(NAV_ITEMS_BY_ROLE[ROLES.AUTHORITY].find((n) => n.id === a.go)?.labelKey || 'nav.overview')}
                       </span>
                     </span>
@@ -441,15 +447,14 @@ export const Overview = ({ onNavigate }) => {
             </div>
           )}
 
-          <div className="pt-[18px]">
+          <div className="pt-4">
             <RegionHeader
               number="04"
               title={t('overview.nextOut')}
-              isHindi={isHindi}
               meta={`${activeDate} · ${nextOut.length} / ${tasksOnDate.length}`}
             />
             {nextOut.length === 0 ? (
-              <div className="py-4 font-ws text-xs text-ws-mid">{t('overview.noPossessionOnDate')}</div>
+              <div className="py-4 text-[13px] text-ws-mid">{t('overview.noPossessionOnDate')}</div>
             ) : (
               <div className="border-t border-ws-rule">
                 {nextOut.map((task) => {
@@ -458,78 +463,110 @@ export const Overview = ({ onNavigate }) => {
                     <button
                       key={task.task_id}
                       onClick={() => onNavigate && onNavigate('block-planning')}
-                      className="flex items-baseline gap-2.5 w-full text-left py-2 px-1.5 border-b border-ws-hairline last:border-b-0 hover:bg-ws-paper transition-colors"
+                      className="flex items-baseline gap-2.5 w-full text-left py-1.5 px-1 border-b border-ws-hairline last:border-b-0 hover:bg-ws-paper transition-colors"
                     >
                       <span className={`font-mono text-[11px] font-semibold shrink-0 ${critical ? 'text-ws-critical' : 'text-ws-ink'}`}>{task.task_id}</span>
-                      <span className="font-ws text-xs text-ws-mid flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
+                      <span className={`text-[12px] flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap ${critical ? 'text-ws-critical' : 'text-ws-mid'}`}>
                         {task.maintenance_type} · {task.section_id}{critical ? ` · risk ${task.risk_score}` : ''}
                       </span>
-                      <span className={`font-mono text-[11px] shrink-0 ${critical ? 'text-ws-critical' : 'text-ws-body'}`}>
-                        {String(Math.floor(task.start_minute / 60)).padStart(2, '0')}:{String(task.start_minute % 60).padStart(2, '0')}
-                      </span>
+                      <span className={`font-mono text-[11px] shrink-0 ${critical ? 'text-ws-critical' : 'text-ws-body'}`}>{hhmm(task.start_minute)}</span>
                     </button>
                   );
                 })}
               </div>
             )}
-            <button
-              onClick={() => onNavigate && onNavigate('block-planning')}
-              className={`w-full mt-2 py-1.5 font-display text-[13px] font-bold ${uc} ${tr} text-ws-mid bg-transparent border border-ws-rule hover:bg-ws-paper hover:text-ws-ink transition-colors`}
-            >
+            <Button variant="secondary" className="w-full mt-2.5" onClick={() => onNavigate && onNavigate('block-planning')}>
               {t('overview.allOnDate', { count: tasksOnDate.length })}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
 
-      {/* Corridor situation */}
-      <div className="bg-ws-surface rounded-lg shadow-panel mx-4 md:mx-5 xl:mx-6 mt-6 px-6 pt-6 pb-6">
-        <RegionHeader
-          title={t('overview.corridorSituation')}
-          meta={`${activeDate} · ${tasksOnDate.length} / ${corridorStats.length}`}
-        />
-        <div className="max-w-2xl">
-          {shownCorridors.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => setSelectedCorridor(c.id)}
-              className={`grid grid-cols-[52px_minmax(0,1fr)_58px] sm:grid-cols-[72px_minmax(0,1fr)_104px] items-center gap-2 sm:gap-2.5 w-full text-left px-1.5 py-1.5 border-b border-ws-hairline hover:bg-ws-paper ${
-                c.id === activeCorridor ? 'bg-ws-selected' : ''
-              }`}
-            >
-              <span className={`font-mono text-[11px] ${c.id === activeCorridor ? 'font-bold' : 'font-medium'} text-ws-ink`}>{c.id}</span>
-              <span className="flex items-center gap-1.5 min-w-0">
-                <span className="flex h-[9px] w-8 sm:w-32 shrink-0 gap-px bg-ws-tick">
-                  <span className="bg-ws-critical" style={{ width: `${(c.crit / maxPoss) * 100}%` }} />
-                  <span className="bg-ws-body" style={{ width: `${((c.poss - c.crit) / maxPoss) * 100}%` }} />
+      {/* 05 corridor situation + 06 plan state */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] xl:grid-cols-[minmax(0,1fr)_420px] gap-px bg-ws-rule border-b border-ws-rule">
+        <div className={`bg-ws-surface ${pad} pt-4 pb-3.5 min-w-0`}>
+          <RegionHeader
+            number="05"
+            title={t('overview.corridorSituation')}
+            meta={`${activeDate} · ${tasksOnDate.length} / ${corridorStats.length}`}
+          />
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-6 border-t border-ws-rule">
+            {shownCorridors.map((c) => (
+              <button
+                key={c.id}
+                onClick={() => setSelectedCorridor(c.id)}
+                aria-pressed={c.id === activeCorridor}
+                className={`grid grid-cols-[56px_minmax(0,1fr)_64px] sm:grid-cols-[64px_minmax(0,1fr)_80px] items-center gap-2.5 w-full text-left px-1 py-1.5 border-b border-ws-hairline transition-colors ${
+                  c.id === activeCorridor ? 'bg-ws-selected' : 'hover:bg-ws-paper'
+                }`}
+              >
+                <span className={`font-mono text-[11px] text-ws-ink ${c.id === activeCorridor ? 'font-bold' : 'font-medium'}`}>{c.id}</span>
+                <span className="flex items-center gap-2 min-w-0">
+                  <span className="flex h-2 w-16 sm:w-32 shrink-0 bg-ws-tick">
+                    <span className="bg-ws-critical" style={{ width: `${(c.crit / maxPoss) * 100}%` }} />
+                    <span className="bg-ws-body" style={{ width: `${((c.poss - c.crit) / maxPoss) * 100}%` }} />
+                  </span>
+                  <span className="text-[12px] text-ws-mid overflow-hidden text-ellipsis whitespace-nowrap">{c.name}</span>
                 </span>
-                <span className="font-ws text-xs text-ws-mid overflow-hidden text-ellipsis whitespace-nowrap">{c.name}</span>
+                <span className="font-mono text-[10px] text-ws-mid text-right">{c.poss} · {c.crit} · {c.sec}</span>
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-4 pt-2.5 flex-wrap">
+            {hiddenCorridors.length > 0 && (
+              <span className="text-[12px] text-ws-light">
+                {allHiddenSingle
+                  ? t('overview.corridorsNotListed', { count: hiddenCorridors.length })
+                  : t('overview.corridorsNotListedGeneric', { count: hiddenCorridors.length })}
               </span>
-              <span className="text-[12px] text-ws-mid text-right">{c.poss} · {c.crit} · {c.sec}</span>
-            </button>
-          ))}
-        </div>
-        <div className="flex items-center gap-4 pt-[9px] flex-wrap">
-          {hiddenCorridors.length > 0 && (
-            <span className="font-ws text-xs text-ws-light">
-              {allHiddenSingle
-                ? t('overview.corridorsNotListed', { count: hiddenCorridors.length })
-                : t('overview.corridorsNotListedGeneric', { count: hiddenCorridors.length })}
+            )}
+            <span className="flex-1 min-w-2" />
+            <span className="inline-flex items-center gap-1.5 text-[12px] text-ws-mid">
+              <span className="w-3.5 h-2 bg-ws-critical" />{t('overview.legendCriticalLower')}
             </span>
-          )}
-          <span className="flex-1 min-w-2" />
-          <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
-            <span className="w-3.5 h-[9px] bg-ws-critical" />{t('overview.legendCriticalLower')}
-          </span>
-          <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
-            <span className="w-3.5 h-[9px] bg-ws-body" />{t('overview.otherPossessions')}
-          </span>
+            <span className="inline-flex items-center gap-1.5 text-[12px] text-ws-mid">
+              <span className="w-3.5 h-2 bg-ws-body" />{t('overview.otherPossessions')}
+            </span>
+            <span className="font-mono text-[10px] uppercase text-ws-light">poss · crit · sec</span>
+          </div>
+        </div>
+
+        <div className={`bg-ws-surface ${pad} pt-4 pb-4 min-w-0`}>
+          <RegionHeader
+            number="06"
+            title={t('overview.planState')}
+            meta={t('scope.fullRunTasks', { count: metrics.summary.total_tasks_considered.toLocaleString() })}
+          />
+          <div className="grid grid-cols-2 gap-x-5 gap-y-4 border-t border-ws-rule pt-3">
+            <StatFigure
+              value={metrics.summary.total_scheduled.toLocaleString()}
+              label={t('overview.tasksScheduledCaption', { pct: metrics.summary.scheduled_percentage })}
+            />
+            <StatFigure
+              value={(risk.critical_risk_deferred ?? 0).toLocaleString()}
+              label={t('overview.criticalDeferred')}
+              tone={risk.critical_risk_deferred ? 'text-ws-critical' : 'text-ws-ink'}
+            />
+            <StatFigure
+              value={`${op.teams_utilized ?? 0} / ${teamsData.length}`}
+              label={t('overview.crewsUtilized')}
+              tone={(op.teams_utilized ?? 0) >= teamsData.length ? 'text-ws-warn' : 'text-ws-ink'}
+            />
+            {networkStats.track_availability_percent != null ? (
+              <StatFigure
+                value={`${networkStats.track_availability_percent}%`}
+                label={`${t('overview.trackAvailability')} · ${(networkStats.track_available_block_windows ?? 0).toLocaleString()} / ${(networkStats.total_block_windows ?? 0).toLocaleString()}`}
+              />
+            ) : (
+              <NotAvailable label={t('overview.trackAvailability')} />
+            )}
+          </div>
         </div>
       </div>
 
-      {/* footer */}
-      <div className="px-4 md:px-5 xl:px-6 pt-4 pb-5 mt-2 flex flex-wrap items-center gap-3.5">
-        <span className="text-[12px] text-ws-mid">
+      {/* Footer: headline scope vs day-sheet scope, and the run command. */}
+      <div className={`bg-ws-band ${pad} py-2 flex flex-wrap items-center gap-x-3.5 gap-y-1`}>
+        <span className="font-mono text-[10px] uppercase text-ws-mid">
           {t('overview.headlineScope', {
             full: metrics.summary.total_tasks_considered.toLocaleString(),
             scheduled: metrics.summary.total_scheduled.toLocaleString(),
@@ -538,7 +575,7 @@ export const Overview = ({ onNavigate }) => {
           })}
         </span>
         <span className="flex-1 min-w-2" />
-        <span className="text-[12px] text-ws-mid break-all">
+        <span className="font-mono text-[10px] text-ws-light break-all">
           {prov.scope} · $ {prov.command}
         </span>
       </div>

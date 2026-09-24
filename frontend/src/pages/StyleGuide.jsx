@@ -59,15 +59,15 @@ export const StyleGuide = () => {
         <Section
           id="type"
           title="Typography"
-          note="Playfair Display for page titles, section titles, large figures and the wordmark. Source Sans 3 for all interface text. IBM Plex Mono for small-caps labels and tabular figures, never prose."
+          note="Figtree for all interface text, with weight carrying the emphasis rather than a second family. JetBrains Mono for identifiers, timestamps, minutes and counts. Mono is never used for prose."
         >
           <Panel>
             <PanelBody className="space-y-3">
-              <div><div className="t-label">t-label · 11px mono small caps</div></div>
+              <div><div className="t-label">t-label · 11px semibold uppercase</div></div>
               <div><div className="t-value">t-value · 13px medium — human-readable values</div></div>
               <div><div className="t-mono-id">t-mono-id · TASK-000005 · BLK-009637 · SEC-0004</div></div>
               <div><div className="t-metric">1,598</div><ScopeCaption>t-metric · tabular figures</ScopeCaption></div>
-              <div><div className="t-section-title">t-section-title · 20px serif</div></div>
+              <div><div className="t-section-title">t-section-title · 15px semibold</div></div>
               <div><ScopeCaption>t-scope · full run · 30,000 tasks</ScopeCaption></div>
               <div className="pt-1 border-t border-line-subtle">
                 <div className="t-wordmark text-ws-ink">Railway Maintenance Operations</div>
@@ -80,7 +80,7 @@ export const StyleGuide = () => {
         <Section
           id="colour"
           title="Colour"
-          note="Ivory and rich black, with burnished gold as the single accent for controls and rules. Status colour is semantic and never decorative: red critical, rust attention, green complete, slate planned, grey inactive, teal bundled."
+          note="Chrome is warm ink (design 2A, &quot;industrial worksheet&quot;). Status colour is semantic and never decorative: red blocked/critical, amber conflict/attention, green feasible/complete, blue selected/planning, grey inactive/deferred. Teal survives only for bundling, where it carries real meaning."
         >
           <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
             <Swatch name="rail-950" cls="bg-rail-950" />
@@ -105,19 +105,19 @@ export const StyleGuide = () => {
         <Section
           id="geometry"
           title="Geometry & density"
-          note="4px on badges, 6px on controls, 8px on cards. Structure comes from 1px warm rules; shadows are barely there."
+          note="0px on tables, timelines and Gantt bars. 2px on controls. 4px on panels and modals. Structure comes from borders; shadows appear on overlays only."
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="bg-surface-panel border border-line rounded p-3">
-              <div className="t-label">rounded · 6px</div>
-              <div className="text-xs text-rail-500 mt-1">buttons · inputs</div>
+            <div className="bg-surface-panel border border-line p-3">
+              <div className="t-label">rounded-none</div>
+              <div className="text-xs text-rail-500 mt-1">tables · timeline · Gantt bars</div>
             </div>
             <div className="bg-surface-panel border border-line rounded-sm p-3">
-              <div className="t-label">rounded-sm · 4px</div>
-              <div className="text-xs text-rail-500 mt-1">badges · timeline bars</div>
+              <div className="t-label">rounded-sm · 2px</div>
+              <div className="text-xs text-rail-500 mt-1">buttons · inputs · badges</div>
             </div>
             <div className="bg-surface-panel border border-line rounded-lg p-3">
-              <div className="t-label">rounded-lg · 8px</div>
+              <div className="t-label">rounded-lg · 4px</div>
               <div className="text-xs text-rail-500 mt-1">panels · modals · drawers</div>
             </div>
           </div>

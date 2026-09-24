@@ -2,6 +2,8 @@ import React from 'react';
 import { usePlan } from '../../context/PlanContext';
 import { useI18n } from '../../i18n';
 import { minToHhmm } from '../../utils/time';
+import { RerouteDiagram } from '../../components/occ/RerouteDiagram';
+import { RegionHeader } from '../../components/ui/worksheet';
 
 /**
  * Replanning worksheet (design 2A idiom) — before, disruption, after, as one
@@ -187,6 +189,17 @@ export const Replanning = ({ onNavigate }) => {
           </p>
         </div>
       </div>
+
+      {/* 01b — the reroute search, on the section graph it ran against */}
+      {rejectedRoutes.length > 0 && (
+        <div className="bg-ws-surface border-t border-ws-rule px-3.5 md:px-4 xl:px-5 pt-4 pb-4">
+          <RegionHeader
+            title={t('reroute.title')}
+            meta={t('reroute.meta', { count: rejectedRoutes.length, train: (m.affected_trains || [])[0] || ev.train_id || '' })}
+          />
+          <RerouteDiagram routes={rejectedRoutes} possessionSection={ev.section_id} />
+        </div>
+      )}
 
       {/* 02 — audit record + 03 — plan retention */}
       <div className="grid grid-cols-1 lg:grid-cols-[60fr_40fr] xl:grid-cols-[64fr_36fr] bg-ws-rule gap-px border-t border-ws-rule">

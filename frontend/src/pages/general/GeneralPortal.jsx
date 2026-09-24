@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
+import { SaveNote } from '../../components/common/SaveNote';
 import { usePlan } from '../../context/PlanContext';
 import { useI18n } from '../../i18n';
-import { RegionHeader, StatFigure, Pill, AdvisoryNote, WsInput, WsSelect } from '../../components/ui/worksheet';
+import { RegionHeader, StatFigure, Pill, WsInput, WsSelect } from '../../components/ui/worksheet';
 import { Button } from '../../components/ui';
 import { Modal } from '../../components/common/Modal';
 import { minToHhmm } from '../../utils/time';
@@ -25,7 +26,8 @@ const VERDICT_TONE = { Approved: 'ok', Rejected: 'critical', Flagged: 'warn' };
 const RISK_PILL = { critical: 'critical', warn: 'warn', info: 'info', ok: 'ok', idle: 'idle' };
 
 export const GeneralPortal = () => {
-  const { verifications, submitVerification } = usePlan();
+  const { verifications, submitVerification, tasksInventory, evidence, photoSrc } = usePlan();
+  const [zoom, setZoom] = useState(null);
   const { t, isHindi } = useI18n();
   const [query, setQuery] = useState('');
   const [deptFilter, setDeptFilter] = useState('ALL');
@@ -81,6 +83,22 @@ export const GeneralPortal = () => {
 
   const open = (job, action) => { setModal({ job, action }); setComment(''); };
 
+  // Work closed through the app itself: a crew set it Completed (an event,
+  // not the dataset's own status) or attached evidence. Some of these task ids
+  // also appear in the historical register below; this section is about the
+  // live closure and its evidence.
+  const fieldClosed = useMemo(() => {
+    return tasksInventory
+      .filter((tk) => tk.statusMeta?.status === 'Completed' || evidence[tk.task_id])
+      .map((tk) => ({
+        ...tk,
+        execution_date: tk.scheduled_date,
+        closedBy: tk.statusMeta?.by || '',
+        closedAt: tk.statusMeta?.updatedAt || '',
+        items: evidence[tk.task_id] || [],
+      }));
+  }, [tasksInventory, evidence]);
+
   const confirm = () => {
     const cfg = ACTIONS[modal.action];
     if (cfg.requiresComment && !comment.trim()) return;
@@ -108,9 +126,62 @@ export const GeneralPortal = () => {
         </div>
       </div>
 
-      {/* 02 — completed possessions register */}
+      {/* 01b — closed in the field, with the crew's own evidence */}
       <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-3.5">
-        <RegionHeader number="02" title={t('verification.completedPossessions')} meta={t('verification.completedScope', { shown: rows.length, total: completedWorkJson.length })} isHindi={isHindi} />
+        <RegionHeader number="02" title={t('verification.fieldClosed')} meta={t('verification.fieldClosedMeta', { count: fieldClosed.length })} />
+        {fieldClosed.length === 0 ? (
+          <p className="text-[13px] text-ws-mid py-2">{t('verification.fieldClosedEmpty')}</p>
+        ) : (
+          <div className="border-t border-ws-rule">
+            {fieldClosed.map((j) => {
+              const v = verdictOf(j.task_id);
+              return (
+                <div key={j.task_id} className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto] gap-3 py-3 border-b border-ws-hairline">
+                  <div className="min-w-0">
+                    <div className="flex items-baseline gap-2 flex-wrap">
+                      <span className="font-mono text-[12px] font-bold text-ws-ink">{j.task_id}</span>
+                      <span className="text-[13px] text-ws-body">{j.maintenance_type} · {j.section_id}</span>
+                      <span className="text-[12px] text-ws-mid">{j.department}</span>
+                      {v && <Pill tone={VERDICT_TONE[v] || 'idle'} size="sm">{v}</Pill>}
+                    </div>
+                    <div className="font-mono text-[11px] text-ws-mid mt-0.5">
+                      {j.status}{j.closedAt ? ` · ${j.closedAt}` : ''}{j.closedBy ? ` · ${j.closedBy}` : ''}
+                    </div>
+                    {j.items.length === 0 ? (
+                      <p className="text-[12px] text-ws-warn mt-1.5">{t('verification.noEvidence')}</p>
+                    ) : (
+                      <ul className="mt-2 space-y-2">
+                        {j.items.map((it, i) => (
+                          <li key={i} className="flex gap-3 items-start">
+                            {photoSrc(it) && (
+                              <button type="button" onClick={() => setZoom(photoSrc(it))} className="shrink-0 border border-ws-rule hover:border-ws-ink">
+                                <img src={photoSrc(it)} alt={t('verification.photoAlt', { task: j.task_id })} className="h-20 w-28 object-cover" loading="lazy" />
+                              </button>
+                            )}
+                            <div className="min-w-0">
+                              <p className="text-[13px] text-ws-ink">{it.note || t('verification.photoOnly')}</p>
+                              <p className="font-mono text-[10px] text-ws-light mt-0.5">{it.at} · {it.by}</p>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                  <div className="flex md:flex-col gap-1.5 items-start">
+                    <Button size="sm" variant="primary" onClick={() => open(j, 'approve')}>{t('verification.approve')}</Button>
+                    <Button size="sm" variant="secondary" onClick={() => open(j, 'reject')}>{t('verification.reject')}</Button>
+                    <Button size="sm" variant="warn" onClick={() => open(j, 'flag')}>{t('verification.flag')}</Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* 03 — completed possessions register */}
+      <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-3.5">
+        <RegionHeader number="03" title={t('verification.completedPossessions')} meta={t('verification.completedScope', { shown: rows.length, total: completedWorkJson.length })} isHindi={isHindi} />
         <div className="flex flex-wrap items-center gap-2.5">
           <WsInput placeholder={t('verification.searchPlaceholder')} value={query} onChange={(e) => setQuery(e.target.value)} className="min-w-[220px] flex-1" />
           <WsSelect value={deptFilter} onChange={(e) => setDeptFilter(e.target.value)}>
@@ -178,7 +249,7 @@ export const GeneralPortal = () => {
       </div>
 
       <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-3.5">
-        <AdvisoryNote tone="idle" title={t('verification.sessionOnlyTitle')}>{t('verification.sessionOnlyBody')}</AdvisoryNote>
+        <SaveNote />
       </div>
 
       <div className="bg-ws-band px-3.5 md:px-4 xl:px-5 py-2">
@@ -235,6 +306,10 @@ export const GeneralPortal = () => {
             </div>
           </div>
         )}
+      </Modal>
+
+      <Modal isOpen={Boolean(zoom)} onClose={() => setZoom(null)} title={t('verification.photoTitle')} maxWidth="max-w-3xl">
+        {zoom && <img src={zoom} alt={t('verification.photoTitle')} className="w-full h-auto" />}
       </Modal>
     </div>
   );

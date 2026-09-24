@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from 'react';
+import { SaveNote } from '../../components/common/SaveNote';
 import { usePlan } from '../../context/PlanContext';
 import { useAuth } from '../../context/AuthContext';
 import { useI18n } from '../../i18n';
-import { Pill, AdvisoryNote } from '../../components/ui/worksheet';
+import { Pill } from '../../components/ui/worksheet';
 import { TaskActionModal } from '../../components/maintenance/TaskActionModal';
 import {
   WorkOrderHeader, WorkOrderFacts, BlockStatusBanner, SectionContext,
@@ -88,13 +89,7 @@ export const ActiveBlock = ({ onNavigate }) => {
         <OperationalGaps />
       </div>
 
-      <AdvisoryNote
-        tone="idle"
-        title={t('ground.sessionOnlyTitle')}
-        action={<button onClick={() => onNavigate && onNavigate('my-tasks')} className="font-display text-[11px] font-bold text-ws-mid hover:text-ws-ink">{t('ground.viewAllWork')}</button>}
-      >
-        {t('ground.sessionOnlyBody')}
-      </AdvisoryNote>
+      <SaveNote action={<button onClick={() => onNavigate && onNavigate('my-tasks')} className="font-display text-[11px] font-bold text-ws-mid hover:text-ws-ink">{t('ground.viewAllWork')}</button>} />
 
       <TaskActionModal
         isOpen={Boolean(action)}

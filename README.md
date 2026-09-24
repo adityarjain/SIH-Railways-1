@@ -111,6 +111,11 @@ tests/
 ├── test_bundling.py          # Bundling rules & overlap tests
 ├── test_solver.py            # CP-SAT day batch solve tests
 └── test_post_solve_validator.py # Independent validation tests
+
+api/                          # Operations API (FastAPI + SQLite)
+├── app.py                    # Routes: role sessions, event log, files, alerts, admin reset
+├── auth.py                   # Session tokens (only their hash is stored)
+└── db.py                     # SQLite schema and connection
 ```
 
 ---
@@ -147,6 +152,61 @@ PYTHONPATH=. .venv/bin/python demo_closed_loop.py
 ### Running the Full Dataset Optimizer
 ```bash
 PYTHONPATH=. .venv/bin/python -m optimizer.main --data-dir Arnav_Optimizer_Clean_Dataset --output-dir .
+```
+
+### Running the Web App (frontend + Operations API)
+
+Entry is always role selection (Ground Operations also picks its
+department); there are no usernames or passwords. The frontend runs in one of
+two modes, chosen automatically at start-up:
+
+| Mode | When | What is saved |
+| --- | --- | --- |
+| **API** | `api/` is running | Every action, shared between roles and browsers. Choosing a role opens a server session for that role and department. |
+| **Browser-only** | No API (e.g. the static Netlify build) | Nothing: actions live in the tab and are lost on refresh |
+
+```bash
+# 1. Operations API (FastAPI + SQLite, stores in api_data/rmo.sqlite3)
+.venv/bin/uvicorn api.app:app --port 8000
+
+# 2. Frontend dev server (proxies /api to port 8000)
+cd frontend && npm install && npm run dev
+```
+
+For a single-server deploy, run `npm run build` in `frontend/` and start only
+the API: it serves `frontend/dist` from the same origin.
+
+Role selection is a demonstration control, not authentication. What it does
+enforce, server-side, is scope: a Ground Operations session is only ever sent
+its own department's events and photos, and can only act on its own
+department's tasks.
+
+What the API adds:
+
+- **Saved state**: every action (status change, controller decision,
+  verification, replan, disruption, requirement revision, completion evidence)
+  is one row in an append-only event log. The browser rebuilds the plan state
+  by replaying it (`frontend/src/context/planEvents.js`).
+- **Department scoping**: Ground reads and writes only its own department's
+  work (other departments' events and photos are never sent to it); only
+  Authority records decisions, verifications and replans; only Admin can clear
+  the log. Enforced in `api/app.py`, not just hidden in the UI.
+- **Completion evidence**: a note and a site photo (JPEG/PNG/WebP, magic bytes
+  checked, 3 MB cap, shrunk in the browser first), shown to Authority on Work
+  Verification. Photos need a signed-in session to fetch.
+- **Alerts**: Ground is told when a decision, replan or verdict touches its
+  work; Authority when work is closed, evidence added, an issue raised or a
+  requirement revised. Derived from the same log (`context/alerts.js`).
+- **Audit history**: the log itself, filterable and exportable to CSV.
+
+Other features in both modes: a network map (real city positions, straight
+corridors split by section length), the reroute search drawn on the section
+graph it ran against, day-plan CSV export, print/PDF of the day sheet and of
+Ground work orders, and field requirement revision.
+
+### Running the Frontend Tests
+```bash
+cd frontend && npm test        # Vitest + Testing Library (unit and app-flow tests)
 ```
 
 ---

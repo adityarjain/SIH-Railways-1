@@ -5,6 +5,8 @@ import { minToHhmm } from '../../utils/time';
 import { bandOf } from '../../utils/risk';
 import { RegionHeader, SegmentedControl, WsSelect } from '../ui/worksheet';
 import sectionTrains from '../../data/live/sectionTrains';
+import { Button } from '../ui';
+import { downloadCsv } from '../../utils/export';
 
 /**
  * Day sheet — the "industrial worksheet" (design 2A) hero timeline for the
@@ -36,7 +38,7 @@ const barTone = (task, replannedTaskId) => {
   if (bandOf(task) === 'CRITICAL') {
     return { bg: 'bg-ws-barCriticalBg', border: 'border-ws-barCriticalBorder', rule: 'border-l-ws-critical', label: 'text-ws-barCriticalLabel' };
   }
-  return { bg: 'bg-ws-barPlannedBg', border: 'border-ws-barPlannedBorder', rule: 'border-l-ws-steel', label: 'text-ws-barPlannedLabel' };
+  return { bg: 'bg-ws-barPlannedBg', border: 'border-ws-barPlannedBorder', rule: 'border-l-ws-info', label: 'text-ws-barPlannedLabel' };
 };
 
 const LegendSwatch = ({ bg, border, rule, h = 10 }) => (
@@ -95,12 +97,30 @@ export const DaySheet = ({
     [sections, date],
   );
 
+  // Every possession on the date, all corridors, not just the one on screen.
+  const exportDay = () => {
+    const rows = scheduledTasks
+      .filter((tk) => tk.date === date)
+      .sort((x, y) => x.corridor_id.localeCompare(y.corridor_id) || x.section_id.localeCompare(y.section_id) || x.start_minute - y.start_minute)
+      .map((tk) => [
+        tk.date, tk.corridor_id, tk.section_id, tk.task_id, tk.maintenance_type, tk.department,
+        minToHhmm(tk.start_minute), minToHhmm(tk.end_minute), tk.end_minute - tk.start_minute,
+        (tk.block_ids || []).join(' + '), (tk.assigned_teams || []).join(' + '),
+        tk.risk_score, bandOf(tk) || '', tk.is_bundled ? 'yes' : 'no',
+      ]);
+    downloadCsv(`day-plan-${date}.csv`, [
+      'date', 'corridor', 'section', 'task', 'work', 'department', 'start', 'end', 'minutes',
+      'blocks', 'crew', 'risk_score', 'risk_band', 'bundled',
+    ], rows);
+  };
+
   const corridorLabel = corridorOptions.find((c) => c.id === corridorId)?.label || corridorId;
   const domainHours = Math.round((domain.end - domain.start) / 60);
 
   return (
-    <div className="bg-ws-surface rounded-lg shadow-panel mx-4 md:mx-5 xl:mx-6 pt-7 px-7 pb-7 font-ws text-ws-body">
+    <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-4 pb-3.5 font-ws text-ws-body">
       <RegionHeader
+        number="01"
         title={t('overview.daySheet')}
         meta={t('overview.daySheetMeta', { corridor: corridorLabel, date, hours: domainHours })}
       />
@@ -130,8 +150,12 @@ export const DaySheet = ({
           ]}
         />
         <span className="flex-1 min-w-2" />
-        <span className="text-[12px] text-ws-mid">
+        <span className="font-mono text-[11px] text-ws-mid">
           {t('overview.daySheetScope', { sections: sections.length, blocks: totalBlocks, trains: totalTrains })}
+        </span>
+        <span className="flex gap-1.5 print:hidden">
+          <Button size="sm" variant="secondary" onClick={exportDay}>{t('export.dayCsv')}</Button>
+          <Button size="sm" variant="secondary" onClick={() => window.print()}>{t('export.print')}</Button>
         </span>
       </div>
 
@@ -153,7 +177,7 @@ export const DaySheet = ({
           {labelTicks.map((tk) => (
             <span
               key={tk.minute}
-              className="absolute text-[12px] text-ws-mid"
+              className="absolute font-mono text-[10px] leading-none text-ws-mid"
               style={
                 tk.minute === scale.domainStart
                   ? { left: 0 }
@@ -229,7 +253,7 @@ export const DaySheet = ({
                       key={task.task_id}
                       onClick={() => onSelectTask && onSelectTask(task)}
                       title={`${task.task_id} · ${task.maintenance_type || ''} · ${minToHhmm(task.start_minute)}–${minToHhmm(task.end_minute)}${task.risk_score != null ? ` · risk ${task.risk_score}` : ''}`}
-                      className={`absolute flex items-center px-1.5 overflow-hidden border ${tone.bg} ${tone.border} ${tone.rule} hover:bg-ws-surface transition-colors`}
+                      className={`absolute flex items-center px-1.5 overflow-hidden border ${tone.bg} ${tone.border} ${tone.rule} hover:bg-ws-surface transition-colors focus-visible:z-10`}
                       style={{
                         left: `${scale.toPercent(a)}%`,
                         width: `${scale.toWidth(a, b)}%`,
@@ -267,15 +291,15 @@ export const DaySheet = ({
       {/* legend */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-2.5">
         <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
-          <LegendSwatch bg="bg-ws-barPlannedBg" border="border-ws-barPlannedBorder" rule="#4E6072" />
+          <LegendSwatch bg="bg-ws-barPlannedBg" border="border-ws-barPlannedBorder" rule="#1B4C8C" />
           {t('gantt.legendBlock')}
         </span>
         <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
-          <LegendSwatch bg="bg-ws-barCriticalBg" border="border-ws-barCriticalBorder" rule="#A61B1B" />
+          <LegendSwatch bg="bg-ws-barCriticalBg" border="border-ws-barCriticalBorder" rule="#B22A22" />
           {t('gantt.legendCritical')}
         </span>
         <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">
-          <LegendSwatch bg="bg-ws-barBundledBg" border="border-ws-barBundledBorder" rule="#2F6B6B" />
+          <LegendSwatch bg="bg-ws-barBundledBg" border="border-ws-barBundledBorder" rule="#1C6260" />
           {t('gantt.legendBundled')}
         </span>
         <span className="inline-flex items-center gap-1.5 font-ws text-xs text-ws-mid">

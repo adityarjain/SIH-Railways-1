@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
-// Editorial serif design system (see DESIGN.md). See DESIGN.md for the rationale behind
-// each value; token NAMES are stable across repaints (~1,350 call sites read
+// Industrial worksheet design system, direction 2A (see DESIGN.md for the
+// rationale behind each value); token NAMES are stable across repaints (~1,350 call sites read
 // them), so a repaint is a change to this file, not to the components.
 export default {
   content: [
@@ -10,110 +10,101 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        // Playfair Display carries headlines, section titles, large figures and
-        // the wordmark, nothing else. Its Hindi counterpart is Noto Serif
-        // Devanagari, so a Hindi headline stays a serif headline.
-        serif: ['"Playfair Display"', '"Noto Serif Devanagari"', 'Georgia', 'serif'],
-        // Source Sans 3 carries the interface. `display` and `ws` stay sans on
-        // purpose: ~130 small labels and buttons use them.
-        sans: ['"Source Sans 3"', '"Noto Sans Devanagari"', 'system-ui', 'sans-serif'],
-        display: ['"Source Sans 3"', '"Noto Sans Devanagari"', 'system-ui', 'sans-serif'],
-        ws: ['"Source Sans 3"', '"Noto Sans Devanagari"', 'system-ui', 'sans-serif'],
-        // IBM Plex Mono: small-caps labels and tabular figures.
-        mono: ['"IBM Plex Mono"', '"Noto Sans Devanagari"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        // Barlow for body and interface text; Barlow Semi Condensed for
+        // operational headings, section labels, buttons and nav; JetBrains Mono
+        // for IDs, timestamps, minutes, risk values, rule codes and counts only.
+        sans: ['Barlow', '"Noto Sans Devanagari"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        ws: ['Barlow', '"Noto Sans Devanagari"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['"Barlow Semi Condensed"', '"Noto Sans Devanagari"', 'ui-sans-serif', 'sans-serif'],
+        mono: ['"JetBrains Mono"', '"Noto Sans Devanagari"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       colors: {
-        // Burnished gold, the single accent. DEFAULT is deep enough to carry
-        // white text at AA (~4.9:1); `bright` (#B8860B, the brief's gold) is
-        // for rules, rings and small-caps accents, never for text on white.
+        // Ink is the one action colour: primary buttons, the selected
+        // segment, focus rings. Never status.
         accent: {
-          DEFAULT: '#8F6A08',
-          hover: '#7A5A06',
-          bright: '#B8860B',
-          soft: '#D4A84B',
+          DEFAULT: '#1F1C17',
+          hover: '#3C372E',
           ink: '#FFFFFF',
         },
-        // Warm neutral ramp. 950..800 are near-black ink; 600..300 are greys.
+        // Warm ink ramp: 950..800 near-black, 600..300 greys.
         rail: {
-          950: '#1A1A1A',
-          900: '#2A2826',
-          800: '#3A3734',
-          700: '#4A4643',
-          600: '#6B6B6B',
-          500: '#6B6B6B',
-          400: '#6B6B6B',
-          300: '#A8A49C',
+          950: '#1F1C17',
+          900: '#2A261F',
+          800: '#3C372E',
+          700: '#4A4338',
+          600: '#6A6255',
+          500: '#6A6255',
+          400: '#7A7263',
+          300: '#BEB6A7',
         },
         surface: {
-          base: '#FAFAF8',
+          base: '#F3F0E8',
           panel: '#FFFFFF',
-          sunken: '#F5F3F0',
+          sunken: '#EFEAE0',
         },
         line: {
-          DEFAULT: '#E8E4DF',
-          strong: '#D4CFC8',
-          subtle: '#EFECE7',
+          DEFAULT: '#D7D0C2',
+          strong: '#B9B0A0',
+          subtle: '#E8E2D6',
         },
-        // Status is desaturated so it sits in the palette, and warnings are
-        // rust rather than amber so they never read as the gold accent.
         status: {
-          critical: '#A61B1B',
-          'critical-tint': '#F6E3E1',
-          warn: '#A4471A',
-          'warn-tint': '#F4E4DA',
-          ok: '#2E6B3F',
-          'ok-tint': '#E3EEE5',
-          info: '#8B6508',
-          'info-tint': '#F5EDD9',
-          idle: '#6B6B6B',
-          'idle-tint': '#F0EDE8',
+          critical: '#B22A22',
+          'critical-tint': '#F7E4E1',
+          warn: '#96660E',
+          'warn-tint': '#F4EBD8',
+          ok: '#2E6A4A',
+          'ok-tint': '#E2EDE6',
+          info: '#1B4C8C',
+          'info-tint': '#E5EBF4',
+          idle: '#7C7466',
+          'idle-tint': '#EFEAE0',
         },
         bundle: {
-          DEFAULT: '#2F6B6B',
-          tint: '#E1EDEC',
+          DEFAULT: '#1C6260',
+          tint: '#DFEAE8',
         },
         ws: {
-          ink: '#1A1A1A',
-          body: '#333130',
-          mid: '#6B6B6B',
-          light: '#6B6B6B',
-          disabled: '#A8A49C',
-          rule: '#E8E4DF',
-          hairline: '#EFECE7',
-          paper: '#FAFAF8',
-          band: '#FAFAF8',
+          ink: '#1F1C17',
+          body: '#3C372E',
+          mid: '#6A6255',
+          // Lightest text allowed: 4.8:1 on white.
+          light: '#7A7263',
+          disabled: '#BEB6A7',
+          rule: '#D7D0C2',
+          hairline: '#E8E2D6',
+          paper: '#F3F0E8',
+          band: '#EAE5D9',
           surface: '#FFFFFF',
-          dossier: '#FFFFFF',
-          tick: '#F5F3F0',
-          selected: '#F5EDD9',
-          critical: '#A61B1B',
-          warn: '#A4471A',
-          ok: '#2E6B3F',
-          info: '#8B6508',
-          idle: '#6B6B6B',
-          bundle: '#2F6B6B',
-          // Slate for planned / moderate / active-possession state.
-          steel: '#4E6072',
-          barCriticalBg: '#F6E3E1',
-          barCriticalBorder: '#D9A7A1',
-          barCriticalLabel: '#7F1A1A',
-          barPlannedBg: '#ECEFF2',
-          barPlannedBorder: '#B9C3CD',
-          barPlannedLabel: '#33475A',
-          barBundledBg: '#E1EDEC',
-          barBundledBorder: '#A7C5C2',
-          barBundledLabel: '#24504F',
+          dossier: '#FBF9F4',
+          tick: '#EFEAE0',
+          selected: '#EDF1F7',
+          critical: '#B22A22',
+          warn: '#96660E',
+          ok: '#2E6A4A',
+          info: '#1B4C8C',
+          idle: '#7C7466',
+          bundle: '#1C6260',
+          steel: '#1B4C8C',
+          barCriticalBg: '#F7E4E1',
+          barCriticalBorder: '#E0B8B2',
+          barCriticalLabel: '#7E1A14',
+          barPlannedBg: '#E5EBF4',
+          barPlannedBorder: '#BECDE1',
+          barPlannedLabel: '#153C6D',
+          barBundledBg: '#DFEAE8',
+          barBundledBorder: '#B5CCC9',
+          barBundledLabel: '#16504E',
         },
       },
-      // Neither sharp nor round: 4px badges, 6px controls, 8px cards.
+      // Square worksheet: 0 on regions, tables and bars; 2px on controls.
       borderRadius: {
         none: '0',
-        sm: '4px',
-        DEFAULT: '6px',
-        md: '6px',
-        lg: '8px',
-        xl: '10px',
-        '2xl': '12px',
+        sm: '2px',
+        DEFAULT: '2px',
+        md: '2px',
+        lg: '0',
+        xl: '0',
+        '2xl': '0',
         full: '9999px',
       },
       fontSize: {
@@ -127,17 +118,20 @@ export default {
         'touch': '44px',
       },
       boxShadow: {
-        // Refinement, not depth. The 1px warm ring doubles as the card border,
-        // so every card carrying these gets its hairline edge for free.
-        soft: '0 0 0 1px #E8E4DF, 0 1px 2px rgba(26, 26, 26, 0.04)',
-        panel: '0 0 0 1px #E8E4DF, 0 1px 2px rgba(26, 26, 26, 0.04)',
-        lift: '0 0 0 1px #E8E4DF, 0 4px 12px rgba(26, 26, 26, 0.06)',
-        key: '0 0 0 1px #E8E4DF, 0 1px 2px rgba(26, 26, 26, 0.05)',
-        'key-accent': '0 1px 2px rgba(143, 106, 8, 0.25)',
-        pressed: 'inset 0 0 0 1px #D4CFC8',
-        recessed: 'inset 0 0 0 1px #E8E4DF',
-        overlay: '0 8px 24px rgba(26, 26, 26, 0.08), 0 0 0 1px #E8E4DF',
-        focus: '0 0 0 2px #FAFAF8, 0 0 0 4px #B8860B',
+        // No depth outside overlays. The panel "shadows" are a 1px rule ring,
+        // so every region keeps its edge without a border utility.
+        soft: '0 0 0 1px #D7D0C2',
+        panel: '0 0 0 1px #D7D0C2',
+        lift: '0 0 0 1px #D7D0C2',
+        key: '0 0 0 1px #D7D0C2',
+        'key-accent': 'none',
+        pressed: 'inset 0 0 0 1px #1F1C17',
+        recessed: 'inset 0 0 0 1px #D7D0C2',
+        overlay: '0 12px 32px rgba(31, 28, 23, 0.18), 0 0 0 1px #D7D0C2',
+        focus: '0 0 0 1px #FFFFFF, 0 0 0 3px #1F1C17',
+        'led-ok': 'none',
+        'led-critical': 'none',
+        'led-accent': 'none',
         none: 'none',
       },
       zIndex: {

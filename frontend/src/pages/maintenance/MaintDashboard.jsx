@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { SaveNote } from '../../components/common/SaveNote';
 import { usePlan } from '../../context/PlanContext';
 import { useAuth } from '../../context/AuthContext';
 import { Pill } from '../../components/ui/worksheet';
@@ -186,15 +187,7 @@ export const MaintDashboard = ({ onNavigate }) => {
         )}
       </div>
 
-      <div className="border-l-[3px] border-l-ws-idle bg-ws-paper px-3 py-2.5 flex items-center justify-between gap-3 flex-wrap">
-        <div>
-          <div className="font-display text-[11px] font-bold text-ws-idle">Session state only</div>
-          <div className="font-ws text-xs text-ws-body leading-relaxed mt-1">Status changes are held in the browser for this session. Nothing is written to an external register and no notification is sent.</div>
-        </div>
-        <button onClick={() => onNavigate && onNavigate('my-tasks')} className="font-display text-[11px] font-bold text-ws-mid hover:text-ws-ink shrink-0">
-          View all assigned work
-        </button>
-      </div>
+      <SaveNote action={<button onClick={() => onNavigate && onNavigate('my-tasks')} className="font-display text-[11px] font-bold text-ws-mid hover:text-ws-ink">View all assigned work</button>} />
 
       <TaskActionModal
         isOpen={Boolean(action)}

@@ -16,6 +16,7 @@ export const NAV_SECTIONS_BY_ROLE = {
         { id: 'overview', labelKey: 'nav.overview' },
         { id: 'live-ops', labelKey: 'nav.liveOps' },
         { id: 'train-impact', labelKey: 'nav.trainImpact' },
+        { id: 'network-map', labelKey: 'nav.networkMap' },
         { id: 'replanning', labelKey: 'nav.replanning' },
       ],
     },
@@ -33,6 +34,7 @@ export const NAV_SECTIONS_BY_ROLE = {
       items: [
         { id: 'decision-trace', labelKey: 'nav.decisionTrace' },
         { id: 'general-verify', labelKey: 'nav.workVerification' },
+        { id: 'history', labelKey: 'nav.history' },
       ],
     },
   ],
@@ -43,6 +45,7 @@ export const NAV_SECTIONS_BY_ROLE = {
       items: [
         { id: 'maint-dashboard', labelKey: 'nav.todaysTasks' },
         { id: 'my-tasks', labelKey: 'nav.assignedWork', highlight: true },
+        { id: 'requirements', labelKey: 'nav.requirements' },
         { id: 'active-block', labelKey: 'nav.activeBlock' },
       ],
     },
@@ -58,6 +61,7 @@ export const NAV_SECTIONS_BY_ROLE = {
       items: [
         { id: 'issues', labelKey: 'nav.issues' },
         { id: 'completed', labelKey: 'nav.completion' },
+        { id: 'history', labelKey: 'nav.history' },
       ],
     },
   ],
@@ -70,6 +74,7 @@ export const NAV_SECTIONS_BY_ROLE = {
         { id: 'performance', labelKey: 'nav.performance' },
         { id: 'evaluation', labelKey: 'nav.evaluation' },
         { id: 'system-verification', labelKey: 'nav.systemVerification' },
+        { id: 'history', labelKey: 'nav.history' },
       ],
     },
   ],

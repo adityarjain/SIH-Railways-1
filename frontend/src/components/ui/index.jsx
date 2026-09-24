@@ -1,7 +1,7 @@
 /**
  * Railway Maintenance Operations — shared UI primitives.
  *
- * Geometry: 0px on tables/timelines, 2px on controls, 4px on panels/modals.
+ * Geometry: 0px on tables, timelines and panels; 2px on controls.
  * Structure comes from borders and spacing; shadows appear on overlays only.
  * Mono is reserved for IDs, timestamps, minutes and counts — never prose.
  */
@@ -141,24 +141,24 @@ export const MetricRow = ({ label, value, sub, tone: t, onClick }) => {
 export const Button = ({
   variant = 'secondary', size = 'md', children, className = '', ...props
 }) => {
-  // Primary is burnished gold; secondary is a black outline that warms to
-  // gold on hover; ghost is text that underlines. Nothing moves.
+  // Flat worksheet buttons: primary is ink, secondary an outline that takes
+  // the paper fill and an ink edge on hover. Only colour transitions.
   const variants = {
-    primary: 'bg-accent text-accent-ink shadow-key-accent hover:bg-accent-hover',
-    secondary: 'bg-transparent text-ws-ink border border-ws-ink hover:bg-ws-tick hover:border-accent hover:text-accent',
-    danger: 'bg-status-critical text-white hover:brightness-110',
+    primary: 'bg-ws-ink text-white border border-ws-ink hover:bg-ws-body',
+    secondary: 'bg-transparent text-ws-ink border border-ws-rule hover:bg-ws-paper hover:border-ws-ink',
+    danger: 'bg-status-critical text-white border border-status-critical hover:brightness-110',
     warn: 'bg-transparent text-status-warn border border-status-warn hover:bg-status-warn-tint',
-    ghost: 'bg-transparent text-ws-mid hover:text-ws-ink hover:underline decoration-accent-bright underline-offset-4',
+    ghost: 'bg-transparent text-ws-mid border border-transparent hover:text-ws-ink hover:bg-ws-paper',
   };
   const sizes = {
     sm: 'text-[12px] px-2.5 py-1.5',
     md: 'text-[13px] px-3.5 py-2',
     // Ground portal: 44px minimum touch target.
-    lg: 'text-[15px] px-6 py-3 min-h-[44px]',
+    lg: 'text-sm px-6 py-3 min-h-12',
   };
   return (
     <button
-      className={`inline-flex items-center justify-center gap-1.5 font-semibold tracking-[0.03em] rounded-md touch-manipulation transition-all duration-200 ease-out focus:outline-none focus-visible:shadow-focus disabled:opacity-40 disabled:cursor-not-allowed ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`inline-flex items-center justify-center gap-1.5 font-display font-bold uppercase tracking-[0.08em] rounded-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${variants[variant]} ${sizes[size]} ${className}`}
       {...props}
     >
       {children}

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useMemo } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import initialPlanRaw from '../data/optimized_block_plan.json';
 // Two distinct optimizer runs, deliberately kept separate. `metrics` describes
 // the scenario subset this UI actually renders; `baselineMetrics` describes the
@@ -20,6 +20,11 @@ import demoEventsRaw from '../data/ritvik_demo_events.json';
 import ritvikScenariosRaw from '../data/ritvik_scenarios.json';
 import { SIMULATION_EVENTS } from '../data/simulationData';
 import { shiftDatesDeep } from '../utils/dateShift';
+import { minToHhmm } from '../utils/time';
+import { useAuth } from './AuthContext';
+import { api } from '../lib/api';
+import { replay } from './planEvents';
+import { alertsFor, visibleInHistory } from './alerts';
 
 // The demo scenario's own artifacts are date-shifted onto a live rolling
 // window (see utils/dateShift.js) so the 14-day dataset keeps re-presenting
@@ -33,26 +38,92 @@ const ritvikScenariosJson = shiftDatesDeep(ritvikScenariosRaw);
 
 const PlanContext = createContext();
 
+const TASK_DEPT = Object.fromEntries(initialTasks.map((t) => [t.task_id, t.department]));
+export const deptOf = (taskId) => TASK_DEPT[taskId];
+
+/** Merge freshly fetched events into the list, keeping id order, no dupes. */
+const mergeEvents = (prev, fresh) => {
+  if (!fresh.length) return prev;
+  const seen = new Set(prev.map((e) => e.id));
+  const add = fresh.filter((e) => !seen.has(e.id));
+  return add.length ? [...prev, ...add].sort((x, y) => x.id - y.id) : prev;
+};
+
+const POLL_MS = 10_000;
+
 export const PlanContext_Provider = ({ children }) => {
-  // Toggle between original schedule (07 Sep) and replanned schedule (08 Sep) for TASK-000005
-  const [isReplanned, setIsReplanned] = useState(false);
+  const { mode, currentUser } = useAuth();
 
-  // Active operational event simulated
-  const [activeEvent, setActiveEvent] = useState(null);
+  // The event log. Everything below the fold of this component is derived
+  // from it (see planEvents.js), so there is exactly one source of truth.
+  const [events, setEvents] = useState([]);
+  const [saveError, setSaveError] = useState(null);
+  const [alertsSeenId, setAlertsSeenId] = useState(0);
+  const localSeq = useRef(1);
 
-  // Status overrides for maintenance tasks (e.g. accepted, in_progress, completed)
-  const [taskStatusOverrides, setTaskStatusOverrides] = useState({});
+  const username = currentUser?.username;
 
-  // General user verification actions (approvals, false closure reports)
-  const [verifications, setVerifications] = useState({
-    'TASK-000421': { status: 'Verified', comments: 'Track alignment certified by station master', reportedAt: '2026-09-04 11:30' },
-  });
+  // API mode: load the shared log on sign-in, then poll for other people's
+  // actions. Browser-only mode keeps its in-memory log across role switches.
+  useEffect(() => {
+    if (mode !== 'api' || !username) return undefined;
+    let live = true;
+    let last = 0;
+    let first = true;
+    const pull = async () => {
+      try {
+        const fresh = await api.events(last);
+        if (!live) return;
+        // The first load replaces whatever a previous account left in memory.
+        if (first) { first = false; setEvents(fresh); }
+        else if (fresh.length) setEvents((prev) => mergeEvents(prev, fresh));
+        if (fresh.length) last = fresh[fresh.length - 1].id;
+      } catch (err) {
+        if (live && err.status !== 401) setSaveError(err.message);
+      }
+    };
+    pull();
+    api.alertsSeen().then((r) => live && setAlertsSeenId(r.last_event_id)).catch(() => {});
+    const timer = setInterval(pull, POLL_MS);
+    return () => { live = false; clearInterval(timer); };
+  }, [mode, username]);
 
-  // Replan request state
-  const [replanRequestActive, setReplanRequestActive] = useState(false);
+  const emit = useCallback(async (kind, taskId, payload = {}) => {
+    if (mode === 'api') {
+      try {
+        const ev = await api.appendEvent(kind, taskId, payload);
+        setEvents((prev) => mergeEvents(prev, [ev]));
+        setSaveError(null);
+        return ev;
+      } catch (err) {
+        setSaveError(err.message);
+        return null;
+      }
+    }
+    const ev = {
+      id: localSeq.current++,
+      ts: new Date().toISOString(),
+      kind,
+      task_id: taskId ?? null,
+      payload,
+      actor: {
+        username: currentUser?.username, name: currentUser?.name,
+        role: currentUser?.role, department: currentUser?.department,
+      },
+    };
+    setEvents((prev) => [...prev, ev]);
+    return ev;
+  }, [mode, currentUser]);
 
-  // Controller decisions on optimizer recommendations, keyed by task id.
-  const [planDecisions, setPlanDecisions] = useState({});
+  const state = useMemo(() => replay(events), [events]);
+  const {
+    isReplanned, activeEventId, replanRequestActive, taskStatusOverrides,
+    verifications, planDecisions, requirements, evidence,
+  } = state;
+  const activeEvent = useMemo(
+    () => SIMULATION_EVENTS.find((e) => e.id === activeEventId) || null,
+    [activeEventId],
+  );
 
   // Derive scheduled tasks based on isReplanned state
   // The replanned record is the optimizer's actual output, captured by
@@ -95,69 +166,34 @@ export const PlanContext_Provider = ({ children }) => {
     });
   }, [isReplanned, taskStatusOverrides, replannedRecord]);
 
-  // Actions
-  const toggleReplan = (state) => {
-    const newState = state !== undefined ? state : !isReplanned;
-    setIsReplanned(newState);
-    if (newState) {
-      setReplanRequestActive(false);
-    }
+  // Actions. Each appends one event; the replay above does the rest.
+  const replanMove = {
+    task_id: replannedRecord.task_id,
+    date: replannedRecord.date,
+    window: `${minToHhmm(replannedRecord.start_minute)}–${minToHhmm(replannedRecord.end_minute)}`,
   };
+
+  const toggleReplan = (on) => emit('replan_toggled', null, { on: on !== undefined ? !!on : !isReplanned, ...replanMove });
 
   const triggerEvent = (eventId) => {
     const ev = SIMULATION_EVENTS.find((e) => e.id === eventId);
-    if (ev) {
-      setActiveEvent(ev);
-      if (ev.outcomeType === 'REPLAN_REQUEST') {
-        setReplanRequestActive(true);
-      }
-    }
+    if (ev) emit('event_triggered', null, { event_id: eventId, replan_request: ev.outcomeType === 'REPLAN_REQUEST' });
   };
 
-  const clearEvent = () => {
-    setActiveEvent(null);
-    setReplanRequestActive(false);
-  };
+  const clearEvent = () => emit('event_cleared', null, {});
 
-  const executeReplanFlow = () => {
-    setIsReplanned(true);
-    setReplanRequestActive(false);
-  };
+  const executeReplanFlow = () => toggleReplan(true);
 
-  const updateTaskStatus = (taskId, newStatus, reason = '', proposedDate = '') => {
-    setTaskStatusOverrides((prev) => ({
-      ...prev,
-      [taskId]: {
-        status: newStatus,
-        reason,
-        proposedDate,
-        updatedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      },
-    }));
-  };
+  const updateTaskStatus = (taskId, newStatus, reason = '', proposedDate = '') =>
+    emit('status_changed', taskId, { status: newStatus, reason, proposedDate });
 
   // --- OCC recommendation workflow -------------------------------------------
   // The controller accepts, amends or rejects the optimizer's recommendation.
-  // Session state only, like the verification flow: nothing is written to an
-  // external system, and the UI says so.
-  const recordDecision = (taskId, decision, note = '') => {
-    setPlanDecisions((prev) => ({
-      ...prev,
-      [taskId]: {
-        decision,
-        note,
-        decidedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      },
-    }));
-  };
+  // A rejection raises a replan request (applied in planEvents.js).
+  const recordDecision = (taskId, decision, note = '') => emit('decision_recorded', taskId, { decision, note });
 
   const approveRecommendation = (taskId, note = '') => recordDecision(taskId, 'APPROVED', note);
-  const rejectRecommendation = (taskId, note = '') => {
-    recordDecision(taskId, 'REJECTED', note);
-    // A rejected possession is no longer an accepted plan; surface it as needing
-    // re-optimization rather than silently leaving it approved.
-    setReplanRequestActive(true);
-  };
+  const rejectRecommendation = (taskId, note = '') => recordDecision(taskId, 'REJECTED', note);
   const modifyRecommendation = (taskId, note = '') => recordDecision(taskId, 'MODIFIED', note);
 
   /**
@@ -166,21 +202,62 @@ export const PlanContext_Provider = ({ children }) => {
    * committed as ritvik_operational_decision.json / replan_request.json, so the
    * resulting schedule is the optimizer's real output rather than a mock.
    */
-  const reoptimize = (taskId = 'TASK-000005') => {
-    setIsReplanned(true);
-    setReplanRequestActive(false);
-    recordDecision(taskId, 'RE_OPTIMIZED', 'Applied replan produced by optimizer.replan (replan_output/)');
+  const reoptimize = async (taskId = 'TASK-000005') => {
+    await emit('replan_toggled', null, { on: true, ...replanMove });
+    await recordDecision(taskId, 'RE_OPTIMIZED', 'Applied replan produced by optimizer.replan (replan_output/)');
   };
 
-  const submitVerification = (taskId, action, comments = '') => {
-    setVerifications((prev) => ({
-      ...prev,
-      [taskId]: {
-        status: action === 'approve' ? 'Approved' : action === 'false_closure' ? 'False Closure Reported' : 'Rejected',
-        comments,
-        reportedAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
-      },
-    }));
+  const submitVerification = (taskId, action, comments = '') =>
+    emit('verification_submitted', taskId, {
+      status: { approve: 'Approved', flag: 'Flagged', false_closure: 'False Closure Reported' }[action] || 'Rejected',
+      comments,
+    });
+
+  /** Field crew revises what a task needs before it is planned. */
+  const submitRequirement = (taskId, req) => emit('requirement_submitted', taskId, req);
+
+  /**
+   * Completion evidence: a note and an optional photo. With the API the photo
+   * is uploaded and referenced by id; browser-only mode keeps the (already
+   * downscaled) data URL in memory.
+   */
+  const addEvidence = async (taskId, { note = '', photo = null }) => {
+    let extra = {};
+    if (photo) {
+      if (mode === 'api') {
+        try {
+          const f = await api.uploadPhoto(photo.name, photo.dataUrl);
+          extra = { file_id: f.id };
+        } catch (err) {
+          setSaveError(err.message);
+          return null;
+        }
+      } else {
+        extra = { data_url: photo.dataUrl };
+      }
+    }
+    return emit('evidence_added', taskId, { note, ...extra });
+  };
+
+  const photoSrc = (item) => (item.fileId != null ? api.fileUrl(item.fileId) : item.dataUrl);
+
+  const alerts = useMemo(() => alertsFor(currentUser, events, deptOf), [currentUser, events]);
+  const unseenAlerts = alerts.filter((a) => a.id > alertsSeenId).length;
+  const markAlertsSeen = () => {
+    const top = events.length ? events[events.length - 1].id : 0;
+    setAlertsSeenId(top);
+    if (mode === 'api') api.markAlertsSeen(top).catch(() => {});
+  };
+
+  const historyEvents = useMemo(
+    () => events.filter((e) => visibleInHistory(currentUser, e, deptOf)),
+    [currentUser, events],
+  );
+
+  const resetSaved = async () => {
+    if (mode === 'api') await api.reset();
+    setEvents([]);
+    setAlertsSeenId(0);
   };
 
   return (
@@ -213,6 +290,19 @@ export const PlanContext_Provider = ({ children }) => {
         scenarioProvenance: ritvikScenariosJson.provenance,
         demoEvents: demoEventsJson.events || [],
         updateTaskStatus,
+        events,
+        historyEvents,
+        saveError,
+        clearSaveError: () => setSaveError(null),
+        requirements,
+        submitRequirement,
+        evidence,
+        addEvidence,
+        photoSrc,
+        alerts,
+        unseenAlerts,
+        markAlertsSeen,
+        resetSaved,
         verifications,
         submitVerification,
         planDecisions,

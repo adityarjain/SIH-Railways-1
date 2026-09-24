@@ -10,22 +10,22 @@ import {
 // Tailwind classes), so the charts read as one system with the rest of the
 // interface. Teal stays reserved for bundling.
 const TOKEN = {
-  critical: '#A61B1B',
-  warn: '#A4471A',
-  info: '#4E6072',
-  ok: '#2E6B3F',
-  // Neutral series: warm grey, so the unbanded workload chart stays quiet.
-  ink: '#8A8580',
+  critical: '#B22A22',
+  warn: '#96660E',
+  info: '#1B4C8C',
+  ok: '#2E6A4A',
+  // Neutral series: the idle warm grey, so the unbanded chart stays quiet.
+  ink: '#7C7466',
 };
 
 const TIP_STYLE = {
   fontSize: '11px',
-  borderRadius: '6px',
+  borderRadius: '2px',
   background: '#FFFFFF',
-  border: '1px solid #E8E4DF',
-  color: '#1A1A1A',
+  border: '1px solid #D7D0C2',
+  color: '#1F1C17',
   padding: '6px 10px',
-  fontFamily: '"Source Sans 3", sans-serif',
+  fontFamily: 'Barlow, sans-serif',
 };
 
 export const Analytics = () => {
@@ -84,9 +84,9 @@ export const Analytics = () => {
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={riskData} margin={{ top: 8, right: 8, left: -20, bottom: 24 }}>
-                <XAxis dataKey="name" tick={{ fontSize: 9, fill: '#6B6B6B' }} angle={-15} textAnchor="end" />
-                <YAxis tick={{ fontSize: 10, fill: '#6B6B6B' }} allowDecimals={false} />
-                <Tooltip contentStyle={TIP_STYLE} cursor={{ fill: '#F5F3F0' }} />
+                <XAxis dataKey="name" tick={{ fontSize: 9, fill: '#7A7263' }} angle={-15} textAnchor="end" />
+                <YAxis tick={{ fontSize: 10, fill: '#7A7263' }} allowDecimals={false} />
+                <Tooltip contentStyle={TIP_STYLE} cursor={{ fill: '#EFEAE0' }} />
                 <Bar dataKey="count" radius={0}>
                   {riskData.map((entry) => <Cell key={entry.name} fill={entry.color} />)}
                 </Bar>
@@ -100,9 +100,9 @@ export const Analytics = () => {
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={departmentData} layout="vertical" margin={{ top: 8, right: 16, left: 16, bottom: 4 }}>
-                <XAxis type="number" tick={{ fontSize: 10, fill: '#6B6B6B' }} allowDecimals={false} />
-                <YAxis type="category" dataKey="name" tick={{ fontSize: 9, fill: '#6B6B6B' }} width={88} />
-                <Tooltip contentStyle={TIP_STYLE} cursor={{ fill: '#F5F3F0' }} />
+                <XAxis type="number" tick={{ fontSize: 10, fill: '#7A7263' }} allowDecimals={false} />
+                <YAxis type="category" dataKey="name" tick={{ fontSize: 9, fill: '#7A7263' }} width={88} />
+                <Tooltip contentStyle={TIP_STYLE} cursor={{ fill: '#EFEAE0' }} />
                 <Bar dataKey="count" fill={TOKEN.ink} radius={0} />
               </BarChart>
             </ResponsiveContainer>

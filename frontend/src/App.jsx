@@ -33,6 +33,11 @@ import { ActiveBlock } from './pages/ground/ActiveBlock';
 import { BlockStatus } from './pages/ground/BlockStatus';
 import { SectionInfo } from './pages/ground/SectionInfo';
 import { Issues } from './pages/ground/Issues';
+import { Requirements } from './pages/ground/Requirements';
+
+// Shared
+import { History } from './pages/shared/History';
+import { NetworkMap } from './pages/authority/NetworkMap';
 
 /**
  * Tab ids are load-bearing: they key this map, the reachability guard, and
@@ -56,6 +61,8 @@ const PAGES = {
   'decision-trace': DecisionTrace,
   'general-verify': GeneralPortal,
   'system-verification': SystemVerification,
+  'network-map': NetworkMap,
+  history: History,
 
   // Ground Operations
   'maint-dashboard': MaintDashboard,
@@ -65,6 +72,7 @@ const PAGES = {
   'section-info': SectionInfo,
   issues: Issues,
   completed: CompletedWork,
+  requirements: Requirements,
 };
 
 /** A role's first nav item is its landing page. */

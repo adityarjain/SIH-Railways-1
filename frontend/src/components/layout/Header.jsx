@@ -2,9 +2,11 @@ import React from 'react';
 import { useAuth, ROLES } from '../../context/AuthContext';
 import { useI18n } from '../../i18n';
 
-/** The three roles as small-caps links; the active one carries a gold rule,
- *  so which product you are in is always unmistakable. */
-export const RoleSwitch = ({ onNavigate }) => {
+/** The three experiences are distinct products, so the switch is a
+ *  segmented control rather than a dropdown: a 1px ink box with the active
+ *  role filled in ink. `tone` is accepted for old call sites and ignored. */
+// eslint-disable-next-line no-unused-vars
+export const RoleSwitch = ({ onNavigate, tone }) => {
   const { currentUser, login } = useAuth();
   const { t } = useI18n();
   const role = currentUser?.role;
@@ -17,7 +19,9 @@ export const RoleSwitch = ({ onNavigate }) => {
         type="button"
         aria-pressed={active}
         onClick={() => (onNavigate ? onNavigate(null, target) : login(target))}
-        className={`py-1 border-b-2 font-mono text-[11px] font-medium uppercase tracking-[0.12em] transition-colors duration-200 ease-out focus:outline-none focus-visible:shadow-focus ${active ? 'border-accent-bright text-ws-ink' : 'border-transparent text-ws-mid hover:text-ws-ink'}`}
+        className={`px-3 py-1 font-display text-[12px] font-bold uppercase tracking-[0.1em] transition-colors ${
+          active ? 'bg-ws-ink text-white' : 'text-ws-ink hover:bg-ws-paper'
+        }`}
       >
         {label}
       </button>
@@ -28,7 +32,7 @@ export const RoleSwitch = ({ onNavigate }) => {
     <div
       role="group"
       aria-label={t('role.switchLabel')}
-      className="inline-flex items-center gap-4 shrink-0"
+      className="inline-flex items-stretch shrink-0 border border-ws-ink bg-ws-surface"
     >
       {seg(ROLES.AUTHORITY, t('role.authorityShort'))}
       {seg(ROLES.GROUND, t('role.groundShort'))}

@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from 'react';
+import { SaveNote } from '../../components/common/SaveNote';
 import { usePlan } from '../../context/PlanContext';
 import { useAuth } from '../../context/AuthContext';
 import { useI18n } from '../../i18n';
-import { StatFigure, Pill, AdvisoryNote } from '../../components/ui/worksheet';
+import { StatFigure, Pill } from '../../components/ui/worksheet';
 import { Button } from '../../components/ui';
 import { TaskActionModal } from '../../components/maintenance/TaskActionModal';
 import { minToHhmm } from '../../utils/time';
@@ -122,13 +123,7 @@ export const Issues = ({ onNavigate }) => {
         )}
       </div>
 
-      <AdvisoryNote
-        tone="idle"
-        title={t('ground.sessionOnlyTitle')}
-        action={<button onClick={() => onNavigate && onNavigate('my-tasks')} className="font-display text-[11px] font-bold text-ws-mid hover:text-ws-ink">{t('ground.backToWork')}</button>}
-      >
-        {t('ground.issuesSessionBody')}
-      </AdvisoryNote>
+      <SaveNote action={<button onClick={() => onNavigate && onNavigate('my-tasks')} className="font-display text-[11px] font-bold text-ws-mid hover:text-ws-ink">{t('ground.backToWork')}</button>} />
 
       <TaskActionModal
         isOpen={Boolean(target)}
