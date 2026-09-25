@@ -207,6 +207,7 @@ Ground work orders, and field requirement revision.
 ### Running the Frontend Tests
 ```bash
 cd frontend && npm test        # Vitest + Testing Library (unit and app-flow tests)
+cd frontend && npm run e2e    # Playwright: real API + browser (needs: npx playwright install chromium)
 ```
 
 ---
