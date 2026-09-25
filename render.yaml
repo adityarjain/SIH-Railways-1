@@ -1,0 +1,16 @@
+# One Render web service: the FastAPI app serves the built frontend, so the
+# whole site is a single URL. Free plan sleeps when idle and resets its SQLite
+# file on redeploy; add a disk and set RMO_DB_PATH to keep data.
+services:
+  - type: web
+    name: railway-maintenance-ops
+    runtime: python
+    plan: free
+    buildCommand: pip install fastapi "uvicorn>=0.30" && cd frontend && npm install && npm run build
+    startCommand: uvicorn api.app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: NODE_VERSION
+        value: "20"
