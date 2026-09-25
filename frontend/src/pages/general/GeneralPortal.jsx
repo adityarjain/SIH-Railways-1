@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { SaveNote } from '../../components/common/SaveNote';
 import { usePlan } from '../../context/PlanContext';
 import { useI18n } from '../../i18n';
-import { RegionHeader, StatFigure, Pill, WsInput, WsSelect } from '../../components/ui/worksheet';
+import { RegionHeader, StatFigure, Pill, WsInput, WsSelect, SegmentedControl } from '../../components/ui/worksheet';
 import { Button } from '../../components/ui';
 import { Modal } from '../../components/common/Modal';
 import { minToHhmm } from '../../utils/time';
@@ -20,10 +20,20 @@ const ACTIONS = {
   approve: { labelKey: 'verification.approve', tone: 'ok', titleKey: 'verification.approveTitle', blurbKey: 'verification.approveBlurb', requiresComment: false, status: 'Approved' },
   reject: { labelKey: 'verification.reject', tone: 'critical', titleKey: 'verification.rejectTitle', blurbKey: 'verification.rejectBlurb', requiresComment: true, status: 'Rejected' },
   flag: { labelKey: 'verification.flag', tone: 'warn', titleKey: 'verification.flagTitle', blurbKey: 'verification.flagBlurb', requiresComment: true, status: 'Flagged' },
+  false_closure: { labelKey: 'verification.falseClosure', tone: 'critical', titleKey: 'verification.falseClosureTitle', blurbKey: 'verification.falseClosureBlurb', requiresComment: true, status: 'False Closure Reported' },
 };
 
-const VERDICT_TONE = { Approved: 'ok', Rejected: 'critical', Flagged: 'warn' };
+const VERDICT_TONE = { Approved: 'ok', Rejected: 'critical', Flagged: 'warn', 'False Closure Reported': 'critical', Verified: 'ok' };
 const RISK_PILL = { critical: 'critical', warn: 'warn', info: 'info', ok: 'ok', idle: 'idle' };
+
+/** A recorded verdict: who, when, the reading taken, and the comment. */
+const VerdictDetail = ({ v, t }) => (
+  <div className="text-[12px] md:text-right md:max-w-[240px]">
+    <div className="font-mono text-[10px] text-ws-mid">{v.by} · {v.reportedAt}</div>
+    {v.reading && <div className="text-ws-ink mt-0.5">{t('verification.reading')}: <span className="font-mono">{v.reading}</span></div>}
+    {v.comments && <div className="text-ws-mid mt-0.5">{v.comments}</div>}
+  </div>
+);
 
 export const GeneralPortal = () => {
   const { verifications, submitVerification, tasksInventory, evidence, photoSrc } = usePlan();
@@ -31,7 +41,10 @@ export const GeneralPortal = () => {
   const { t, isHindi } = useI18n();
   const [query, setQuery] = useState('');
   const [deptFilter, setDeptFilter] = useState('ALL');
-  const [statusFilter, setStatusFilter] = useState('ALL');
+  // Pending: closed, awaiting a verdict. Upcoming: planned work that will
+  // need sign-off once done. History: every verdict recorded.
+  const [tab, setTab] = useState('pending');
+  const [reading, setReading] = useState('');
   const [modal, setModal] = useState(null); // { job, action }
   const [comment, setComment] = useState('');
 
@@ -52,9 +65,7 @@ export const GeneralPortal = () => {
       .filter((j) => (deptFilter === 'ALL' ? true : j.department === deptFilter))
       .filter((j) => {
         const verdict = verdictOf(j.task_id);
-        if (statusFilter === 'ALL') return true;
-        if (statusFilter === 'PENDING') return !verdict;
-        return verdict === statusFilter;
+        return tab === 'history' ? Boolean(verdict) : tab === 'pending' ? !verdict : false;
       })
       .filter((j) => {
         if (!q) return true;
@@ -67,21 +78,23 @@ export const GeneralPortal = () => {
       })
       .sort((a, b) => b.execution_date.localeCompare(a.execution_date) || a.task_id.localeCompare(b.task_id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, deptFilter, statusFilter, verifications]);
+  }, [query, deptFilter, tab, verifications]);
 
   const counts = useMemo(() => {
-    let approved = 0, rejected = 0, flagged = 0;
+    let approved = 0, rejected = 0, flagged = 0, decided = 0;
     for (const j of completedWorkJson) {
       const v = verdictOf(j.task_id);
-      if (v === 'Approved') approved += 1;
-      else if (v === 'Rejected') rejected += 1;
+      if (!v) continue;
+      decided += 1;
+      if (v === 'Approved' || v === 'Verified') approved += 1;
+      else if (v === 'Rejected' || v === 'False Closure Reported') rejected += 1;
       else if (v === 'Flagged') flagged += 1;
     }
-    return { approved, rejected, flagged, pending: completedWorkJson.length - approved - rejected - flagged };
+    return { approved, rejected, flagged, pending: completedWorkJson.length - decided };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [verifications]);
 
-  const open = (job, action) => { setModal({ job, action }); setComment(''); };
+  const open = (job, action) => { setModal({ job, action }); setComment(''); setReading(''); };
 
   // Work closed through the app itself: a crew set it Completed (an event,
   // not the dataset's own status) or attached evidence. Some of these task ids
@@ -99,12 +112,26 @@ export const GeneralPortal = () => {
       }));
   }, [tasksInventory, evidence]);
 
+  const upcoming = useMemo(
+    () => tasksInventory
+      .filter((tk) => tk.scheduled_date && tk.status !== 'Completed' && !verifications[tk.task_id])
+      .sort((a, b) => a.scheduled_date.localeCompare(b.scheduled_date) || (a.start_minute ?? 0) - (b.start_minute ?? 0)),
+    [tasksInventory, verifications],
+  );
+  const pendingIds = new Set([
+    ...completedWorkJson.filter((j) => !verdictOf(j.task_id)).map((j) => j.task_id),
+    ...fieldClosed.filter((j) => !verdictOf(j.task_id)).map((j) => j.task_id),
+  ]);
+  const historyCount = Object.keys(verifications).length;
+  const fieldShown = fieldClosed.filter((j) => (tab === 'history' ? Boolean(verdictOf(j.task_id)) : !verdictOf(j.task_id)));
+
   const confirm = () => {
     const cfg = ACTIONS[modal.action];
     if (cfg.requiresComment && !comment.trim()) return;
-    submitVerification(modal.job.task_id, modal.action, comment.trim());
+    submitVerification(modal.job.task_id, modal.action, comment.trim(), reading.trim());
     setModal(null);
     setComment('');
+    setReading('');
   };
 
   const cfg = modal ? ACTIONS[modal.action] : null;
@@ -119,21 +146,58 @@ export const GeneralPortal = () => {
       <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-4">
         <RegionHeader number="01" title={t('verification.title')} meta={t('scope.thisSession').toUpperCase()} isHindi={isHindi} />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-5 gap-y-3.5 border-t border-ws-rule pt-3">
-          <StatFigure value={counts.pending} label={t('verification.awaitingVerification')} tone={counts.pending ? 'text-ws-warn' : 'text-ws-ok'} />
+          <StatFigure value={pendingIds.size} label={t('verification.awaitingVerification')} tone={pendingIds.size ? 'text-ws-warn' : 'text-ws-ok'} />
           <StatFigure value={counts.approved} label={t('verification.approved')} tone="text-ws-ok" />
           <StatFigure value={counts.rejected} label={t('verification.rejected')} tone="text-ws-critical" />
           <StatFigure value={counts.flagged} label={t('verification.flaggedForReview')} tone="text-ws-warn" />
         </div>
       </div>
 
+      {/* Work queue tabs */}
+      <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-2.5 flex items-center gap-3 flex-wrap">
+        <SegmentedControl
+          value={tab}
+          onChange={setTab}
+          options={[
+            { id: 'pending', label: `${t('verification.tabPending')} · ${pendingIds.size}` },
+            { id: 'upcoming', label: `${t('verification.tabUpcoming')} · ${upcoming.length}` },
+            { id: 'history', label: `${t('verification.tabHistory')} · ${historyCount}` },
+          ]}
+        />
+        <span className="text-[12px] text-ws-mid">{t(`verification.tabNote.${tab}`)}</span>
+      </div>
+
+      {tab === 'upcoming' && (
+        <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-3.5">
+          <RegionHeader number="02" title={t('verification.upcomingTitle')} meta={t('verification.upcomingMeta', { count: upcoming.length })} />
+          <div className="overflow-x-auto custom-scrollbar">
+            <table className="w-full min-w-[720px] text-left border-t border-ws-rule">
+              <tbody>
+                {upcoming.slice(0, 60).map((tk) => (
+                  <tr key={tk.task_id} className="border-b border-ws-hairline">
+                    <td className="px-2 py-1.5 font-mono text-[11px] font-semibold text-ws-ink whitespace-nowrap">{tk.task_id}</td>
+                    <td className="px-2 py-1.5 text-[12px] text-ws-body">{tk.maintenance_type} · {tk.section_id}</td>
+                    <td className="px-2 py-1.5 text-[12px] text-ws-mid">{tk.department}</td>
+                    <td className="px-2 py-1.5 font-mono text-[11px] text-ws-body whitespace-nowrap">{tk.scheduled_date} {minToHhmm(tk.start_minute)}–{minToHhmm(tk.end_minute)}</td>
+                    <td className="px-2 py-1.5 text-right whitespace-nowrap"><Pill tone="idle" size="sm">{tk.status}</Pill></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {upcoming.length > 60 && <p className="text-[12px] text-ws-mid mt-2">{t('verification.upcomingMore', { count: upcoming.length - 60 })}</p>}
+        </div>
+      )}
+
       {/* 01b — closed in the field, with the crew's own evidence */}
+      {tab !== 'upcoming' && (
       <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-3.5">
-        <RegionHeader number="02" title={t('verification.fieldClosed')} meta={t('verification.fieldClosedMeta', { count: fieldClosed.length })} />
-        {fieldClosed.length === 0 ? (
+        <RegionHeader number="02" title={t('verification.fieldClosed')} meta={t('verification.fieldClosedMeta', { count: fieldShown.length })} />
+        {fieldShown.length === 0 ? (
           <p className="text-[13px] text-ws-mid py-2">{t('verification.fieldClosedEmpty')}</p>
         ) : (
           <div className="border-t border-ws-rule">
-            {fieldClosed.map((j) => {
+            {fieldShown.map((j) => {
               const v = verdictOf(j.task_id);
               return (
                 <div key={j.task_id} className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto] gap-3 py-3 border-b border-ws-hairline">
@@ -167,11 +231,16 @@ export const GeneralPortal = () => {
                       </ul>
                     )}
                   </div>
-                  <div className="flex md:flex-col gap-1.5 items-start">
-                    <Button size="sm" variant="primary" onClick={() => open(j, 'approve')}>{t('verification.approve')}</Button>
-                    <Button size="sm" variant="secondary" onClick={() => open(j, 'reject')}>{t('verification.reject')}</Button>
-                    <Button size="sm" variant="warn" onClick={() => open(j, 'flag')}>{t('verification.flag')}</Button>
-                  </div>
+                  {v ? (
+                    <VerdictDetail v={verifications[j.task_id]} t={t} />
+                  ) : (
+                    <div className="flex md:flex-col gap-1.5 items-start">
+                      <Button size="sm" variant="primary" onClick={() => open(j, 'approve')}>{t('verification.approve')}</Button>
+                      <Button size="sm" variant="secondary" onClick={() => open(j, 'reject')}>{t('verification.reject')}</Button>
+                      <Button size="sm" variant="warn" onClick={() => open(j, 'flag')}>{t('verification.flag')}</Button>
+                      <Button size="sm" variant="danger" onClick={() => open(j, 'false_closure')}>{t('verification.falseClosure')}</Button>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -179,7 +248,10 @@ export const GeneralPortal = () => {
         )}
       </div>
 
+      )}
+
       {/* 03 — completed possessions register */}
+      {tab !== 'upcoming' && (<>
       <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 pt-[15px] pb-3.5">
         <RegionHeader number="03" title={t('verification.completedPossessions')} meta={t('verification.completedScope', { shown: rows.length, total: completedWorkJson.length })} isHindi={isHindi} />
         <div className="flex flex-wrap items-center gap-2.5">
@@ -187,13 +259,6 @@ export const GeneralPortal = () => {
           <WsSelect value={deptFilter} onChange={(e) => setDeptFilter(e.target.value)}>
             <option value="ALL">{t('common.allDepartments')}</option>
             {departments.map((d) => <option key={d} value={d}>{d}</option>)}
-          </WsSelect>
-          <WsSelect value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-            <option value="ALL">{t('common.all')}</option>
-            <option value="PENDING">{t('verification.awaitingVerification')}</option>
-            <option value="Approved">{t('verification.approved')}</option>
-            <option value="Rejected">{t('verification.rejected')}</option>
-            <option value="Flagged">{t('status.flagged')}</option>
           </WsSelect>
         </div>
       </div>
@@ -233,13 +298,18 @@ export const GeneralPortal = () => {
                   <td className="px-3.5 py-1.5 text-right whitespace-nowrap"><Pill tone={RISK_PILL[bandTone(band)] || 'idle'} size="sm">{j.risk_score?.toFixed?.(1) ?? '—'}</Pill></td>
                   <td className="px-3.5 py-1.5 text-right whitespace-nowrap">
                     {v ? <Pill tone={RISK_PILL[VERDICT_TONE[v]] || 'idle'} size="sm">{v}</Pill> : <span className="font-ws text-[10px] text-ws-light">{t('status.awaiting')}</span>}
+                    {verifications[j.task_id]?.reading && <div className="font-mono text-[10px] text-ws-mid mt-0.5">{verifications[j.task_id].reading}</div>}
                   </td>
                   <td className="px-3.5 py-1.5 text-right whitespace-nowrap">
-                    <span className="inline-flex gap-1 justify-end">
-                      <Button size="sm" variant="secondary" onClick={() => open(j, 'approve')}>{t('verification.approve')}</Button>
-                      <Button size="sm" variant="warn" onClick={() => open(j, 'flag')}>{t('verification.flag')}</Button>
-                      <Button size="sm" variant="secondary" onClick={() => open(j, 'reject')}>{t('verification.reject')}</Button>
-                    </span>
+                    {v ? (
+                      <span className="font-mono text-[10px] text-ws-mid">{verifications[j.task_id]?.by || ''} {verifications[j.task_id]?.reportedAt}</span>
+                    ) : (
+                      <span className="inline-flex gap-1 justify-end">
+                        <Button size="sm" variant="secondary" onClick={() => open(j, 'approve')}>{t('verification.approve')}</Button>
+                        <Button size="sm" variant="warn" onClick={() => open(j, 'flag')}>{t('verification.flag')}</Button>
+                        <Button size="sm" variant="secondary" onClick={() => open(j, 'reject')}>{t('verification.reject')}</Button>
+                      </span>
+                    )}
                   </td>
                 </tr>
               );
@@ -247,6 +317,8 @@ export const GeneralPortal = () => {
           </tbody>
         </table>
       </div>
+
+      </>)}
 
       <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-3.5">
         <SaveNote />
@@ -280,6 +352,11 @@ export const GeneralPortal = () => {
                 </div>
               ))}
             </div>
+
+            <label className="block">
+              <span className="font-display text-[11px] font-semibold text-ws-light block mb-1">{t('verification.reading')} · {t('verification.optional')}</span>
+              <WsInput value={reading} maxLength={120} onChange={(e) => setReading(e.target.value)} placeholder={t('verification.readingPlaceholder')} className="w-full" />
+            </label>
 
             <div>
               <label className="font-display text-[11px] font-semibold text-ws-light block mb-1">

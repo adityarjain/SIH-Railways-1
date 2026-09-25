@@ -4,7 +4,7 @@ import { useI18n } from '../../i18n';
 import { minToHhmm } from '../../utils/time';
 import { bandOf } from '../../utils/risk';
 import { BundlingView } from '../../components/timeline/BundlingView';
-import { WeeklyViewWorksheet } from '../../components/planning/WeeklyViewWorksheet';
+import { WeeklyBlockCalendar } from '../../components/planning/WeeklyBlockCalendar';
 import { MonthlyHeatmapWorksheet } from '../../components/planning/MonthlyHeatmapWorksheet';
 import bundlingData from '../../data/live/bundling';
 
@@ -204,7 +204,7 @@ export const MaintenanceBlocks = ({ onNavigate }) => {
       )}
       {view === 'weekly' && (
         <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-3.5">
-          <WeeklyViewWorksheet selectedDate={dateFilter === 'ALL' ? null : dateFilter} onSelectDate={(d) => { setDateFilter(d); setView('register'); }} />
+          <WeeklyBlockCalendar onSelectDate={(d) => { setDateFilter(d); setView('register'); }} />
         </div>
       )}
       {view === 'monthly' && (

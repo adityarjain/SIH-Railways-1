@@ -55,3 +55,47 @@ test('new pages render without overflow at phone width', async ({ page }) => {
     expect(w).toBeLessThanOrEqual(375);
   }
 });
+
+test('weekly calendar: hover card and original/replanned view', async ({ page }) => {
+  await enter(page, /Authority/);
+  await page.getByRole('button', { name: 'Maintenance Blocks', exact: true }).click();
+  await page.getByRole('button', { name: 'Weekly', exact: true }).click();
+  const chip = page.locator('table button', { hasText: 'SEC-' }).first();
+  await chip.hover();
+  await expect(page.getByRole('dialog')).toContainText('TASK-');
+  await page.getByRole('button', { name: 'Replanned', exact: true }).click();
+  await expect(page.getByText('View only: the plan is changed on Replanning.')).toBeVisible();
+});
+
+test('verification: false closure moves work from Pending to History and alerts the crew', async ({ page }) => {
+  // Crew closes a task with a note.
+  await enter(page, /Ground Operations/, 'Electrical / TRD');
+  await page.getByRole('navigation').getByRole('button', { name: 'Assigned Work', exact: true }).click();
+  await page.getByRole('button', { name: 'Start work' }).first().click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Start work' }).click();
+  await page.getByRole('button', { name: 'Complete', exact: true }).first().click();
+  await page.getByLabel(/Completion note/).fill('Done, section handed back');
+  await page.getByRole('button', { name: 'Mark complete' }).click();
+
+  // Controller reports it as a false closure, with a reading.
+  await page.getByRole('button', { name: /^Authority$/i }).click();
+  await page.getByRole('navigation').getByRole('button', { name: 'Work Verification', exact: true }).click();
+  await expect(page.getByText('Done, section handed back')).toBeVisible();
+  await page.getByRole('button', { name: 'Report false closure' }).first().click();
+  const dlg = page.getByRole('dialog');
+  await dlg.getByRole('textbox').first().fill('gauge 1680 mm');
+  await dlg.locator('textarea').fill('Site not restored');
+  await dlg.getByRole('button', { name: 'Report false closure' }).click();
+
+  await page.getByRole('button', { name: /^History · / }).click();
+  await expect(page.getByText('gauge 1680 mm').first()).toBeVisible();
+
+  // Audit history outcome tab counts it.
+  await page.getByRole('navigation').getByRole('button', { name: 'History', exact: true }).click();
+  await page.getByRole('button', { name: /^False closure · 1$/ }).click();
+  await expect(page.getByText(/Verification: False Closure Reported/)).toBeVisible();
+
+  // The crew is told.
+  await page.getByRole('button', { name: /^Ground ops$/i }).click();
+  await expect(page.getByRole('button', { name: /Alerts, 1 unread/ })).toBeVisible();
+});

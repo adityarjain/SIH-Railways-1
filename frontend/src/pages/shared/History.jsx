@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { usePlan } from '../../context/PlanContext';
 import { useAuth, ROLES } from '../../context/AuthContext';
 import { useI18n } from '../../i18n';
-import { RegionHeader, WsSelect, AdvisoryNote } from '../../components/ui/worksheet';
+import { RegionHeader, WsSelect, AdvisoryNote, SegmentedControl } from '../../components/ui/worksheet';
 import { Button } from '../../components/ui';
 import { downloadCsv } from '../../utils/export';
 
@@ -10,6 +10,20 @@ const KINDS = [
   'status_changed', 'requirement_submitted', 'evidence_added', 'decision_recorded',
   'verification_submitted', 'replan_toggled', 'event_triggered', 'event_cleared',
 ];
+
+// Outcome tabs: what happened to the work, across event kinds.
+const OUTCOMES = {
+  all: () => true,
+  approved: (e) => e.kind === 'verification_submitted' && e.payload?.status === 'Approved',
+  rejected: (e) => (e.kind === 'verification_submitted' && e.payload?.status === 'Rejected')
+    || (e.kind === 'decision_recorded' && e.payload?.decision === 'REJECTED'),
+  falseClosure: (e) => e.kind === 'verification_submitted' && e.payload?.status === 'False Closure Reported',
+  flagged: (e) => e.kind === 'verification_submitted' && e.payload?.status === 'Flagged',
+  completed: (e) => e.kind === 'status_changed' && e.payload?.status === 'Completed',
+  rescheduled: (e) => (e.kind === 'replan_toggled' && e.payload?.on)
+    || (e.kind === 'decision_recorded' && e.payload?.decision === 'RE_OPTIMIZED')
+    || (e.kind === 'status_changed' && String(e.payload?.status || '').startsWith('Reschedule')),
+};
 
 const stamp = (iso) => {
   const d = new Date(iso);
@@ -28,7 +42,7 @@ export const describeEvent = (e, t) => {
     case 'decision_recorded':
       return [t('history.decision', { decision: p.decision }), p.note];
     case 'verification_submitted':
-      return [t('history.verification', { status: p.status }), p.comments];
+      return [t('history.verification', { status: p.status }), [p.reading && `${t('verification.reading')}: ${p.reading}`, p.comments].filter(Boolean).join(' · ')];
     case 'replan_toggled':
       return p.on
         ? [t('history.replanOn', { task: p.task_id, date: p.date, window: p.window }), '']
@@ -55,11 +69,12 @@ export const History = () => {
   const { currentUser, mode } = useAuth();
   const { t } = useI18n();
   const [kind, setKind] = useState('all');
+  const [outcome, setOutcome] = useState('all');
   const [confirming, setConfirming] = useState(false);
 
   const rows = useMemo(
-    () => historyEvents.filter((e) => kind === 'all' || e.kind === kind).slice().reverse(),
-    [historyEvents, kind],
+    () => historyEvents.filter((e) => (kind === 'all' || e.kind === kind) && OUTCOMES[outcome](e)).slice().reverse(),
+    [historyEvents, kind, outcome],
   );
 
   const exportRows = () => downloadCsv(
@@ -83,6 +98,18 @@ export const History = () => {
         {mode === 'api' ? t('history.savedBody') : t('history.localBody')}
         {currentUser?.role === ROLES.GROUND && ` ${t('history.scopeGround', { dept: currentUser.department })}`}
       </AdvisoryNote>
+
+      <div className="overflow-x-auto custom-scrollbar">
+        <SegmentedControl
+          size="sm"
+          value={outcome}
+          onChange={setOutcome}
+          options={Object.keys(OUTCOMES).map((k) => ({
+            id: k,
+            label: `${t(`history.outcome.${k}`)} · ${historyEvents.filter(OUTCOMES[k]).length}`,
+          }))}
+        />
+      </div>
 
       <div className="flex items-center gap-2.5 flex-wrap">
         <WsSelect value={kind} onChange={(e) => setKind(e.target.value)} aria-label={t('history.filter')}>

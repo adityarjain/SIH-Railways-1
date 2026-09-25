@@ -3,6 +3,7 @@ import { usePlan } from '../../context/PlanContext';
 import { useI18n } from '../../i18n';
 import { minToHhmm } from '../../utils/time';
 import { RerouteDiagram } from '../../components/occ/RerouteDiagram';
+import { DecisionFlow } from '../../components/occ/DecisionFlow';
 import { RegionHeader } from '../../components/ui/worksheet';
 
 /**
@@ -188,6 +189,12 @@ export const Replanning = ({ onNavigate }) => {
             {t('replanning.step3Note', { runtime: m.replan_runtime_seconds })}
           </p>
         </div>
+      </div>
+
+      {/* 01a — the decision as the sequence the replanner ran */}
+      <div className="bg-ws-surface border-t border-ws-rule px-3.5 md:px-4 xl:px-5 pt-4 pb-4">
+        <RegionHeader title={t('flow.title')} meta={m.affected_task_id} />
+        <DecisionFlow meta={m} validation={baselineMetrics?.provenance?.post_solve_validation} />
       </div>
 
       {/* 01b — the reroute search, on the section graph it ran against */}

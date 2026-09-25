@@ -59,7 +59,7 @@ export const applyEvent = (state, e) => {
     case 'verification_submitted':
       return {
         ...state,
-        verifications: { ...state.verifications, [tid]: { status: p.status, comments: p.comments || '', reportedAt: stamp(e.ts), by } },
+        verifications: { ...state.verifications, [tid]: { status: p.status, comments: p.comments || '', reading: p.reading || '', reportedAt: stamp(e.ts), by } },
       };
     case 'replan_toggled':
       return { ...state, isReplanned: !!p.on, replanRequestActive: p.on ? false : state.replanRequestActive };

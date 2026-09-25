@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { X } from 'lucide-react';
 import { useDismissable } from '../../utils/useDismissable';
 
 export const Modal = ({ isOpen, onClose, title, subtitle, children, maxWidth = 'max-w-3xl' }) => {
   useDismissable(isOpen, onClose);
+  const titleId = useId();
 
   if (!isOpen) return null;
 
@@ -11,10 +12,10 @@ export const Modal = ({ isOpen, onClose, title, subtitle, children, maxWidth = '
     <div className="fixed inset-0 z-overlay overflow-y-auto flex items-start justify-center p-6">
       <div className="fixed inset-0 bg-rail-950/55" onClick={onClose} />
 
-      <div className={`relative bg-surface-panel rounded-lg shadow-overlay border border-line w-full ${maxWidth} z-10 overflow-hidden my-4`}>
+      <div role="dialog" aria-modal="true" aria-labelledby={titleId} className={`relative bg-surface-panel rounded-lg shadow-overlay border border-line w-full ${maxWidth} z-10 overflow-hidden my-4`}>
         <div className="px-4 py-3 border-b border-line flex items-start justify-between gap-3 bg-surface-sunken">
           <div className="min-w-0">
-            <h3 className="t-section-title">{title}</h3>
+            <h3 id={titleId} className="t-section-title">{title}</h3>
             {subtitle && <p className="text-xs text-rail-500 mt-0.5">{subtitle}</p>}
           </div>
           <button

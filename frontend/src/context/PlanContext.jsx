@@ -207,10 +207,13 @@ export const PlanContext_Provider = ({ children }) => {
     await recordDecision(taskId, 'RE_OPTIMIZED', 'Applied replan produced by optimizer.replan (replan_output/)');
   };
 
-  const submitVerification = (taskId, action, comments = '') =>
+  // `reading` is an optional inspection measurement typed by the controller
+  // at sign-off; the dataset records none, so nothing is pre-filled.
+  const submitVerification = (taskId, action, comments = '', reading = '') =>
     emit('verification_submitted', taskId, {
       status: { approve: 'Approved', flag: 'Flagged', false_closure: 'False Closure Reported' }[action] || 'Rejected',
       comments,
+      ...(reading ? { reading } : {}),
     });
 
   /** Field crew revises what a task needs before it is planned. */
@@ -287,6 +290,9 @@ export const PlanContext_Provider = ({ children }) => {
         // The timeline colours the replanned possession from this rather than
         // from a hardcoded task id / date pair.
         replannedRecord,
+        // The same task as first solved, so views can compare before/after
+        // without changing the plan state.
+        originalRecord: initialPlanJson.scheduled_tasks.find((tk) => tk.task_id === replannedRecord.task_id),
         scenarioProvenance: ritvikScenariosJson.provenance,
         demoEvents: demoEventsJson.events || [],
         updateTaskStatus,

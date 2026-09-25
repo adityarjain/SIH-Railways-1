@@ -3,7 +3,7 @@ import { BlockTrainGantt } from '../../components/timeline/BlockTrainGantt';
 import { BlockDrawer } from '../../components/timeline/BlockDrawer';
 import { DecisionTraceModal } from '../../components/timeline/DecisionTraceModal';
 import { TrafficContext } from '../../components/timeline/TrafficContext';
-import { WeeklyViewWorksheet } from '../../components/planning/WeeklyViewWorksheet';
+import { WeeklyBlockCalendar } from '../../components/planning/WeeklyBlockCalendar';
 import { MonthlyHeatmapWorksheet } from '../../components/planning/MonthlyHeatmapWorksheet';
 import { RecommendationActions } from '../../components/occ/RecommendationActions';
 import { RegionHeader, SegmentedControl, StatFigure, WsSelect } from '../../components/ui/worksheet';
@@ -171,7 +171,7 @@ export const BlockPlanning = ({ onNavigate }) => {
       )}
       {viewMode === 'weekly' && (
         <div className="bg-ws-surface border-b border-ws-rule px-3.5 md:px-4 xl:px-5 py-3.5">
-          <WeeklyViewWorksheet selectedDate={selectedDate} onSelectDate={(date) => { setSelectedDate(date); setViewMode('timeline'); }} />
+          <WeeklyBlockCalendar onSelectDate={(date) => { setSelectedDate(date); setViewMode('timeline'); }} />
         </div>
       )}
       {viewMode === 'monthly' && (
